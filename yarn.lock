@@ -290,17 +290,15 @@
   resolved "https://registry.yarnpkg.com/@bcoe/v8-coverage/-/v8-coverage-0.2.3.tgz#75a2e8b51cb758a7553d6804a5932d7aace75c39"
   integrity sha512-0hYQ8SB4Db5zvZB4axdMHGwEaQjkZzFjQiN9LVYvIFB2nSUHW9tYpxWriPrWDASIxiaXax83REcLxuSdnGPZtw==
 
-"@hirosystems/chainhook-types@^1.0.0":
-  version "1.0.5"
-  resolved "https://registry.yarnpkg.com/@hirosystems/chainhook-types/-/chainhook-types-1.0.5.tgz#9440e898c07bed9d5ace4ec5d61eca2df10f0a53"
-  integrity sha512-vkz3KP7YMdGb81WVWAF4eHSPXT10/gnessJH+ZDz7VuWebe3dlsjIGw1LpauELzJWxbl/jozt+M6N6CO9I7YsA==
+"@hirosystems/chainhook-types@^1.1.1-rc.1":
+  version "1.1.1-rc.1"
+  resolved "https://registry.yarnpkg.com/@hirosystems/chainhook-types/-/chainhook-types-1.1.1-rc.1.tgz#c8587670ab0954712552b97cabb479f5e248a52f"
+  integrity sha512-NG3P3jaLtD9SS3YzDZ86sZoK9n7S1ilJ3LeADLoLnOiVYuIRyVN9Uw0Lnflo6D0BgreRcHnnEdrB+pXKtG03Iw==
 
-"@hirosystems/stacks-devnet-js@^1.1.0":
-  version "1.1.0"
-  resolved "https://registry.yarnpkg.com/@hirosystems/stacks-devnet-js/-/stacks-devnet-js-1.1.0.tgz#ac2dc48c5ac57a4c64845985013a705a6b9ef5b7"
-  integrity sha512-zaDQW0EYKEpcwtU/CJhJuTAYzm7ed5ZE5VJq+9U1WU8OkCHwUbKa5MiRBRUexcMadIK/f9Nnv8pJAlLCQZrw2Q==
+"@hirosystems/stacks-devnet-js@../clarinet/components/stacks-devnet-js":
+  version "1.1.1-rc.1"
   dependencies:
-    "@hirosystems/chainhook-types" "^1.0.0"
+    "@hirosystems/chainhook-types" "^1.1.1-rc.1"
     "@mapbox/node-pre-gyp" "^1.0.8"
     neon-cli "^0.9.1"
     node-pre-gyp-github "^1.4.3"
