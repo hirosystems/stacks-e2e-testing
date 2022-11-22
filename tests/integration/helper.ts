@@ -7,9 +7,9 @@ export function buildStacksDevnetOrchestrator() {
         logs: true,
         devnet: {
             bitcoin_controller_block_time: Constants.BITCOIN_BLOCK_TIME,
-            epoch_2_0: 100,
-            epoch_2_05: 120,
-            epoch_2_1: 140,
+            epoch_2_0: Constants.DEVNET_DEFAULT_EPOCH_2_0,
+            epoch_2_05: Constants.DEVNET_DEFAULT_EPOCH_2_05,
+            epoch_2_1: Constants.DEVNET_DEFAULT_EPOCH_2_1,
         }
     });
     return orchestrator;
