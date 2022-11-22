@@ -1,0 +1,20 @@
+{
+  "name": "stacks-2-1-integration-tests",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "jest"
+  },
+  "dependencies": {
+    "@hirosystems/stacks-devnet-js": "^1.1.0",
+    "@stacks/network": "^3.0.0",
+    "@types/node": "^16.7.13",
+    "@types/jest": "^27.0.3",
+    "typescript": "^4.9.0",
+    "jest": "^27.4.5",
+    "ts-jest": "^27.1.2"
+  },
+  "author": "",
+  "license": "ISC"
+}
