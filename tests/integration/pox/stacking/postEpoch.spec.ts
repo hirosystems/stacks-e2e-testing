@@ -3,9 +3,6 @@ import { StacksBlockMetadata, StacksChainUpdate } from '@hirosystems/stacks-devn
 import { assert } from 'console';
 import { Constants, Accounts, Contracts } from '../../constants';
 import {
-    addressFromHashMode,
-    AddressHashMode,
-    addressToString,
     AnchorMode,
     broadcastTransaction,
     bufferCV,
@@ -13,13 +10,14 @@ import {
     getNonce,
     makeContractCall,
     PostConditionMode,
-    standardPrincipalCVFromAddress,
-    TransactionVersion,
     tupleCV,
     uintCV,
 } from "@stacks/transactions";
 import { StacksTestnet } from "@stacks/network";
 import { principalCV } from '@stacks/transactions/dist/clarity/types/principalCV';
+import { decodeBtcAddress } from '@stacks/stacking';
+import { toBytes } from '@stacks/common';
+
 
 const orchestrator = buildStacksDevnetOrchestrator();
 
@@ -45,16 +43,20 @@ test('submitting stacks-stx through pox-2 contract after epoch 2.1 transition sh
     const network = new StacksTestnet({ url: orchestrator.getStacksNodeUrl() });
     const nonce = await getNonce(Accounts.DEPLOYER.stxAddress, network);
     let wallet1 = principalCV(Accounts.WALLET_1.stxAddress);
+
+    const { hashMode, data } = decodeBtcAddress(Accounts.WALLET_1.btcAddress);
+    const version = bufferCV(toBytes(new Uint8Array([hashMode.valueOf()])));
+    const hashbytes = bufferCV(data);
+
     const txOptions = {
       contractAddress: Contracts.POX_1.address,
       contractName: Contracts.POX_1.name,
-      functionName: "stacks-stx",
+      functionName: "stack-stx",
       functionArgs: [
         uintCV(50_000_000_000_000),
         tupleCV({
-            // version: bufferCV(wallet1.address.version.valueOf()),
-            version: bufferCVFromString("0x26"),
-            hashbytes: bufferCVFromString(wallet1.address.hash160),
+            version,
+            hashbytes,
         }),
         uintCV(blockHeight),
         uintCV(12),
@@ -70,6 +72,8 @@ test('submitting stacks-stx through pox-2 contract after epoch 2.1 transition sh
   
     // Broadcast transaction to our Devnet stacks node
     const result = await broadcastTransaction(tx, network);
+
+    console.log(result);
 
     chainEvent = orchestrator.waitForStacksBlock();
     console.log(chainEvent.new_blocks[0].block.transactions);
