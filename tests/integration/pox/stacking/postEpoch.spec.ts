@@ -1,4 +1,5 @@
-import { buildStacksDevnetOrchestrator, broadcastStackSTX } from '../../helpers';
+import { buildStacksDevnetOrchestrator } from '../../helpers';
+import { broadcastStackSTX, waitForNextPreparePhase, waitForNextRewardPhase, getPoxInfo, getBitcoinBlockHeight } from '../helpers'
 import { StacksChainUpdate } from '@hirosystems/stacks-devnet-js';
 import { assert } from 'console';
 import { Accounts } from '../../constants';
@@ -11,28 +12,26 @@ afterAll(() => orchestrator.stop());
 
 test('submitting stacks-stx through pox-2 contract after epoch 2.1 transition should succeed', async () => {
     const network = new StacksTestnet({ url: orchestrator.getStacksNodeUrl() });
+    
+    // Wait for Stacks genesis block
+    orchestrator.waitForStacksBlock();
 
-    // Wait for Stacks genesis block to be mined
-    let chainEvent: StacksChainUpdate = orchestrator.waitForStacksBlock();
-    let blockHeight = chainEvent.new_blocks[0].block.block_identifier.index;
-    assert(blockHeight == 1);
-
-    // // Wait for 2.1 epoch transition
-    // do {
-    //     chainEvent = orchestrator.waitForStacksBlock();
-    //     let metadata = chainEvent.new_blocks[0].block.metadata! as StacksBlockMetadata;
-    //     blockHeight = metadata.bitcoin_anchor_block_identifier.index;
-    // } while (blockHeight < Constants.DEVNET_DEFAULT_EPOCH_2_1);
+    // Wait for block N-2 where N is the height of the next prepare phase
+    let chainUpdate = await waitForNextPreparePhase(network, orchestrator, -2);
+    let blockHeight = getBitcoinBlockHeight(chainUpdate);
 
     // Broadcast some STX stacking orders
+    let response = await broadcastStackSTX(1, network, 25_000_000_000_000, Accounts.WALLET_1, blockHeight);
+    expect(response.error).toBeUndefined();
 
-    // Build a `stack-stx` transaction
-    let result = await broadcastStackSTX(1, network, 50_000_000_000_000, Accounts.WALLET_1, blockHeight);
-    console.log(result);
+    response = await broadcastStackSTX(1, network, 50_000_000_000_000, Accounts.WALLET_2, blockHeight);
+    expect(response.error).toBeUndefined();
 
-    chainEvent = orchestrator.waitForStacksBlock();
-    console.log(chainEvent.new_blocks[0].block.transactions);
+    response = await broadcastStackSTX(1, network, 75_000_000_000_000, Accounts.WALLET_3, blockHeight);
+    expect(response.error).toBeUndefined();
 
-    chainEvent = orchestrator.waitForStacksBlock();
-    console.log(chainEvent.new_blocks[0].block.transactions);
+    // Wait for block N+1 where N is the height of the next reward phase
+    chainUpdate = await waitForNextRewardPhase(network, orchestrator, 1);
+    let poxInfo = await getPoxInfo(network);
+    expect(poxInfo.current_cycle.is_pox_active).toBe(true);
 })
