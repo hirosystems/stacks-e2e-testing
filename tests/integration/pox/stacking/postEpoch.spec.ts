@@ -10,7 +10,7 @@ const orchestrator = buildStacksDevnetOrchestrator();
 beforeAll(() => orchestrator.start());
 afterAll(() => orchestrator.stop());
 
-test('submitting stacks-stx through pox-2 contract after epoch 2.1 transition should succeed', async () => {
+test('submitting stacks-stx through pox-1 contract during epoch 2.0 should succeed', async () => {
     const network = new StacksTestnet({ url: orchestrator.getStacksNodeUrl() });
     
     // Wait for Stacks genesis block
