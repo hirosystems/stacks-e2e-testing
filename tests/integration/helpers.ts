@@ -17,10 +17,10 @@ const DEFAULT_EPOCH_TIMELINE = {
     pox_2_activation: Constants.DEVNET_DEFAULT_POX_2_ACTIVATION,
 }
 
-export function buildStacksDevnetOrchestrator(networkId: number = 0, timeline: EpochTimeline = DEFAULT_EPOCH_TIMELINE) {
+export function buildStacksDevnetOrchestrator(networkId: number = 0, timeline: EpochTimeline = DEFAULT_EPOCH_TIMELINE, logs = true) {
     const orchestrator = new StacksDevnetOrchestrator({
         path: "./Clarinet.toml",
-        logs: true,
+        logs,
         devnet: {
             network_id: networkId,
             bitcoin_controller_block_time: Constants.BITCOIN_BLOCK_TIME,

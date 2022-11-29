@@ -6,7 +6,7 @@ import { StacksTestnet } from "@stacks/network";
 describe('testing stacking under epoch 2.0', () => {
 
     test('submitting stacks-stx through pox-1 contract during epoch 2.0 should succeed', async () => {
-        const orchestrator = buildStacksDevnetOrchestrator(1);
+        const orchestrator = buildStacksDevnetOrchestrator(1, { epoch_2_0: 100, epoch_2_05: 105, epoch_2_1: 112, pox_2_activation: 120 }, false);
         orchestrator.start()
         const network = new StacksTestnet({ url: orchestrator.getStacksNodeUrl() });
         
@@ -30,7 +30,11 @@ describe('testing stacking under epoch 2.0', () => {
         // Wait for block N+1 where N is the height of the next reward phase
         chainUpdate = await waitForNextRewardPhase(network, orchestrator, 1);
         let poxInfo = await getPoxInfo(network);
+
+        // Assert
+        expect(poxInfo.contract_id).toBe('ST000000000000000000002AMW42H.pox');
         expect(poxInfo.current_cycle.is_pox_active).toBe(true);
+
         orchestrator.stop()
     })   
 })
