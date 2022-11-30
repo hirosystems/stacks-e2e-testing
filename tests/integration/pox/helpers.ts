@@ -52,6 +52,24 @@ export const getPoxInfo = async (network: StacksNetwork, retry?: number): Promis
     }
 }
 
+export const getAccount = async (network: StacksNetwork, address: string, retry?: number): Promise<any> => {
+    let retryCountdown = retry ? retry: 20;
+    if (retryCountdown == 0) return Promise.reject();
+    try {
+        let response = await fetch(network.getAccountApiUrl(address))
+        let payload = await response.json();
+        return {
+            balance: BigInt(payload.balance),
+            locked: BigInt(payload.locked),
+            unlock_height: payload.unlock_height,
+            nonce: payload.nonce,
+        };
+    } catch (e) {
+      await delay();
+      return getAccount(network, address, retryCountdown - 1);
+    }
+}
+
 export const getBitcoinHeightOfNextRewardPhase = async (network: StacksNetwork, retry?: number): Promise<number> => {
     let response = await getPoxInfo(network, retry);
     return response.next_cycle.reward_phase_start_block_height;
@@ -78,7 +96,7 @@ export const waitForNextRewardPhase = async (network: StacksNetwork, orchestrato
     return waitForStacksChainUpdate(orchestrator, height)
 }
 
-export const broadcastStackSTX = async (poxVersion: number, network: StacksNetwork, amount: number, account: Account, blockHeight: number) : Promise<TxBroadcastResult> => {
+export const broadcastStackSTX = async (poxVersion: number, network: StacksNetwork, amount: number, account: Account, blockHeight: number, cycles: number, fee: number) : Promise<TxBroadcastResult> => {
     const nonce = await getNonce(account.stxAddress, network);
     const { hashMode, data } = decodeBtcAddress(account.btcAddress);
     const version = bufferCV(toBytes(new Uint8Array([hashMode.valueOf()])));
@@ -95,9 +113,9 @@ export const broadcastStackSTX = async (poxVersion: number, network: StacksNetwo
             hashbytes,
         }),
         uintCV(blockHeight),
-        uintCV(12),
+        uintCV(cycles),
       ],
-      fee: 1000,
+      fee,
       nonce,
       network,
       anchorMode: AnchorMode.OnChainOnly,

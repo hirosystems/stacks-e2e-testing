@@ -120,25 +120,3 @@ bitcoin_controller_block_time = 10_000
 # epoch_2_05 = 102
 # epoch_2_1 = 106
 # pox_2_activation = 108
-
-# Send some stacking orders
-[[devnet.pox_stacking_orders]]
-start_at_cycle = 2
-duration = 12
-wallet = "wallet_1"
-slots = 2
-btc_address = "mr1iPkD9N3RJZZxXRk7xF9d36gffa6exNC"
-
-[[devnet.pox_stacking_orders]]
-start_at_cycle = 2
-duration = 12
-wallet = "wallet_2"
-slots = 1
-btc_address = "muYdXKmX9bByAueDe6KFfHd5Ff1gdN9ErG"
-
-[[devnet.pox_stacking_orders]]
-start_at_cycle = 2
-duration = 12
-wallet = "wallet_3"
-slots = 1
-btc_address = "mvZtbibDAAA3WLpY7zXXFqRa3T4XSknBX7"
