@@ -45,7 +45,13 @@ describe("stx-account", () => {
     let deployTxOptions = {
       senderKey: Accounts.DEPLOYER.secretKey,
       contractName: "test-2-05",
-      codeBody: `(define-public (test (p principal))
+      codeBody: `(define-public (test-literal-1)
+    (ok (stx-account 'SZ2J6ZY48GV1EZ5V2V5RB9MP66SW86PYKKQ9H6DPR))
+)
+(define-public (test-literal-2)
+    (ok (stx-account 'SZ2J6ZY48GV1EZ5V2V5RB9MP66SW86PYKKQ9H6DPR.foo))
+)
+(define-public (test (p principal))
     (ok (stx-account p))
 )`,
       fee: 2000,
@@ -88,7 +94,13 @@ describe("stx-account", () => {
       let deployTxOptions = {
         senderKey: Accounts.DEPLOYER.secretKey,
         contractName: "test-2-1",
-        codeBody: `(define-public (test (p principal))
+        codeBody: `(define-public (test-literal-1)
+    (ok (stx-account 'SZ2J6ZY48GV1EZ5V2V5RB9MP66SW86PYKKQ9H6DPR))
+)
+(define-public (test-literal-2)
+    (ok (stx-account 'SZ2J6ZY48GV1EZ5V2V5RB9MP66SW86PYKKQ9H6DPR.foo))
+)
+(define-public (test (p principal))
     (ok (stx-account p))
 )`,
         fee: 2000,
@@ -110,6 +122,72 @@ describe("stx-account", () => {
       );
       expect(tx.description).toBe(
         `deployed: ${Accounts.DEPLOYER.stxAddress}.test-2-1`
+      );
+      expect(tx.success).toBeTruthy();
+    });
+
+    test("works for a literal standard principal", async () => {
+      // Build a transaction to call the contract
+      let callTxOptions: SignedContractCallOptions = {
+        senderKey: Accounts.WALLET_1.secretKey,
+        contractAddress: Accounts.DEPLOYER.stxAddress,
+        contractName: "test-2-1",
+        functionName: "test-literal-1",
+        functionArgs: [],
+        fee: 2000,
+        network,
+        anchorMode: AnchorMode.OnChainOnly,
+        postConditionMode: PostConditionMode.Allow,
+      };
+      let transaction = await makeContractCall(callTxOptions);
+
+      // Broadcast transaction
+      let result = await broadcastTransaction(transaction, network);
+      expect((<TxBroadcastResultOk>result).error).toBeUndefined();
+
+      // Wait for the transaction to be processed
+      let [block, tx] = waitForStacksTransaction(
+        orchestrator,
+        Accounts.WALLET_1.stxAddress
+      );
+      expect(tx.description).toBe(
+        `invoked: ${Accounts.DEPLOYER.stxAddress}.test-2-1::test-literal-1()`
+      );
+      expect(tx.result).toBe(
+        "(ok (tuple (locked u0) (unlock-height u0) (unlocked u0)))"
+      );
+      expect(tx.success).toBeTruthy();
+    });
+    
+    test("works for a literal contract principal", async () => {
+      // Build a transaction to call the contract
+      let callTxOptions: SignedContractCallOptions = {
+        senderKey: Accounts.WALLET_1.secretKey,
+        contractAddress: Accounts.DEPLOYER.stxAddress,
+        contractName: "test-2-1",
+        functionName: "test-literal-2",
+        functionArgs: [],
+        fee: 2000,
+        network,
+        anchorMode: AnchorMode.OnChainOnly,
+        postConditionMode: PostConditionMode.Allow,
+      };
+      let transaction = await makeContractCall(callTxOptions);
+
+      // Broadcast transaction
+      let result = await broadcastTransaction(transaction, network);
+      expect((<TxBroadcastResultOk>result).error).toBeUndefined();
+
+      // Wait for the transaction to be processed
+      let [block, tx] = waitForStacksTransaction(
+        orchestrator,
+        Accounts.WALLET_1.stxAddress
+      );
+      expect(tx.description).toBe(
+        `invoked: ${Accounts.DEPLOYER.stxAddress}.test-2-1::test-literal-2()`
+      );
+      expect(tx.result).toBe(
+        "(ok (tuple (locked u0) (unlock-height u0) (unlocked u0)))"
       );
       expect(tx.success).toBeTruthy();
     });
@@ -177,7 +255,7 @@ describe("stx-account", () => {
         `invoked: ${Accounts.DEPLOYER.stxAddress}.test-2-1::test(${Accounts.WALLET_1.stxAddress})`
       );
       expect(tx.result).toBe(
-        "(ok (tuple (locked u0) (unlock-height u0) (unlocked u99999999996000)))"
+        "(ok (tuple (locked u0) (unlock-height u0) (unlocked u99999999992000)))"
       );
       expect(tx.success).toBeTruthy();
     });
@@ -268,7 +346,7 @@ describe("stx-account", () => {
         `invoked: ${Accounts.DEPLOYER.stxAddress}.test-2-1::test(${Accounts.WALLET_1.stxAddress})`
       );
       expect(tx.result).toBe(
-        "(ok (tuple (locked u25000000000000) (unlock-height u240) (unlocked u74999999991000)))"
+        "(ok (tuple (locked u25000000000000) (unlock-height u240) (unlocked u74999999977000)))"
       );
       expect(tx.success).toBeTruthy();
     });

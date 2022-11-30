@@ -39,7 +39,13 @@ describe("principal-destruct?", () => {
     let deployTxOptions = {
       senderKey: Accounts.DEPLOYER.secretKey,
       contractName: "test-2-05",
-      codeBody: `(define-public (test (p principal))
+      codeBody: `(define-public (test-literal-1)
+    (principal-destruct? 'STB44HYPYAT2BB2QE513NSP81HTMYWBJP02HPGK6)
+)
+(define-public (test-literal-2)
+    (principal-destruct? 'STB44HYPYAT2BB2QE513NSP81HTMYWBJP02HPGK6.foo)
+)
+(define-public (test (p principal))
     (principal-destruct? p)
 )`,
       fee: 2000,
@@ -82,7 +88,13 @@ describe("principal-destruct?", () => {
       let deployTxOptions = {
         senderKey: Accounts.DEPLOYER.secretKey,
         contractName: "test-2-1",
-        codeBody: `(define-public (test (p principal))
+        codeBody: `(define-public (test-literal-1)
+    (principal-destruct? 'STB44HYPYAT2BB2QE513NSP81HTMYWBJP02HPGK6)
+)
+(define-public (test-literal-2)
+    (principal-destruct? 'STB44HYPYAT2BB2QE513NSP81HTMYWBJP02HPGK6.foo)
+)
+(define-public (test (p principal))
     (principal-destruct? p)
 )`,
         fee: 2000,
@@ -104,6 +116,72 @@ describe("principal-destruct?", () => {
       );
       expect(tx.description).toBe(
         `deployed: ${Accounts.DEPLOYER.stxAddress}.test-2-1`
+      );
+      expect(tx.success).toBeTruthy();
+    });
+
+    test("works for a literal standard principal", async () => {
+      // Build a transaction to call the contract
+      let callTxOptions: SignedContractCallOptions = {
+        senderKey: Accounts.WALLET_1.secretKey,
+        contractAddress: Accounts.DEPLOYER.stxAddress,
+        contractName: "test-2-1",
+        functionName: "test-literal-1",
+        functionArgs: [],
+        fee: 2000,
+        network,
+        anchorMode: AnchorMode.OnChainOnly,
+        postConditionMode: PostConditionMode.Allow,
+      };
+      let transaction = await makeContractCall(callTxOptions);
+
+      // Broadcast transaction
+      let result = await broadcastTransaction(transaction, network);
+      expect((<TxBroadcastResultOk>result).error).toBeUndefined();
+
+      // Wait for the transaction to be processed
+      let [block, tx] = waitForStacksTransaction(
+        orchestrator,
+        Accounts.WALLET_1.stxAddress
+      );
+      expect(tx.description).toBe(
+        `invoked: ${Accounts.DEPLOYER.stxAddress}.test-2-1::test-literal-1()`
+      );
+      expect(tx.result).toBe(
+        "(ok (tuple (hash-bytes 0x164247d6f2b425ac5771423ae6c80c754f7172b0) (name none) (version 0x1a)))"
+      );
+      expect(tx.success).toBeTruthy();
+    });
+
+    test("works for a literal contract principal", async () => {
+      // Build a transaction to call the contract
+      let callTxOptions = {
+        senderKey: Accounts.WALLET_1.secretKey,
+        contractAddress: Accounts.DEPLOYER.stxAddress,
+        contractName: "test-2-1",
+        functionName: "test-literal-2",
+        functionArgs: [],
+        fee: 2000,
+        network,
+        anchorMode: AnchorMode.OnChainOnly,
+        postConditionMode: PostConditionMode.Allow,
+      };
+      let transaction = await makeContractCall(callTxOptions);
+
+      // Broadcast transaction
+      let result = await broadcastTransaction(transaction, network);
+      expect((<TxBroadcastResultOk>result).error).toBeUndefined();
+
+      // Wait for the transaction to be processed
+      let [_, tx] = waitForStacksTransaction(
+        orchestrator,
+        Accounts.WALLET_1.stxAddress
+      );
+      expect(tx.description).toBe(
+        `invoked: ${Accounts.DEPLOYER.stxAddress}.test-2-1::test-literal-2()`
+      );
+      expect(tx.result).toBe(
+        '(ok (tuple (hash-bytes 0x164247d6f2b425ac5771423ae6c80c754f7172b0) (name (some "foo")) (version 0x1a)))'
       );
       expect(tx.success).toBeTruthy();
     });
