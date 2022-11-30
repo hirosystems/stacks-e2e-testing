@@ -89,7 +89,7 @@ enable_next_features = true
 # bitcoin_node_rpc_port = 18443
 # bitcoin_node_username = "devnet"
 # bitcoin_node_password = "devnet"
-bitcoin_controller_block_time = 25_000
+bitcoin_controller_block_time = 10_000
 # stacks_node_rpc_port = 20443
 # stacks_node_p2p_port = 20444
 # stacks_api_port = 3999
@@ -101,7 +101,8 @@ bitcoin_controller_block_time = 25_000
 # postgres_password = "postgres"
 # postgres_database = "postgres"
 # bitcoin_node_image_url = "quay.io/hirosystems/bitcoind:devnet-v2"
-# stacks_node_image_url = "localhost:5000/stacks-node:devnet-v2"
+# stacks_node_image_url = "quay.io/hirosystems/stacks-node:v3-beta2"
+# stacks_node_env_vars = ["STACKS_LOG_DEBUG=1"]
 # stacks_api_image_url = "hirosystems/stacks-blockchain-api:latest"
 # stacks_explorer_image_url = "hirosystems/explorer:latest"
 # bitcoin_explorer_image_url = "quay.io/hirosystems/bitcoin-explorer:devnet"
@@ -115,9 +116,10 @@ bitcoin_controller_block_time = 25_000
 # subnet_node_p2p_port = 30444
 # subnet_events_ingestion_port = 30445
 # subnet_node_events_observers = ["host.docker.internal:8002"]
-epoch_2_00 = 100
-epoch_2_05 = 104
-epoch_2_1 = 105
+# epoch_2_00 = 100
+# epoch_2_05 = 102
+# epoch_2_1 = 106
+# pox_2_activation = 108
 
 # Send some stacking orders
 [[devnet.pox_stacking_orders]]
