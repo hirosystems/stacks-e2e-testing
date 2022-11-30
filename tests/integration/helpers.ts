@@ -69,14 +69,13 @@ export const waitForStacksChainUpdate = (
 
 export const waitForStacksTransaction = (
   orchestrator: StacksDevnetOrchestrator,
-  sender: string,
-  nonce: number
+  sender: string
 ): [StacksBlockMetadata, StacksTransactionMetadata] => {
   while (true) {
     let chainUpdate = orchestrator.waitForStacksBlock();
     for (const tx of chainUpdate.new_blocks[0].block.transactions) {
       let metadata = <StacksTransactionMetadata>tx.metadata;
-      if (metadata.sender == sender && metadata.nonce == nonce) {
+      if (metadata.sender == sender) {
         return [
           <StacksBlockMetadata>chainUpdate.new_blocks[0].block.metadata,
           metadata,

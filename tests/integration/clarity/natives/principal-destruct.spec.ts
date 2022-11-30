@@ -20,7 +20,6 @@ import { StacksDevnetOrchestrator } from "@hirosystems/stacks-devnet-js";
 describe("principal-destruct?", () => {
   let orchestrator: StacksDevnetOrchestrator;
   let network: StacksNetwork;
-  let wallet1Nonce = 0;
 
   beforeAll(() => {
     orchestrator = buildStacksDevnetOrchestrator(1);
@@ -44,7 +43,6 @@ describe("principal-destruct?", () => {
     (principal-destruct? p)
 )`,
       fee: 2000,
-      nonce: 0,
       network,
       anchorMode: AnchorMode.OnChainOnly,
       postConditionMode: PostConditionMode.Allow,
@@ -59,8 +57,7 @@ describe("principal-destruct?", () => {
     // Wait for the transaction to be processed
     let [block, tx] = waitForStacksTransaction(
       orchestrator,
-      Accounts.DEPLOYER.stxAddress,
-      0
+      Accounts.DEPLOYER.stxAddress
     );
     expect(block.bitcoin_anchor_block_identifier.index).toBeLessThan(
       Constants.DEVNET_DEFAULT_EPOCH_2_1
@@ -72,13 +69,15 @@ describe("principal-destruct?", () => {
   });
 
   describe("in 2.1", () => {
-    test("is valid", async () => {
+    beforeAll(() => {
       // Wait for 2.1 to go live
       waitForStacksChainUpdate(
         orchestrator,
         Constants.DEVNET_DEFAULT_EPOCH_2_1
       );
+    });
 
+    test("is valid", async () => {
       // Build the transaction to deploy the contract
       let deployTxOptions = {
         senderKey: Accounts.DEPLOYER.secretKey,
@@ -87,7 +86,6 @@ describe("principal-destruct?", () => {
     (principal-destruct? p)
 )`,
         fee: 2000,
-        nonce: 1,
         network,
         anchorMode: AnchorMode.OnChainOnly,
         postConditionMode: PostConditionMode.Allow,
@@ -102,8 +100,7 @@ describe("principal-destruct?", () => {
       // Wait for the transaction to be processed
       let [block, tx] = waitForStacksTransaction(
         orchestrator,
-        Accounts.DEPLOYER.stxAddress,
-        1
+        Accounts.DEPLOYER.stxAddress
       );
       expect(tx.description).toBe(
         `deployed: ${Accounts.DEPLOYER.stxAddress}.test-2-1`
@@ -120,7 +117,6 @@ describe("principal-destruct?", () => {
         functionName: "test",
         functionArgs: [principalCV("STB44HYPYAT2BB2QE513NSP81HTMYWBJP02HPGK6")],
         fee: 2000,
-        nonce: wallet1Nonce,
         network,
         anchorMode: AnchorMode.OnChainOnly,
         postConditionMode: PostConditionMode.Allow,
@@ -134,8 +130,7 @@ describe("principal-destruct?", () => {
       // Wait for the transaction to be processed
       let [block, tx] = waitForStacksTransaction(
         orchestrator,
-        Accounts.WALLET_1.stxAddress,
-        wallet1Nonce
+        Accounts.WALLET_1.stxAddress
       );
       expect(tx.description).toBe(
         `invoked: ${Accounts.DEPLOYER.stxAddress}.test-2-1::test(STB44HYPYAT2BB2QE513NSP81HTMYWBJP02HPGK6)`
@@ -144,8 +139,6 @@ describe("principal-destruct?", () => {
         "(ok (tuple (hash-bytes 0x164247d6f2b425ac5771423ae6c80c754f7172b0) (name none) (version 0x1a)))"
       );
       expect(tx.success).toBeTruthy();
-
-      wallet1Nonce++;
     });
 
     test("works for a contract principal", async () => {
@@ -159,7 +152,6 @@ describe("principal-destruct?", () => {
           principalCV("STB44HYPYAT2BB2QE513NSP81HTMYWBJP02HPGK6.foo"),
         ],
         fee: 2000,
-        nonce: wallet1Nonce,
         network,
         anchorMode: AnchorMode.OnChainOnly,
         postConditionMode: PostConditionMode.Allow,
@@ -173,8 +165,7 @@ describe("principal-destruct?", () => {
       // Wait for the transaction to be processed
       let [_, tx] = waitForStacksTransaction(
         orchestrator,
-        Accounts.WALLET_1.stxAddress,
-        wallet1Nonce
+        Accounts.WALLET_1.stxAddress
       );
       expect(tx.description).toBe(
         `invoked: ${Accounts.DEPLOYER.stxAddress}.test-2-1::test(STB44HYPYAT2BB2QE513NSP81HTMYWBJP02HPGK6.foo)`
@@ -183,8 +174,6 @@ describe("principal-destruct?", () => {
         '(ok (tuple (hash-bytes 0x164247d6f2b425ac5771423ae6c80c754f7172b0) (name (some "foo")) (version 0x1a)))'
       );
       expect(tx.success).toBeTruthy();
-
-      wallet1Nonce++;
     });
 
     test("fails for an invalid principal", async () => {
@@ -198,7 +187,6 @@ describe("principal-destruct?", () => {
           principalCV("SP3X6QWWETNBZWGBK6DRGTR1KX50S74D3433WDGJY"),
         ],
         fee: 2000,
-        nonce: wallet1Nonce,
         network,
         anchorMode: AnchorMode.OnChainOnly,
         postConditionMode: PostConditionMode.Allow,
@@ -212,8 +200,7 @@ describe("principal-destruct?", () => {
       // Wait for the transaction to be processed
       let [_, tx] = waitForStacksTransaction(
         orchestrator,
-        Accounts.WALLET_1.stxAddress,
-        wallet1Nonce
+        Accounts.WALLET_1.stxAddress
       );
       expect(tx.description).toBe(
         `invoked: ${Accounts.DEPLOYER.stxAddress}.test-2-1::test(SP3X6QWWETNBZWGBK6DRGTR1KX50S74D3433WDGJY)`
@@ -222,8 +209,6 @@ describe("principal-destruct?", () => {
         "(err (tuple (hash-bytes 0xfa6bf38ed557fe417333710d6033e9419391a320) (name none) (version 0x16)))"
       );
       expect(tx.success).toBeFalsy();
-
-      wallet1Nonce++;
     });
 
     test("fails for an invalid contract principal", async () => {
@@ -237,7 +222,6 @@ describe("principal-destruct?", () => {
           principalCV("SP3X6QWWETNBZWGBK6DRGTR1KX50S74D3433WDGJY.foo"),
         ],
         fee: 2000,
-        nonce: wallet1Nonce,
         network,
         anchorMode: AnchorMode.OnChainOnly,
         postConditionMode: PostConditionMode.Allow,
@@ -251,8 +235,7 @@ describe("principal-destruct?", () => {
       // Wait for the transaction to be processed
       let [_, tx] = waitForStacksTransaction(
         orchestrator,
-        Accounts.WALLET_1.stxAddress,
-        wallet1Nonce
+        Accounts.WALLET_1.stxAddress
       );
       expect(tx.description).toBe(
         `invoked: ${Accounts.DEPLOYER.stxAddress}.test-2-1::test(SP3X6QWWETNBZWGBK6DRGTR1KX50S74D3433WDGJY.foo)`
@@ -261,8 +244,6 @@ describe("principal-destruct?", () => {
         '(err (tuple (hash-bytes 0xfa6bf38ed557fe417333710d6033e9419391a320) (name (some "foo")) (version 0x16)))'
       );
       expect(tx.success).toBeFalsy();
-
-      wallet1Nonce++;
 
       orchestrator.stop();
     });
