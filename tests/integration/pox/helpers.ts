@@ -1,5 +1,9 @@
 import { Contracts } from '../constants';
-import { StacksBlockMetadata, StacksChainUpdate, StacksDevnetOrchestrator } from '@hirosystems/stacks-devnet-js';
+import {
+  StacksChainUpdate,
+  StacksDevnetOrchestrator,
+  StacksTransactionMetadata,
+} from "@hirosystems/stacks-devnet-js";
 import { StacksNetwork } from "@stacks/network";
 import {
     AnchorMode,
@@ -15,26 +19,12 @@ import {
 } from "@stacks/transactions";
 import { decodeBtcAddress } from '@stacks/stacking';
 import { toBytes } from '@stacks/common';
+import { waitForStacksChainUpdate } from '../helpers';
 
 interface Account {
     stxAddress: string,
     btcAddress: string,
     secretKey: string,
-}
-
-export const waitForStacksChainUpdate = (orchestrator: StacksDevnetOrchestrator, targetBitcoinBlockHeight: number): StacksChainUpdate => {
-    while (true) {
-        let chainEvent = orchestrator.waitForStacksBlock();
-        let bitcoinBlockHeight = getBitcoinBlockHeight(chainEvent); 
-        if (bitcoinBlockHeight >= targetBitcoinBlockHeight) {
-            return chainEvent
-        }
-    }
-}
-
-export const getBitcoinBlockHeight = (chainUpdate: StacksChainUpdate): number => {
-    let metadata = chainUpdate.new_blocks[0].block.metadata! as StacksBlockMetadata;
-    return metadata.bitcoin_anchor_block_identifier.index;
 }
 
 const delay = () => new Promise(resolve => setTimeout(resolve, 3000));
