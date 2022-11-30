@@ -60,12 +60,6 @@ export const waitForStacksChainUpdate = (
 ): StacksChainUpdate => {
   while (true) {
     let chainUpdate = orchestrator.waitForStacksBlock();
-    for (const tx of chainUpdate.new_blocks[0].block.transactions) {
-      let metadata = <StacksTransactionMetadata>tx.metadata;
-      console.debug(
-        `Tx from ${metadata.sender}:${metadata.position}: ${metadata.description}\n\t-> ${metadata.result}`
-      );
-    }
     let bitcoinBlockHeight = getBitcoinBlockHeight(chainUpdate);
     if (bitcoinBlockHeight >= targetBitcoinBlockHeight) {
       return chainUpdate;
@@ -82,9 +76,6 @@ export const waitForStacksTransaction = (
     let chainUpdate = orchestrator.waitForStacksBlock();
     for (const tx of chainUpdate.new_blocks[0].block.transactions) {
       let metadata = <StacksTransactionMetadata>tx.metadata;
-      console.debug(
-        `Tx from ${metadata.sender}:${metadata.position}: ${metadata.description}\n\t-> ${metadata.result}`
-      );
       if (metadata.sender == sender && metadata.nonce == nonce) {
         return [
           <StacksBlockMetadata>chainUpdate.new_blocks[0].block.metadata,
