@@ -1,7 +1,10 @@
-import { StacksDevnetOrchestrator } from '@hirosystems/stacks-devnet-js';
-import { time } from 'console';
-import { Constants } from './constants';
-
+import {
+  StacksBlockMetadata,
+  StacksChainUpdate,
+  StacksDevnetOrchestrator,
+  StacksTransactionMetadata,
+} from "@hirosystems/stacks-devnet-js";
+import { Constants } from "./constants";
 
 interface EpochTimeline {
     epoch_2_0: number,
@@ -42,3 +45,42 @@ export function buildStacksDevnetOrchestrator(networkId: number = 0, timeline: E
     });
     return orchestrator;
 }
+
+export const getBitcoinBlockHeight = (
+  chainUpdate: StacksChainUpdate
+): number => {
+  let metadata = chainUpdate.new_blocks[0].block
+    .metadata! as StacksBlockMetadata;
+  return metadata.bitcoin_anchor_block_identifier.index;
+};
+
+export const waitForStacksChainUpdate = (
+  orchestrator: StacksDevnetOrchestrator,
+  targetBitcoinBlockHeight: number
+): StacksChainUpdate => {
+  while (true) {
+    let chainUpdate = orchestrator.waitForStacksBlock();
+    let bitcoinBlockHeight = getBitcoinBlockHeight(chainUpdate);
+    if (bitcoinBlockHeight >= targetBitcoinBlockHeight) {
+      return chainUpdate;
+    }
+  }
+};
+
+export const waitForStacksTransaction = (
+  orchestrator: StacksDevnetOrchestrator,
+  sender: string
+): [StacksBlockMetadata, StacksTransactionMetadata] => {
+  while (true) {
+    let chainUpdate = orchestrator.waitForStacksBlock();
+    for (const tx of chainUpdate.new_blocks[0].block.transactions) {
+      let metadata = <StacksTransactionMetadata>tx.metadata;
+      if (metadata.sender == sender) {
+        return [
+          <StacksBlockMetadata>chainUpdate.new_blocks[0].block.metadata,
+          metadata,
+        ];
+      }
+    }
+  }
+};

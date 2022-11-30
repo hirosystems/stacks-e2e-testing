@@ -7,15 +7,16 @@
     "test": "jest"
   },
   "dependencies": {
-    "@stacks/network": "^5.0.3",
-    "@stacks/common": "^5.0.3",
-    "@stacks/transactions": "^5.0.3",
     "@hirosystems/stacks-devnet-js": "../clarinet/components/stacks-devnet-js",
-    "@types/node": "^16.7.13",
+    "@stacks/common": "^5.0.3",
+    "@stacks/network": "^5.0.3",
+    "@stacks/stacking": "^5.0.3",
+    "@stacks/transactions": "^5.0.3",
     "@types/jest": "^27.0.3",
-    "typescript": "^4.9.0",
+    "@types/node": "^16.7.13",
     "jest": "^27.4.5",
-    "ts-jest": "^27.1.2"
+    "ts-jest": "^27.1.2",
+    "typescript": "^4.9.0"
   },
   "author": "",
   "license": "ISC"
