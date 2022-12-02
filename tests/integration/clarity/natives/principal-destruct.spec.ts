@@ -11,18 +11,18 @@ import { StacksNetwork, StacksTestnet } from "@stacks/network";
 import { Accounts, Constants } from "../../constants";
 import { principalCV } from "@stacks/transactions/dist/clarity/types/principalCV";
 import {
-  buildStacksDevnetOrchestrator,
+  buildDevnetNetworkOrchestrator,
   waitForStacksChainUpdate,
   waitForStacksTransaction,
 } from "../../helpers";
-import { StacksDevnetOrchestrator } from "@hirosystems/stacks-devnet-js";
+import { DevnetNetworkOrchestrator } from "@hirosystems/stacks-devnet-js";
 
 describe("principal-destruct?", () => {
-  let orchestrator: StacksDevnetOrchestrator;
+  let orchestrator: DevnetNetworkOrchestrator;
   let network: StacksNetwork;
 
   beforeAll(() => {
-    orchestrator = buildStacksDevnetOrchestrator(1);
+    orchestrator = buildDevnetNetworkOrchestrator();
     orchestrator.start();
     network = new StacksTestnet({ url: orchestrator.getStacksNodeUrl() });
   });

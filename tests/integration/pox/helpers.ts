@@ -1,7 +1,7 @@
 import { Contracts } from '../constants';
 import {
   StacksChainUpdate,
-  StacksDevnetOrchestrator,
+  DevnetNetworkOrchestrator,
   StacksTransactionMetadata,
 } from "@hirosystems/stacks-devnet-js";
 import { StacksNetwork } from "@stacks/network";
@@ -70,7 +70,7 @@ export const getBitcoinHeightOfNextPreparePhase = async (network: StacksNetwork,
     return response.next_cycle.prepare_phase_start_block_height;
 }
 
-export const waitForNextPreparePhase = async (network: StacksNetwork, orchestrator: StacksDevnetOrchestrator, offset?: number): Promise<StacksChainUpdate> => {
+export const waitForNextPreparePhase = async (network: StacksNetwork, orchestrator: DevnetNetworkOrchestrator, offset?: number): Promise<StacksChainUpdate> => {
     var height = await getBitcoinHeightOfNextPreparePhase(network);
     if (offset) {
         height = height + offset;
@@ -78,12 +78,18 @@ export const waitForNextPreparePhase = async (network: StacksNetwork, orchestrat
     return waitForStacksChainUpdate(orchestrator, height)
 }
 
-export const waitForNextRewardPhase = async (network: StacksNetwork, orchestrator: StacksDevnetOrchestrator, offset?: number): Promise<StacksChainUpdate> => {
+export const waitForNextRewardPhase = async (network: StacksNetwork, orchestrator: DevnetNetworkOrchestrator, offset?: number): Promise<StacksChainUpdate> => {
     var height = await getBitcoinHeightOfNextRewardPhase(network);
     if (offset) {
         height = height + offset;
     }
     return waitForStacksChainUpdate(orchestrator, height)
+}
+
+export const expectAccountToBe = async (network: StacksNetwork, address: string, account: number, locked: number) => {
+    let wallet = await getAccount(network, address);
+    expect(wallet.balance).toBe(BigInt(account));
+    expect(wallet.locked).toBe(BigInt(locked));
 }
 
 export const broadcastStackSTX = async (poxVersion: number, network: StacksNetwork, amount: number, account: Account, blockHeight: number, cycles: number, fee: number) : Promise<TxBroadcastResult> => {

@@ -1,12 +1,12 @@
-import { buildStacksDevnetOrchestrator } from '../../helpers';
-import { broadcastStackSTX, waitForNextPreparePhase, waitForNextRewardPhase, getPoxInfo, getBitcoinBlockHeight } from '../helpers'
+import { buildDevnetNetworkOrchestrator, getBitcoinBlockHeight } from '../../helpers';
+import { broadcastStackSTX, waitForNextPreparePhase, waitForNextRewardPhase, getPoxInfo } from '../helpers'
 import { Accounts } from '../../constants';
 import { StacksTestnet } from "@stacks/network";
 
 describe('testing stacking under epoch 2.1', () => {
 
     test('submitting stacks-stx through pox-1 contract during epoch 2.0 should succeed', async () => {
-        const orchestrator = buildStacksDevnetOrchestrator(2, { epoch_2_0: 100, epoch_2_05: 101, epoch_2_1: 102, pox_2_activation: 103 }, false);
+        const orchestrator = buildDevnetNetworkOrchestrator({ epoch_2_0: 100, epoch_2_05: 101, epoch_2_1: 102, pox_2_activation: 103 }, false);
         orchestrator.start();
         const network = new StacksTestnet({ url: orchestrator.getStacksNodeUrl() });
         

@@ -9,14 +9,14 @@ import {
 } from "@stacks/transactions";
 import { StacksNetwork, StacksTestnet } from "@stacks/network";
 import { Accounts, Constants } from "../../constants";
-import { StacksDevnetOrchestrator } from "@hirosystems/stacks-devnet-js";
+import { DevnetNetworkOrchestrator } from "@hirosystems/stacks-devnet-js";
 import {
   broadcastStackSTX,
   waitForNextPreparePhase,
   waitForNextRewardPhase,
 } from "../../pox/helpers";
 import {
-  buildStacksDevnetOrchestrator,
+  buildDevnetNetworkOrchestrator,
   getBitcoinBlockHeight,
   waitForStacksChainUpdate,
   waitForStacksTransaction,
@@ -24,11 +24,11 @@ import {
 import { principalCV } from "@stacks/transactions/dist/clarity/types/principalCV";
 
 describe("stx-account", () => {
-  let orchestrator: StacksDevnetOrchestrator;
+  let orchestrator: DevnetNetworkOrchestrator;
   let network: StacksNetwork;
 
   beforeAll(() => {
-    orchestrator = buildStacksDevnetOrchestrator(1);
+    orchestrator = buildDevnetNetworkOrchestrator();
     orchestrator.start();
     network = new StacksTestnet({ url: orchestrator.getStacksNodeUrl() });
   });
@@ -232,7 +232,9 @@ describe("stx-account", () => {
         network,
         25_000_000_000_000,
         Accounts.WALLET_1,
-        blockHeight
+        blockHeight,
+        12,
+        1000
       );
       expect(response.error).toBeUndefined();
 
