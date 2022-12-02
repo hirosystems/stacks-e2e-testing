@@ -244,8 +244,6 @@ describe("principal-destruct?", () => {
         '(err (tuple (hash-bytes 0xfa6bf38ed557fe417333710d6033e9419391a320) (name (some "foo")) (version 0x16)))'
       );
       expect(tx.success).toBeFalsy();
-
-      orchestrator.stop();
     });
   });
 });
