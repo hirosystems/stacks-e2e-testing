@@ -1,7 +1,7 @@
 import { Contracts } from '../constants';
 import {
   StacksChainUpdate,
-  StacksDevnetOrchestrator,
+  DevnetNetworkOrchestrator,
   StacksTransactionMetadata,
 } from "@hirosystems/stacks-devnet-js";
 import { StacksNetwork } from "@stacks/network";
@@ -42,6 +42,24 @@ export const getPoxInfo = async (network: StacksNetwork, retry?: number): Promis
     }
 }
 
+export const getAccount = async (network: StacksNetwork, address: string, retry?: number): Promise<any> => {
+    let retryCountdown = retry ? retry: 20;
+    if (retryCountdown == 0) return Promise.reject();
+    try {
+        let response = await fetch(network.getAccountApiUrl(address))
+        let payload = await response.json();
+        return {
+            balance: BigInt(payload.balance),
+            locked: BigInt(payload.locked),
+            unlock_height: payload.unlock_height,
+            nonce: payload.nonce,
+        };
+    } catch (e) {
+      await delay();
+      return getAccount(network, address, retryCountdown - 1);
+    }
+}
+
 export const getBitcoinHeightOfNextRewardPhase = async (network: StacksNetwork, retry?: number): Promise<number> => {
     let response = await getPoxInfo(network, retry);
     return response.next_cycle.reward_phase_start_block_height;
@@ -52,7 +70,7 @@ export const getBitcoinHeightOfNextPreparePhase = async (network: StacksNetwork,
     return response.next_cycle.prepare_phase_start_block_height;
 }
 
-export const waitForNextPreparePhase = async (network: StacksNetwork, orchestrator: StacksDevnetOrchestrator, offset?: number): Promise<StacksChainUpdate> => {
+export const waitForNextPreparePhase = async (network: StacksNetwork, orchestrator: DevnetNetworkOrchestrator, offset?: number): Promise<StacksChainUpdate> => {
     var height = await getBitcoinHeightOfNextPreparePhase(network);
     if (offset) {
         height = height + offset;
@@ -60,7 +78,7 @@ export const waitForNextPreparePhase = async (network: StacksNetwork, orchestrat
     return waitForStacksChainUpdate(orchestrator, height)
 }
 
-export const waitForNextRewardPhase = async (network: StacksNetwork, orchestrator: StacksDevnetOrchestrator, offset?: number): Promise<StacksChainUpdate> => {
+export const waitForNextRewardPhase = async (network: StacksNetwork, orchestrator: DevnetNetworkOrchestrator, offset?: number): Promise<StacksChainUpdate> => {
     var height = await getBitcoinHeightOfNextRewardPhase(network);
     if (offset) {
         height = height + offset;
@@ -68,7 +86,13 @@ export const waitForNextRewardPhase = async (network: StacksNetwork, orchestrato
     return waitForStacksChainUpdate(orchestrator, height)
 }
 
-export const broadcastStackSTX = async (poxVersion: number, network: StacksNetwork, amount: number, account: Account, blockHeight: number) : Promise<TxBroadcastResult> => {
+export const expectAccountToBe = async (network: StacksNetwork, address: string, account: number, locked: number) => {
+    let wallet = await getAccount(network, address);
+    expect(wallet.balance).toBe(BigInt(account));
+    expect(wallet.locked).toBe(BigInt(locked));
+}
+
+export const broadcastStackSTX = async (poxVersion: number, network: StacksNetwork, amount: number, account: Account, blockHeight: number, cycles: number, fee: number) : Promise<TxBroadcastResult> => {
     const nonce = await getNonce(account.stxAddress, network);
     const { hashMode, data } = decodeBtcAddress(account.btcAddress);
     const version = bufferCV(toBytes(new Uint8Array([hashMode.valueOf()])));
@@ -85,9 +109,9 @@ export const broadcastStackSTX = async (poxVersion: number, network: StacksNetwo
             hashbytes,
         }),
         uintCV(blockHeight),
-        uintCV(12),
+        uintCV(cycles),
       ],
-      fee: 1000,
+      fee,
       nonce,
       network,
       anchorMode: AnchorMode.OnChainOnly,

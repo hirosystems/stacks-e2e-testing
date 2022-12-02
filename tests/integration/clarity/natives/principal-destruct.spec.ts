@@ -11,18 +11,18 @@ import { StacksNetwork, StacksTestnet } from "@stacks/network";
 import { Accounts, Constants } from "../../constants";
 import { principalCV } from "@stacks/transactions/dist/clarity/types/principalCV";
 import {
-  buildStacksDevnetOrchestrator,
+  buildDevnetNetworkOrchestrator,
   waitForStacksChainUpdate,
   waitForStacksTransaction,
 } from "../../helpers";
-import { StacksDevnetOrchestrator } from "@hirosystems/stacks-devnet-js";
+import { DevnetNetworkOrchestrator } from "@hirosystems/stacks-devnet-js";
 
 describe("principal-destruct?", () => {
-  let orchestrator: StacksDevnetOrchestrator;
+  let orchestrator: DevnetNetworkOrchestrator;
   let network: StacksNetwork;
 
   beforeAll(() => {
-    orchestrator = buildStacksDevnetOrchestrator(1);
+    orchestrator = buildDevnetNetworkOrchestrator();
     orchestrator.start();
     network = new StacksTestnet({ url: orchestrator.getStacksNodeUrl() });
   });
@@ -244,8 +244,6 @@ describe("principal-destruct?", () => {
         '(err (tuple (hash-bytes 0xfa6bf38ed557fe417333710d6033e9419391a320) (name (some "foo")) (version 0x16)))'
       );
       expect(tx.success).toBeFalsy();
-
-      orchestrator.stop();
     });
   });
 });
