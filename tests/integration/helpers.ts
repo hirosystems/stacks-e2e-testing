@@ -22,6 +22,7 @@ const DEFAULT_EPOCH_TIMELINE = {
 }
 
 export function buildDevnetNetworkOrchestrator(timeline: EpochTimeline = DEFAULT_EPOCH_TIMELINE, logs = true) {
+    let working_dir = `/tmp/stacks-test-${Date.now()}`;
     let config = {
         logs,
         devnet: {
@@ -31,7 +32,7 @@ export function buildDevnetNetworkOrchestrator(timeline: EpochTimeline = DEFAULT
             epoch_2_1: timeline.epoch_2_1,
             pox_2_activation: timeline.pox_2_activation,
             bitcoin_controller_automining_disabled: false,
-            working_dir: "/tmp"
+            working_dir,
         }
     };
     let networkId = parseInt(process.env.JEST_WORKER_ID!);
