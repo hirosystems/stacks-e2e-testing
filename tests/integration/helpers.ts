@@ -31,6 +31,7 @@ export function buildDevnetNetworkOrchestrator(timeline: EpochTimeline = DEFAULT
             epoch_2_1: timeline.epoch_2_1,
             pox_2_activation: timeline.pox_2_activation,
             bitcoin_controller_automining_disabled: false,
+            working_dir: "/tmp"
         }
     };
     let networkId = parseInt(process.env.JEST_WORKER_ID!);

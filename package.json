@@ -7,7 +7,7 @@
     "test": "jest"
   },
   "dependencies": {
-    "@hirosystems/stacks-devnet-js": "../clarinet/components/stacks-devnet-js",
+    "@hirosystems/stacks-devnet-js": "^1.2.0",
     "@stacks/common": "^5.0.3",
     "@stacks/network": "^5.0.3",
     "@stacks/stacking": "^5.0.3",
