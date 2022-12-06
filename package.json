@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "jest tests/integration/pox/stacking/epoch_2_0.spec.ts"
+    "test": "jest"
   },
   "dependencies": {
     "@hirosystems/stacks-devnet-js": "^1.2.0",
