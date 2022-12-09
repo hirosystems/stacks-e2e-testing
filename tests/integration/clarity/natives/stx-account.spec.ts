@@ -346,7 +346,7 @@ describe("stx-account", () => {
         `invoked: ${Accounts.DEPLOYER.stxAddress}.test-2-1::test(${Accounts.WALLET_1.stxAddress})`
       );
       expect(tx.result).toBe(
-        "(ok (tuple (locked u25000000000000) (unlock-height u240) (unlocked u74999999977000)))"
+        "(ok (tuple (locked u25000000000000) (unlock-height u240) (unlocked u74999999987000)))"
       );
       expect(tx.success).toBeTruthy();
     });
