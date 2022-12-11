@@ -145,9 +145,9 @@ describe("tx-sponsor?", () => {
         senderKey: Accounts.WALLET_1.secretKey,
         contractAddress: Accounts.DEPLOYER.stxAddress,
         contractName: "test-2-1",
-        functionName: "test-2",
+        functionName: "test-1",
         functionArgs: [],
-        fee: 2000,
+        fee: 0,
         network,
         anchorMode: AnchorMode.OnChainOnly,
         postConditionMode: PostConditionMode.Allow,
@@ -159,7 +159,8 @@ describe("tx-sponsor?", () => {
       const sponsorOptions = {
         transaction,
         sponsorPrivateKey: Accounts.WALLET_2.secretKey,
-        fee: 2000,
+        fee: 2005,
+        sponsorNonce: 0,
       };
       const sponsoredTx = await sponsorTransaction(sponsorOptions);
 
@@ -170,12 +171,12 @@ describe("tx-sponsor?", () => {
       // Wait for the transaction to be processed
       let [_, tx] = waitForStacksTransaction(
         orchestrator,
-        Accounts.WALLET_2.stxAddress
+        Accounts.WALLET_1.stxAddress
       );
       expect(tx.description).toBe(
-        `invoked: ${Accounts.DEPLOYER.stxAddress}.test-2-1::test-2()`
+        `invoked: ${Accounts.DEPLOYER.stxAddress}.test-2-1::test-1()`
       );
-      expect(tx.result).toBe("(ok 'ST2CY5V39NHDPWSXMW9QDT3HC3GD6Q6XX4CFRK9AG)");
+      expect(tx.result).toBe(`(ok '${Accounts.WALLET_2.stxAddress})`);
       expect(tx.success).toBeTruthy();
     });
   });
