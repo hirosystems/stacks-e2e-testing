@@ -176,7 +176,7 @@ describe("tx-sponsor?", () => {
       expect(tx.description).toBe(
         `invoked: ${Accounts.DEPLOYER.stxAddress}.test-2-1::test-1()`
       );
-      expect(tx.result).toBe(`(ok '${Accounts.WALLET_2.stxAddress})`);
+      expect(tx.result).toBe(`(ok (some ${Accounts.WALLET_2.stxAddress}))`);
       expect(tx.success).toBeTruthy();
     });
   });
