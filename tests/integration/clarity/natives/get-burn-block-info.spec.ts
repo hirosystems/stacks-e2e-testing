@@ -211,7 +211,7 @@ describe("get-burn-block-info?", () => {
     );
     // FIXME: verify this output once everything is working
     expect(tx.result).toBe(
-      "(ok (some (tuple (addrs ((tuple (hashbytes 0x0000000000000000000000000000000000000000) (version 0x00)) (tuple (hashbytes 0x0000000000000000000000000000000000000000) (version 0x00)))) (payout u10000))))"
+      "(ok (some (tuple (addrs ((tuple (hashbytes 0x) (version 0x00)) (tuple (hashbytes 0x0000000000000000000000000000000000000000) (version 0x00)))) (payout u10000))))"
     );
     expect(tx.success).toBeTruthy();
   });
