@@ -2,12 +2,21 @@ import { buildDevnetNetworkOrchestrator, getBitcoinBlockHeight, waitForStacksCha
 import { broadcastStackSTX, waitForNextPreparePhase, waitForNextRewardPhase, getPoxInfo, getAccount } from '../helpers'
 import { Accounts } from '../../constants';
 import { StacksTestnet } from "@stacks/network";
+import { DevnetNetworkOrchestrator } from "@hirosystems/stacks-devnet-js";
 
 describe('testing stacking under epoch 2.0', () => {
+    let orchestrator: DevnetNetworkOrchestrator;
 
-    test('submitting stacks-stx through pox-1 contract during epoch 2.0 should succeed', async () => {
-        const orchestrator = buildDevnetNetworkOrchestrator({ epoch_2_0: 100, epoch_2_05: 105, epoch_2_1: 110, pox_2_activation: 115 }, true);
+    beforeAll(() => {
+        orchestrator = buildDevnetNetworkOrchestrator({ epoch_2_0: 100, epoch_2_05: 105, epoch_2_1: 110, pox_2_activation: 115 }, true);
         orchestrator.start()
+    });
+
+    afterAll(() => {
+        orchestrator.stop();
+    });
+    
+    test('submitting stacks-stx through pox-1 contract during epoch 2.0 should succeed', async () => {
         const network = new StacksTestnet({ url: orchestrator.getStacksNodeUrl() });
         
         // Wait for Stacks genesis block
@@ -93,7 +102,5 @@ describe('testing stacking under epoch 2.0', () => {
         wallet3 = await getAccount(network, Accounts.WALLET_3.stxAddress);
         expect(wallet3.balance).toBe(BigInt(genesisBalance - fee));
         expect(wallet3.locked).toBe(BigInt(0));
-
-        orchestrator.stop()
     })   
 })

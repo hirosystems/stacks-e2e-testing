@@ -2,12 +2,21 @@ import { buildDevnetNetworkOrchestrator, getBitcoinBlockHeight } from '../../hel
 import { broadcastStackSTX, waitForNextPreparePhase, waitForNextRewardPhase, getPoxInfo } from '../helpers'
 import { Accounts } from '../../constants';
 import { StacksTestnet } from "@stacks/network";
+import { DevnetNetworkOrchestrator } from "@hirosystems/stacks-devnet-js";
 
 describe('testing stacking under epoch 2.1', () => {
+    let orchestrator: DevnetNetworkOrchestrator;
+
+    beforeAll(() => {
+        orchestrator = buildDevnetNetworkOrchestrator({ epoch_2_0: 100, epoch_2_05: 101, epoch_2_1: 102, pox_2_activation: 103 }, false);
+        orchestrator.start()
+    });
+
+    afterAll(() => {
+        orchestrator.stop();
+    });
 
     test('submitting stacks-stx through pox-1 contract during epoch 2.0 should succeed', async () => {
-        const orchestrator = buildDevnetNetworkOrchestrator({ epoch_2_0: 100, epoch_2_05: 101, epoch_2_1: 102, pox_2_activation: 103 }, false);
-        orchestrator.start();
         const network = new StacksTestnet({ url: orchestrator.getStacksNodeUrl() });
         
         // Wait for Stacks genesis block
@@ -36,7 +45,5 @@ describe('testing stacking under epoch 2.1', () => {
         // Assert
         expect(poxInfo.contract_id).toBe('ST000000000000000000002AMW42H.pox-2');
         expect(poxInfo.current_cycle.is_pox_active).toBe(true);
-
-        orchestrator.stop()    
     })   
 })
