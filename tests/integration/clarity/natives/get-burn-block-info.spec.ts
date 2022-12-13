@@ -170,7 +170,7 @@ describe("get-burn-block-info?", () => {
     let response = await broadcastStackSTX(
       2,
       network,
-      25_000_000_000_000,
+      90_000_000_000_000,
       Accounts.WALLET_1,
       blockHeight,
       12,
@@ -211,7 +211,7 @@ describe("get-burn-block-info?", () => {
     );
     // FIXME: verify this output once everything is working
     expect(tx.result).toBe(
-      "(ok (some (tuple (addrs ((tuple (hashbytes 0x) (version 0x00)) (tuple (hashbytes 0x0000000000000000000000000000000000000000) (version 0x00)))) (payout u10000))))"
+      "(ok (some (tuple (addrs ((tuple (hashbytes 0x7321b74e2b6a7e949e6c4ad313035b1665095017) (version 0x00)) (tuple (hashbytes 0x0000000000000000000000000000000000000000) (version 0x00)))) (payout u10000))))"
     );
     expect(tx.success).toBeTruthy();
   });
