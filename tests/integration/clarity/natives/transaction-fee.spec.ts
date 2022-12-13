@@ -6,6 +6,7 @@ import {
   TxBroadcastResultOk,
   makeContractCall,
   SignedContractCallOptions,
+  ClarityVersion,
 } from "@stacks/transactions";
 import { StacksNetwork, StacksTestnet } from "@stacks/network";
 import { Accounts, Constants } from "../../constants";
@@ -30,12 +31,13 @@ describe("transaction-fee", () => {
       let deployTxOptions = {
         senderKey: Accounts.DEPLOYER.secretKey,
         contractName: "test-2-1",
-        codeBody: `(define-public (test (p principal))
-    (ok (stx-account p))
+        codeBody: `(define-public (test (p bool))
+    (ok p)
   )`,
         fee: 2000,
         network,
         anchorMode: AnchorMode.OnChainOnly,
+        clarityVersion: ClarityVersion.Clarity1,
         postConditionMode: PostConditionMode.Allow,
       };
 
@@ -53,8 +55,13 @@ describe("transaction-fee", () => {
       expect(tx.description).toBe(
         `deployed: ${Accounts.DEPLOYER.stxAddress}.test-2-1`
       );
+      console.log(tx);
       expect(tx.success).toBeTruthy();
 
       orchestrator.stop();
     });
 });
+
+//function deployContract() {
+//  
+//}
