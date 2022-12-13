@@ -4,7 +4,7 @@ export namespace Constants {
     export const DEVNET_DEFAULT_EPOCH_2_05 = 102;
     export const DEVNET_DEFAULT_EPOCH_2_1 = 106;
     export const DEVNET_DEFAULT_POX_2_ACTIVATION = 109;
-    export const BITCOIN_BLOCK_TIME = 5000;
+    export const BITCOIN_BLOCK_TIME = 7500;
 }
 
 export namespace Contracts {
