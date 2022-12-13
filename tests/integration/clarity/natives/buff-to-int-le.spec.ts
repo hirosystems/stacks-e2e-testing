@@ -66,7 +66,7 @@ describe("buff-to-int-le", () => {
       orchestrator,
       Accounts.DEPLOYER.stxAddress
     );
-    expect(block.bitcoin_anchor_block_identifier.index).toBeLessThan(
+    expect(block.bitcoin_anchor_block_identifier.index).toBeLessThanOrEqual(
       Constants.DEVNET_DEFAULT_EPOCH_2_1
     );
     expect(tx.description).toBe(

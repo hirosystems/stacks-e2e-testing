@@ -8,7 +8,7 @@ describe('testing stacking under epoch 2.0', () => {
     let orchestrator: DevnetNetworkOrchestrator;
 
     beforeAll(() => {
-        orchestrator = buildDevnetNetworkOrchestrator({ epoch_2_0: 100, epoch_2_05: 105, epoch_2_1: 110, pox_2_activation: 115 }, true);
+        orchestrator = buildDevnetNetworkOrchestrator({ epoch_2_0: 100, epoch_2_05: 105, epoch_2_1: 111, pox_2_activation: 120 }, true);
         orchestrator.start()
     });
 
@@ -84,6 +84,7 @@ describe('testing stacking under epoch 2.0', () => {
         await waitForStacksChainUpdate(orchestrator, 121);
         poxInfo = await getPoxInfo(network);
 
+        console.log(poxInfo);
         // Proof of transfer should now be handled via pox-2 contract, and the cycle should be inactive
         expect(poxInfo.contract_id).toBe('ST000000000000000000002AMW42H.pox-2');
         expect(poxInfo.current_cycle.is_pox_active).toBe(false);
