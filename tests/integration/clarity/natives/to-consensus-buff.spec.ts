@@ -9,7 +9,6 @@ import {
 } from "@stacks/transactions";
 import { StacksNetwork, StacksTestnet } from "@stacks/network";
 import { Accounts, Constants } from "../../constants";
-import { principalCV } from "@stacks/transactions/dist/clarity/types/principalCV";
 import {
   buildDevnetNetworkOrchestrator,
   waitForStacksChainUpdate,
@@ -17,7 +16,7 @@ import {
 } from "../../helpers";
 import { DevnetNetworkOrchestrator } from "@hirosystems/stacks-devnet-js";
 
-describe("principal-destruct?", () => {
+describe("to-consensus-buff?", () => {
   let orchestrator: DevnetNetworkOrchestrator;
   let network: StacksNetwork;
 
@@ -31,6 +30,16 @@ describe("principal-destruct?", () => {
     orchestrator.stop();
   });
 
+  const codeBody = `(define-public (test-1)
+    (ok (to-consensus-buff? 1))
+)
+(define-public (test-2)
+    (ok (to-consensus-buff? u1))
+)
+(define-public (test-3)
+    (ok (to-consensus-buff? { abc: 3, def: 4 }))
+)`;
+
   test("is invalid in 2.05", async () => {
     // Wait for Stacks 2.05 to start
     waitForStacksChainUpdate(orchestrator, Constants.DEVNET_DEFAULT_EPOCH_2_05);
@@ -39,15 +48,7 @@ describe("principal-destruct?", () => {
     let deployTxOptions = {
       senderKey: Accounts.DEPLOYER.secretKey,
       contractName: "test-2-05",
-      codeBody: `(define-public (test-literal-1)
-    (principal-destruct? 'STB44HYPYAT2BB2QE513NSP81HTMYWBJP02HPGK6)
-)
-(define-public (test-literal-2)
-    (principal-destruct? 'STB44HYPYAT2BB2QE513NSP81HTMYWBJP02HPGK6.foo)
-)
-(define-public (test (p principal))
-    (principal-destruct? p)
-)`,
+      codeBody,
       fee: 2000,
       network,
       anchorMode: AnchorMode.OnChainOnly,
@@ -88,15 +89,7 @@ describe("principal-destruct?", () => {
       let deployTxOptions = {
         senderKey: Accounts.DEPLOYER.secretKey,
         contractName: "test-2-1",
-        codeBody: `(define-public (test-literal-1)
-    (principal-destruct? 'STB44HYPYAT2BB2QE513NSP81HTMYWBJP02HPGK6)
-)
-(define-public (test-literal-2)
-    (principal-destruct? 'STB44HYPYAT2BB2QE513NSP81HTMYWBJP02HPGK6.foo)
-)
-(define-public (test (p principal))
-    (principal-destruct? p)
-)`,
+        codeBody,
         fee: 2000,
         network,
         anchorMode: AnchorMode.OnChainOnly,
@@ -120,13 +113,13 @@ describe("principal-destruct?", () => {
       expect(tx.success).toBeTruthy();
     });
 
-    test("works for a literal standard principal", async () => {
+    test("works for an int", async () => {
       // Build a transaction to call the contract
       let callTxOptions: SignedContractCallOptions = {
         senderKey: Accounts.WALLET_1.secretKey,
         contractAddress: Accounts.DEPLOYER.stxAddress,
         contractName: "test-2-1",
-        functionName: "test-literal-1",
+        functionName: "test-1",
         functionArgs: [],
         fee: 2000,
         network,
@@ -145,21 +138,21 @@ describe("principal-destruct?", () => {
         Accounts.WALLET_1.stxAddress
       );
       expect(tx.description).toBe(
-        `invoked: ${Accounts.DEPLOYER.stxAddress}.test-2-1::test-literal-1()`
+        `invoked: ${Accounts.DEPLOYER.stxAddress}.test-2-1::test-1()`
       );
       expect(tx.result).toBe(
-        "(ok (tuple (hash-bytes 0x164247d6f2b425ac5771423ae6c80c754f7172b0) (name none) (version 0x1a)))"
+        "(ok (some 0x0000000000000000000000000000000001))"
       );
       expect(tx.success).toBeTruthy();
     });
 
-    test("works for a literal contract principal", async () => {
+    test("works for a uint", async () => {
       // Build a transaction to call the contract
       let callTxOptions = {
         senderKey: Accounts.WALLET_1.secretKey,
         contractAddress: Accounts.DEPLOYER.stxAddress,
         contractName: "test-2-1",
-        functionName: "test-literal-2",
+        functionName: "test-2",
         functionArgs: [],
         fee: 2000,
         network,
@@ -178,22 +171,22 @@ describe("principal-destruct?", () => {
         Accounts.WALLET_1.stxAddress
       );
       expect(tx.description).toBe(
-        `invoked: ${Accounts.DEPLOYER.stxAddress}.test-2-1::test-literal-2()`
+        `invoked: ${Accounts.DEPLOYER.stxAddress}.test-2-1::test-2()`
       );
       expect(tx.result).toBe(
-        '(ok (tuple (hash-bytes 0x164247d6f2b425ac5771423ae6c80c754f7172b0) (name (some "foo")) (version 0x1a)))'
+        "(ok (some 0x0100000000000000000000000000000001))"
       );
       expect(tx.success).toBeTruthy();
     });
 
-    test("works for a standard principal", async () => {
+    test("works for a tuple", async () => {
       // Build a transaction to call the contract
       let callTxOptions: SignedContractCallOptions = {
         senderKey: Accounts.WALLET_1.secretKey,
         contractAddress: Accounts.DEPLOYER.stxAddress,
         contractName: "test-2-1",
-        functionName: "test",
-        functionArgs: [principalCV("STB44HYPYAT2BB2QE513NSP81HTMYWBJP02HPGK6")],
+        functionName: "test-3",
+        functionArgs: [],
         fee: 2000,
         network,
         anchorMode: AnchorMode.OnChainOnly,
@@ -211,117 +204,12 @@ describe("principal-destruct?", () => {
         Accounts.WALLET_1.stxAddress
       );
       expect(tx.description).toBe(
-        `invoked: ${Accounts.DEPLOYER.stxAddress}.test-2-1::test(STB44HYPYAT2BB2QE513NSP81HTMYWBJP02HPGK6)`
+        `invoked: ${Accounts.DEPLOYER.stxAddress}.test-2-1::test-3()`
       );
       expect(tx.result).toBe(
-        "(ok (tuple (hash-bytes 0x164247d6f2b425ac5771423ae6c80c754f7172b0) (name none) (version 0x1a)))"
+        "(ok (some 0x0c00000002036162630000000000000000000000000000000003036465660000000000000000000000000000000004))"
       );
       expect(tx.success).toBeTruthy();
-    });
-
-    test("works for a contract principal", async () => {
-      // Build a transaction to call the contract
-      let callTxOptions = {
-        senderKey: Accounts.WALLET_1.secretKey,
-        contractAddress: Accounts.DEPLOYER.stxAddress,
-        contractName: "test-2-1",
-        functionName: "test",
-        functionArgs: [
-          principalCV("STB44HYPYAT2BB2QE513NSP81HTMYWBJP02HPGK6.foo"),
-        ],
-        fee: 2000,
-        network,
-        anchorMode: AnchorMode.OnChainOnly,
-        postConditionMode: PostConditionMode.Allow,
-      };
-      let transaction = await makeContractCall(callTxOptions);
-
-      // Broadcast transaction
-      let result = await broadcastTransaction(transaction, network);
-      expect((<TxBroadcastResultOk>result).error).toBeUndefined();
-
-      // Wait for the transaction to be processed
-      let [_, tx] = waitForStacksTransaction(
-        orchestrator,
-        Accounts.WALLET_1.stxAddress
-      );
-      expect(tx.description).toBe(
-        `invoked: ${Accounts.DEPLOYER.stxAddress}.test-2-1::test(STB44HYPYAT2BB2QE513NSP81HTMYWBJP02HPGK6.foo)`
-      );
-      expect(tx.result).toBe(
-        '(ok (tuple (hash-bytes 0x164247d6f2b425ac5771423ae6c80c754f7172b0) (name (some "foo")) (version 0x1a)))'
-      );
-      expect(tx.success).toBeTruthy();
-    });
-
-    test("fails for an invalid principal", async () => {
-      // Build a transaction to call the contract
-      let callTxOptions = {
-        senderKey: Accounts.WALLET_1.secretKey,
-        contractAddress: Accounts.DEPLOYER.stxAddress,
-        contractName: "test-2-1",
-        functionName: "test",
-        functionArgs: [
-          principalCV("SP3X6QWWETNBZWGBK6DRGTR1KX50S74D3433WDGJY"),
-        ],
-        fee: 2000,
-        network,
-        anchorMode: AnchorMode.OnChainOnly,
-        postConditionMode: PostConditionMode.Allow,
-      };
-      let transaction = await makeContractCall(callTxOptions);
-
-      // Broadcast transaction
-      let result = await broadcastTransaction(transaction, network);
-      expect((<TxBroadcastResultOk>result).error).toBeUndefined();
-
-      // Wait for the transaction to be processed
-      let [_, tx] = waitForStacksTransaction(
-        orchestrator,
-        Accounts.WALLET_1.stxAddress
-      );
-      expect(tx.description).toBe(
-        `invoked: ${Accounts.DEPLOYER.stxAddress}.test-2-1::test(SP3X6QWWETNBZWGBK6DRGTR1KX50S74D3433WDGJY)`
-      );
-      expect(tx.result).toBe(
-        "(err (tuple (hash-bytes 0xfa6bf38ed557fe417333710d6033e9419391a320) (name none) (version 0x16)))"
-      );
-      expect(tx.success).toBeFalsy();
-    });
-
-    test("fails for an invalid contract principal", async () => {
-      // Build a transaction to call the contract
-      let callTxOptions = {
-        senderKey: Accounts.WALLET_1.secretKey,
-        contractAddress: Accounts.DEPLOYER.stxAddress,
-        contractName: "test-2-1",
-        functionName: "test",
-        functionArgs: [
-          principalCV("SP3X6QWWETNBZWGBK6DRGTR1KX50S74D3433WDGJY.foo"),
-        ],
-        fee: 2000,
-        network,
-        anchorMode: AnchorMode.OnChainOnly,
-        postConditionMode: PostConditionMode.Allow,
-      };
-      let transaction = await makeContractCall(callTxOptions);
-
-      // Broadcast transaction
-      let result = await broadcastTransaction(transaction, network);
-      expect((<TxBroadcastResultOk>result).error).toBeUndefined();
-
-      // Wait for the transaction to be processed
-      let [_, tx] = waitForStacksTransaction(
-        orchestrator,
-        Accounts.WALLET_1.stxAddress
-      );
-      expect(tx.description).toBe(
-        `invoked: ${Accounts.DEPLOYER.stxAddress}.test-2-1::test(SP3X6QWWETNBZWGBK6DRGTR1KX50S74D3433WDGJY.foo)`
-      );
-      expect(tx.result).toBe(
-        '(err (tuple (hash-bytes 0xfa6bf38ed557fe417333710d6033e9419391a320) (name (some "foo")) (version 0x16)))'
-      );
-      expect(tx.success).toBeFalsy();
     });
   });
 });
