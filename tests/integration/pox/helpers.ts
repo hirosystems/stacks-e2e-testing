@@ -78,6 +78,15 @@ export const waitForNextPreparePhase = async (network: StacksNetwork, orchestrat
     return waitForStacksChainUpdate(orchestrator, height)
 }
 
+export const waitForRewardCycleId = async (network: StacksNetwork, orchestrator: DevnetNetworkOrchestrator, id: number, offset?: number): Promise<StacksChainUpdate> => {
+    let response = await getPoxInfo(network);
+    let height = response.first_burnchain_block_height + id * response.reward_cycle_length;
+    if (offset) {
+        height = height + offset;
+    }
+    return waitForStacksChainUpdate(orchestrator, height)
+}
+
 export const waitForNextRewardPhase = async (network: StacksNetwork, orchestrator: DevnetNetworkOrchestrator, offset?: number): Promise<StacksChainUpdate> => {
     var height = await getBitcoinHeightOfNextRewardPhase(network);
     if (offset) {

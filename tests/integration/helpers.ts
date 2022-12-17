@@ -21,7 +21,7 @@ const DEFAULT_EPOCH_TIMELINE = {
     pox_2_activation: Constants.DEVNET_DEFAULT_POX_2_ACTIVATION,
 }
 
-export function buildDevnetNetworkOrchestrator(timeline: EpochTimeline = DEFAULT_EPOCH_TIMELINE, logs = true) {
+export function buildDevnetNetworkOrchestrator(networkId: number, timeline: EpochTimeline = DEFAULT_EPOCH_TIMELINE, logs = true) {
     let working_dir = `/tmp/stacks-test-${Date.now()}`;
     let config = {
         logs,
@@ -35,7 +35,6 @@ export function buildDevnetNetworkOrchestrator(timeline: EpochTimeline = DEFAULT
             working_dir,
         }
     };
-    let networkId = parseInt(process.env.JEST_WORKER_ID!);
     let consolidatedConfig = getIsolatedNetworkConfigUsingNetworkId(networkId, config);
     let orchestrator = new DevnetNetworkOrchestrator(consolidatedConfig);
     return orchestrator;
@@ -79,3 +78,8 @@ export const waitForStacksTransaction = (
     }
   }
 };
+
+export const getNetworkIdFromCtx = (task_id: string): number => {
+  let networkId = Math.abs(parseInt(task_id))%500;
+  return networkId;
+}
