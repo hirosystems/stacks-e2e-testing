@@ -94,8 +94,8 @@ export const expectAccountToBe = async (network: StacksNetwork, address: string,
 
 export const broadcastStackSTX = async (poxVersion: number, network: StacksNetwork, amount: number, account: Account, blockHeight: number, cycles: number, fee: number) : Promise<TxBroadcastResult> => {
     const nonce = await getNonce(account.stxAddress, network);
-    const { hashMode, data } = decodeBtcAddress(account.btcAddress);
-    const version = bufferCV(toBytes(new Uint8Array([hashMode.valueOf()])));
+    const { version, data } = decodeBtcAddress(account.btcAddress);
+    const versionCV = bufferCV(toBytes(new Uint8Array([version.valueOf()])));
     const hashbytes = bufferCV(data);
 
     const txOptions = {
@@ -105,7 +105,7 @@ export const broadcastStackSTX = async (poxVersion: number, network: StacksNetwo
       functionArgs: [
         uintCV(amount),
         tupleCV({
-            version,
+            versionCV,
             hashbytes,
         }),
         uintCV(blockHeight),

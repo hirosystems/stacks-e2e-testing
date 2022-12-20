@@ -10,6 +10,7 @@ import {
 } from "@stacks/transactions";
 import { StacksNetwork, StacksTestnet } from "@stacks/network";
 import { Accounts, Constants } from "../../constants";
+import { getAccount, expectAccountToBe } from '../../pox/helpers'
 import { principalCV } from "@stacks/transactions/dist/clarity/types/principalCV";
 import {
     buildDevnetNetworkOrchestrator,
@@ -74,6 +75,10 @@ describe("transaction-fee", () => {
             `deployed: ${Accounts.DEPLOYER.stxAddress}.foo-test`
         );
         expect(tx_foo_test.success).toBeTruthy();
+
+        //TODO: Get balance of current user. Call foo-test. Verify test failure, check balance after execution.
+        let {balance: balanceBeforeFunctionCall} = await getAccount (network, Accounts.DEPLOYER.stxAddress);
+        await expectAccountToBe (network, Accounts.DEPLOYER.stxAddress, balanceBeforeFunctionCall, 0);
 
         orchestrator.stop();
     });
