@@ -14,28 +14,30 @@ import {
   buildDevnetNetworkOrchestrator,
   waitForStacksChainUpdate,
   waitForStacksTransaction,
+  getNetworkIdFromCtx,
 } from "../../helpers";
 import { DevnetNetworkOrchestrator } from "@hirosystems/stacks-devnet-js";
+import { describe, expect, it, beforeAll, afterAll } from 'vitest'
 
 describe("tx-sponsor?", () => {
   let orchestrator: DevnetNetworkOrchestrator;
   let network: StacksNetwork;
 
-  beforeAll(() => {
-    orchestrator = buildDevnetNetworkOrchestrator();
+  beforeAll(async (ctx) => {
+    orchestrator = buildDevnetNetworkOrchestrator(getNetworkIdFromCtx(ctx.id));
     orchestrator.start();
     network = new StacksTestnet({ url: orchestrator.getStacksNodeUrl() });
   });
 
-  afterAll(() => {
-    orchestrator.stop();
+  afterAll(async () => {
+    orchestrator.terminate();
   });
 
   const codeBody = `(define-public (test-1)
     (ok tx-sponsor?)
 )`;
 
-  test("is invalid in 2.05", async () => {
+  it("is invalid in 2.05", async () => {
     // Wait for Stacks 2.05 to start
     waitForStacksChainUpdate(orchestrator, Constants.DEVNET_DEFAULT_EPOCH_2_05);
 
@@ -57,7 +59,7 @@ describe("tx-sponsor?", () => {
     expect((<TxBroadcastResultOk>result).error).toBeUndefined();
 
     // Wait for the transaction to be processed
-    let [block, tx] = waitForStacksTransaction(
+    let [block, tx] = await waitForStacksTransaction(
       orchestrator,
       Accounts.DEPLOYER.stxAddress
     );
@@ -71,7 +73,7 @@ describe("tx-sponsor?", () => {
   });
 
   describe("in 2.1", () => {
-    beforeAll(() => {
+    beforeAll(async (ctx) => {
       // Wait for 2.1 to go live
       waitForStacksChainUpdate(
         orchestrator,
@@ -79,7 +81,7 @@ describe("tx-sponsor?", () => {
       );
     });
 
-    test("is valid", async () => {
+    it("is valid", async () => {
       // Build the transaction to deploy the contract
       let deployTxOptions = {
         senderKey: Accounts.DEPLOYER.secretKey,
@@ -98,7 +100,7 @@ describe("tx-sponsor?", () => {
       expect((<TxBroadcastResultOk>result).error).toBeUndefined();
 
       // Wait for the transaction to be processed
-      let [block, tx] = waitForStacksTransaction(
+      let [block, tx] = await waitForStacksTransaction(
         orchestrator,
         Accounts.DEPLOYER.stxAddress
       );
@@ -108,7 +110,7 @@ describe("tx-sponsor?", () => {
       expect(tx.success).toBeTruthy();
     });
 
-    test("works for an unsponsored transaction", async () => {
+    it("works for an unsponsored transaction", async () => {
       // Build a transaction to call the contract
       let callTxOptions: SignedContractCallOptions = {
         senderKey: Accounts.WALLET_1.secretKey,
@@ -128,7 +130,7 @@ describe("tx-sponsor?", () => {
       expect((<TxBroadcastResultOk>result).error).toBeUndefined();
 
       // Wait for the transaction to be processed
-      let [block, tx] = waitForStacksTransaction(
+      let [block, tx] = await waitForStacksTransaction(
         orchestrator,
         Accounts.WALLET_1.stxAddress
       );
@@ -139,7 +141,7 @@ describe("tx-sponsor?", () => {
       expect(tx.success).toBeTruthy();
     });
 
-    test("works for a sponsored transaction", async () => {
+    it("works for a sponsored transaction", async () => {
       // Build a transaction to call the contract
       let callTxOptions = {
         senderKey: Accounts.WALLET_1.secretKey,
@@ -169,7 +171,7 @@ describe("tx-sponsor?", () => {
       expect((<TxBroadcastResultOk>result).error).toBeUndefined();
 
       // Wait for the transaction to be processed
-      let [_, tx] = waitForStacksTransaction(
+      let [_, tx] = await waitForStacksTransaction(
         orchestrator,
         Accounts.WALLET_1.stxAddress
       );

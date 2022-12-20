@@ -13,21 +13,23 @@ import {
   buildDevnetNetworkOrchestrator,
   waitForStacksChainUpdate,
   waitForStacksTransaction,
+  getNetworkIdFromCtx,
 } from "../../helpers";
 import { DevnetNetworkOrchestrator } from "@hirosystems/stacks-devnet-js";
+import { describe, expect, it, beforeAll, afterAll } from 'vitest'
 
 describe("stx-transfer-memo?", () => {
   let orchestrator: DevnetNetworkOrchestrator;
   let network: StacksNetwork;
 
-  beforeAll(() => {
-    orchestrator = buildDevnetNetworkOrchestrator();
+  beforeAll(async (ctx) => {
+    orchestrator = buildDevnetNetworkOrchestrator(getNetworkIdFromCtx(ctx.id));
     orchestrator.start();
     network = new StacksTestnet({ url: orchestrator.getStacksNodeUrl() });
   });
 
-  afterAll(() => {
-    orchestrator.stop();
+  afterAll(async () => {
+    orchestrator.terminate();
   });
 
   const codeBody = `(define-public (test-1)
@@ -38,7 +40,7 @@ describe("stx-transfer-memo?", () => {
       (stx-transfer-memo? u50 'SP3X6QWWETNBZWGBK6DRGTR1KX50S74D3433WDGJY tx-sender 0x00))
 )`;
 
-  test("is invalid in 2.05", async () => {
+  it("is invalid in 2.05", async () => {
     // Wait for Stacks 2.05 to start
     waitForStacksChainUpdate(orchestrator, Constants.DEVNET_DEFAULT_EPOCH_2_05);
 
@@ -60,7 +62,7 @@ describe("stx-transfer-memo?", () => {
     expect((<TxBroadcastResultOk>result).error).toBeUndefined();
 
     // Wait for the transaction to be processed
-    let [block, tx] = waitForStacksTransaction(
+    let [block, tx] = await waitForStacksTransaction(
       orchestrator,
       Accounts.DEPLOYER.stxAddress
     );
@@ -74,7 +76,7 @@ describe("stx-transfer-memo?", () => {
   });
 
   describe("in 2.1", () => {
-    beforeAll(() => {
+    beforeAll(async (ctx) => {
       // Wait for 2.1 to go live
       waitForStacksChainUpdate(
         orchestrator,
@@ -82,7 +84,7 @@ describe("stx-transfer-memo?", () => {
       );
     });
 
-    test("is valid", async () => {
+    it("is valid", async () => {
       // Build the transaction to deploy the contract
       let deployTxOptions = {
         senderKey: Accounts.DEPLOYER.secretKey,
@@ -101,7 +103,7 @@ describe("stx-transfer-memo?", () => {
       expect((<TxBroadcastResultOk>result).error).toBeUndefined();
 
       // Wait for the transaction to be processed
-      let [block, tx] = waitForStacksTransaction(
+      let [block, tx] = await waitForStacksTransaction(
         orchestrator,
         Accounts.DEPLOYER.stxAddress
       );
@@ -111,7 +113,7 @@ describe("stx-transfer-memo?", () => {
       expect(tx.success).toBeTruthy();
     });
 
-    test("works for a legitimate transfer", async () => {
+    it("works for a legitimate transfer", async () => {
       // Build a transaction to call the contract
       let callTxOptions: SignedContractCallOptions = {
         senderKey: Accounts.WALLET_1.secretKey,
@@ -131,7 +133,7 @@ describe("stx-transfer-memo?", () => {
       expect((<TxBroadcastResultOk>result).error).toBeUndefined();
 
       // Wait for the transaction to be processed
-      let [block, tx] = waitForStacksTransaction(
+      let [block, tx] = await waitForStacksTransaction(
         orchestrator,
         Accounts.WALLET_1.stxAddress
       );
@@ -142,7 +144,7 @@ describe("stx-transfer-memo?", () => {
       expect(tx.success).toBeTruthy();
     });
 
-    test("works for an error", async () => {
+    it("works for an error", async () => {
       // Build a transaction to call the contract
       let callTxOptions = {
         senderKey: Accounts.WALLET_1.secretKey,
@@ -162,7 +164,7 @@ describe("stx-transfer-memo?", () => {
       expect((<TxBroadcastResultOk>result).error).toBeUndefined();
 
       // Wait for the transaction to be processed
-      let [_, tx] = waitForStacksTransaction(
+      let [_, tx] = await waitForStacksTransaction(
         orchestrator,
         Accounts.WALLET_1.stxAddress
       );

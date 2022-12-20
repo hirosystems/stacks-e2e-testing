@@ -14,8 +14,10 @@ import {
   getBitcoinBlockHeight,
   waitForStacksChainUpdate,
   waitForStacksTransaction,
+  getNetworkIdFromCtx,
 } from "../../helpers";
 import { DevnetNetworkOrchestrator } from "@hirosystems/stacks-devnet-js";
+import { describe, expect, it, beforeAll, afterAll } from 'vitest'
 
 const STACKS_2_1_EPOCH = 109;
 
@@ -23,8 +25,8 @@ describe("define a trait with duplicate identical methods", () => {
   let orchestrator: DevnetNetworkOrchestrator;
   let network: StacksNetwork;
 
-  beforeAll(() => {
-    orchestrator = buildDevnetNetworkOrchestrator(
+  beforeAll(async (ctx) => {
+    orchestrator = buildDevnetNetworkOrchestrator(getNetworkIdFromCtx(ctx.id),
       {
         epoch_2_0: 100,
         epoch_2_05: 102,
@@ -37,8 +39,8 @@ describe("define a trait with duplicate identical methods", () => {
     network = new StacksTestnet({ url: orchestrator.getStacksNodeUrl() });
   });
 
-  afterAll(() => {
-    orchestrator.stop();
+  afterAll(async () => {
+    orchestrator.terminate();
   });
 
   const identicalDouble = `(define-trait identical-double-method (
@@ -49,7 +51,7 @@ describe("define a trait with duplicate identical methods", () => {
   (define-read-only (foo (x bool)) (ok x) )`;
 
   describe("in 2.05", () => {
-    beforeAll(() => {
+    beforeAll(async (ctx) => {
       // Wait for Stacks 2.05 to start
       waitForStacksChainUpdate(
         orchestrator,
@@ -57,15 +59,15 @@ describe("define a trait with duplicate identical methods", () => {
       );
     });
 
-    afterAll(() => {
+    afterAll(async () => {
       // Make sure this we stayed in 2.05
-      let chainUpdate = orchestrator.waitForStacksBlock();
+      let chainUpdate = await orchestrator.waitForNextStacksBlock();
       expect(getBitcoinBlockHeight(chainUpdate)).toBeLessThanOrEqual(
         STACKS_2_1_EPOCH
       );
     });
 
-    test("test", async () => {
+    it("test", async () => {
       // Build the transaction to deploy the contract
       let deployTxOptions = {
         senderKey: Accounts.DEPLOYER.secretKey,
@@ -84,7 +86,7 @@ describe("define a trait with duplicate identical methods", () => {
       expect((<TxBroadcastResultOk>result).error).toBeUndefined();
 
       // Wait for the transaction to be processed
-      waitForStacksTransaction(orchestrator, Accounts.DEPLOYER.stxAddress);
+      await waitForStacksTransaction(orchestrator, Accounts.DEPLOYER.stxAddress);
 
       // Build the transaction to deploy the contract
       deployTxOptions = {
@@ -105,18 +107,18 @@ describe("define a trait with duplicate identical methods", () => {
 
       // Wait a block and verify that the transaction was not included.
       // In 2.05, this transaction is just silently ignored by the miner.
-      let chainUpdate = orchestrator.waitForStacksBlock();
+      let chainUpdate = await orchestrator.waitForNextStacksBlock();
       expect(chainUpdate.new_blocks[0].block.transactions.length).toBe(1);
     });
   });
 
   describe("in 2.1", () => {
-    beforeAll(() => {
+    beforeAll(async (ctx) => {
       // Wait for 2.1 to go live
       waitForStacksChainUpdate(orchestrator, STACKS_2_1_EPOCH);
     });
 
-    test("Clarity1", async () => {
+    it("Clarity1", async () => {
       // Build the transaction to deploy the contract
       let deployTxOptions = {
         clarityVersion: 1,
@@ -136,7 +138,7 @@ describe("define a trait with duplicate identical methods", () => {
       expect((<TxBroadcastResultOk>result).error).toBeUndefined();
 
       // Wait for the transaction to be processed
-      let [block, tx] = waitForStacksTransaction(
+      let [block, tx] = await waitForStacksTransaction(
         orchestrator,
         Accounts.DEPLOYER.stxAddress
       );
@@ -146,7 +148,7 @@ describe("define a trait with duplicate identical methods", () => {
       expect(tx.success).toBeTruthy();
     });
 
-    test("Clarity2", async () => {
+    it("Clarity2", async () => {
       // Build the transaction to deploy the contract
       let deployTxOptions = {
         clarityVersion: 2,
@@ -166,7 +168,7 @@ describe("define a trait with duplicate identical methods", () => {
       expect((<TxBroadcastResultOk>result).error).toBeUndefined();
 
       // Wait for the transaction to be processed
-      let [block, tx] = waitForStacksTransaction(
+      let [block, tx] = await waitForStacksTransaction(
         orchestrator,
         Accounts.DEPLOYER.stxAddress
       );

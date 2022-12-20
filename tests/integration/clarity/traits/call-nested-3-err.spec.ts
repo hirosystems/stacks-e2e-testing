@@ -4,11 +4,13 @@ import {
   buildDevnetNetworkOrchestrator,
   getBitcoinBlockHeight,
   waitForStacksChainUpdate,
+  getNetworkIdFromCtx,
 } from "../../helpers";
 import { DevnetNetworkOrchestrator } from "@hirosystems/stacks-devnet-js";
 import { contract_call, load_versioned } from "./helper";
 import { falseCV, responseErrorCV } from "@stacks/transactions";
 import { contractPrincipalCV } from "@stacks/transactions/dist/clarity/types/principalCV";
+import { describe, expect, it, beforeAll, afterAll } from 'vitest'
 
 const STACKS_2_1_EPOCH = 109;
 
@@ -16,8 +18,8 @@ describe("call functions with nested traits", () => {
   let orchestrator: DevnetNetworkOrchestrator;
   let network: StacksNetwork;
 
-  beforeAll(() => {
-    orchestrator = buildDevnetNetworkOrchestrator(
+  beforeAll(async (ctx) => {
+    orchestrator = buildDevnetNetworkOrchestrator(getNetworkIdFromCtx(ctx.id),
       {
         epoch_2_0: 100,
         epoch_2_05: 102,
@@ -33,11 +35,11 @@ describe("call functions with nested traits", () => {
     waitForStacksChainUpdate(orchestrator, Constants.DEVNET_DEFAULT_EPOCH_2_05);
   });
 
-  afterAll(() => {
-    orchestrator.stop();
+  afterAll(async () => {
+    orchestrator.terminate();
   });
 
-  test("in 2.05", async () => {
+  it("in 2.05", async () => {
     await load_versioned(Accounts.DEPLOYER, "empty", network, orchestrator);
     await load_versioned(
       Accounts.DEPLOYER,
@@ -73,19 +75,19 @@ describe("call functions with nested traits", () => {
     expect(res.ok).toBeFalsy();
 
     // Make sure this we stayed in 2.05
-    let chainUpdate = orchestrator.waitForStacksBlock();
+    let chainUpdate = await orchestrator.waitForNextStacksBlock();
     expect(getBitcoinBlockHeight(chainUpdate)).toBeLessThanOrEqual(
       STACKS_2_1_EPOCH
     );
   });
 
   describe("in 2.1", () => {
-    beforeAll(() => {
+    beforeAll(async (ctx) => {
       // Wait for 2.1 to go live
       waitForStacksChainUpdate(orchestrator, STACKS_2_1_EPOCH);
     });
 
-    test("Clarity1", async () => {
+    it("Clarity1", async () => {
       await load_versioned(Accounts.WALLET_1, "empty", network, orchestrator);
       await load_versioned(
         Accounts.WALLET_1,
@@ -124,7 +126,7 @@ describe("call functions with nested traits", () => {
       expect(res.ok).toBeFalsy();
     });
 
-    test("Clarity2", async () => {
+    it("Clarity2", async () => {
       await load_versioned(Accounts.WALLET_2, "empty", network, orchestrator);
       await load_versioned(
         Accounts.WALLET_2,

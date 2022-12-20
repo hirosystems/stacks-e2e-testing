@@ -14,8 +14,10 @@ import {
   getBitcoinBlockHeight,
   waitForStacksChainUpdate,
   waitForStacksTransaction,
+  getNetworkIdFromCtx,
 } from "../../helpers";
 import { DevnetNetworkOrchestrator } from "@hirosystems/stacks-devnet-js";
+import { describe, expect, it, beforeAll, afterAll } from 'vitest'
 
 const STACKS_2_1_EPOCH = 109;
 
@@ -23,8 +25,8 @@ describe("use transitive trait name", () => {
   let orchestrator: DevnetNetworkOrchestrator;
   let network: StacksNetwork;
 
-  beforeAll(() => {
-    orchestrator = buildDevnetNetworkOrchestrator(
+  beforeAll(async (ctx) => {
+    orchestrator = buildDevnetNetworkOrchestrator(getNetworkIdFromCtx(ctx.id),
       {
         epoch_2_0: 100,
         epoch_2_05: 102,
@@ -40,8 +42,8 @@ describe("use transitive trait name", () => {
     waitForStacksChainUpdate(orchestrator, Constants.DEVNET_DEFAULT_EPOCH_2_05);
   });
 
-  afterAll(() => {
-    orchestrator.stop();
+  afterAll(async () => {
+    orchestrator.terminate();
   });
 
   const mathTrait = `(define-trait math (
@@ -67,7 +69,7 @@ describe("use transitive trait name", () => {
     (contract-call? math-contract sub x y)
   )`;
 
-  test("in 2.05", async () => {
+  it("in 2.05", async () => {
     // Build the transaction to deploy the contract
     let deployTxOptions = {
       senderKey: Accounts.DEPLOYER.secretKey,
@@ -86,7 +88,7 @@ describe("use transitive trait name", () => {
     expect((<TxBroadcastResultOk>result).error).toBeUndefined();
 
     // Wait for the transaction to be processed
-    waitForStacksTransaction(orchestrator, Accounts.DEPLOYER.stxAddress);
+    await waitForStacksTransaction(orchestrator, Accounts.DEPLOYER.stxAddress);
 
     // Build the transaction to deploy the contract
     deployTxOptions = {
@@ -106,7 +108,7 @@ describe("use transitive trait name", () => {
     expect((<TxBroadcastResultOk>result).error).toBeUndefined();
 
     // Wait for the transaction to be processed
-    waitForStacksTransaction(orchestrator, Accounts.DEPLOYER.stxAddress);
+    await waitForStacksTransaction(orchestrator, Accounts.DEPLOYER.stxAddress);
 
     // Build the transaction to deploy the contract
     deployTxOptions = {
@@ -126,7 +128,7 @@ describe("use transitive trait name", () => {
     expect((<TxBroadcastResultOk>result).error).toBeUndefined();
 
     // Wait for the transaction to be processed
-    let [_, tx] = waitForStacksTransaction(
+    let [_, tx] = await waitForStacksTransaction(
       orchestrator,
       Accounts.DEPLOYER.stxAddress
     );
@@ -136,19 +138,19 @@ describe("use transitive trait name", () => {
     expect(tx.success).toBeTruthy();
 
     // Make sure we stayed in 2.05
-    let chainUpdate = orchestrator.waitForStacksBlock();
+    let chainUpdate = await orchestrator.waitForNextStacksBlock();
     expect(getBitcoinBlockHeight(chainUpdate)).toBeLessThanOrEqual(
       STACKS_2_1_EPOCH
     );
   });
 
   describe("in 2.1", () => {
-    beforeAll(() => {
+    beforeAll(async (ctx) => {
       // Wait for 2.1 to go live
       waitForStacksChainUpdate(orchestrator, STACKS_2_1_EPOCH);
     });
 
-    test("Clarity1", async () => {
+    it("Clarity1", async () => {
       // Build the transaction to deploy the contract
       let deployTxOptions = {
         clarityVersion: 1,
@@ -168,7 +170,7 @@ describe("use transitive trait name", () => {
       expect((<TxBroadcastResultOk>result).error).toBeUndefined();
 
       // Wait for the transaction to be processed
-      let [_, tx] = waitForStacksTransaction(
+      let [_, tx] = await waitForStacksTransaction(
         orchestrator,
         Accounts.DEPLOYER.stxAddress
       );
@@ -179,7 +181,7 @@ describe("use transitive trait name", () => {
     });
 
     describe("Clarity2", () => {
-      test("using Clarity1 trait", async () => {
+      it("using Clarity1 trait", async () => {
         // Build the transaction to deploy the contract
         let deployTxOptions = {
           clarityVersion: 2,
@@ -199,7 +201,7 @@ describe("use transitive trait name", () => {
         expect((<TxBroadcastResultOk>result).error).toBeUndefined();
 
         // Wait for the transaction to be processed
-        let [_, tx] = waitForStacksTransaction(
+        let [_, tx] = await waitForStacksTransaction(
           orchestrator,
           Accounts.DEPLOYER.stxAddress
         );
@@ -209,7 +211,7 @@ describe("use transitive trait name", () => {
         expect(tx.success).toBeTruthy();
       });
 
-      test("using Clarity2 trait", async () => {
+      it("using Clarity2 trait", async () => {
         // Build the transaction to deploy the contract
         let deployTxOptions = {
           senderKey: Accounts.WALLET_1.secretKey,
@@ -228,7 +230,7 @@ describe("use transitive trait name", () => {
         expect((<TxBroadcastResultOk>result).error).toBeUndefined();
 
         // Wait for the transaction to be processed
-        waitForStacksTransaction(orchestrator, Accounts.WALLET_1.stxAddress);
+        await waitForStacksTransaction(orchestrator, Accounts.WALLET_1.stxAddress);
 
         // Build the transaction to deploy the contract
         deployTxOptions = {
@@ -248,7 +250,7 @@ describe("use transitive trait name", () => {
         expect((<TxBroadcastResultOk>result).error).toBeUndefined();
 
         // Wait for the transaction to be processed
-        waitForStacksTransaction(orchestrator, Accounts.WALLET_1.stxAddress);
+        await waitForStacksTransaction(orchestrator, Accounts.WALLET_1.stxAddress);
 
         // Build the transaction to deploy the contract
         deployTxOptions = {
@@ -268,7 +270,7 @@ describe("use transitive trait name", () => {
         expect((<TxBroadcastResultOk>result).error).toBeUndefined();
 
         // Wait for the transaction to be processed
-        let [_, tx] = waitForStacksTransaction(
+        let [_, tx] = await waitForStacksTransaction(
           orchestrator,
           Accounts.WALLET_1.stxAddress
         );

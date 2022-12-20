@@ -4,9 +4,11 @@ import {
   buildDevnetNetworkOrchestrator,
   getBitcoinBlockHeight,
   waitForStacksChainUpdate,
+  getNetworkIdFromCtx,
 } from "../../helpers";
 import { DevnetNetworkOrchestrator } from "@hirosystems/stacks-devnet-js";
 import { load_versioned } from "./helper";
+import { describe, expect, it, beforeAll, afterAll } from 'vitest'
 
 const STACKS_2_1_EPOCH = 109;
 
@@ -14,8 +16,8 @@ describe("use trait from contract that redefines it", () => {
   let orchestrator: DevnetNetworkOrchestrator;
   let network: StacksNetwork;
 
-  beforeAll(() => {
-    orchestrator = buildDevnetNetworkOrchestrator(
+  beforeAll(async (ctx) => {
+    orchestrator = buildDevnetNetworkOrchestrator(getNetworkIdFromCtx(ctx.id),
       {
         epoch_2_0: 100,
         epoch_2_05: 102,
@@ -31,11 +33,11 @@ describe("use trait from contract that redefines it", () => {
     waitForStacksChainUpdate(orchestrator, Constants.DEVNET_DEFAULT_EPOCH_2_05);
   });
 
-  afterAll(() => {
-    orchestrator.stop();
+  afterAll(async () => {
+    orchestrator.terminate();
   });
 
-  test("in 2.05", async () => {
+  it("in 2.05", async () => {
     await load_versioned(Accounts.DEPLOYER, "a-trait", network, orchestrator);
     await load_versioned(
       Accounts.DEPLOYER,
@@ -52,20 +54,20 @@ describe("use trait from contract that redefines it", () => {
     expect(res.ok).toBeFalsy();
 
     // Make sure this we stayed in 2.05
-    let chainUpdate = orchestrator.waitForStacksBlock();
+    let chainUpdate = await orchestrator.waitForNextStacksBlock();
     expect(getBitcoinBlockHeight(chainUpdate)).toBeLessThanOrEqual(
       STACKS_2_1_EPOCH
     );
   });
 
   describe("in 2.1", () => {
-    beforeAll(() => {
+    beforeAll(async (ctx) => {
       // Wait for 2.1 to go live
       waitForStacksChainUpdate(orchestrator, STACKS_2_1_EPOCH);
     });
 
     describe("define a trait with duplicate method names", () => {
-      test("Clarity1", async () => {
+      it("Clarity1", async () => {
         await load_versioned(
           Accounts.WALLET_1,
           "a-trait",
@@ -89,7 +91,7 @@ describe("use trait from contract that redefines it", () => {
         expect(res.ok).toBeFalsy();
       });
 
-      test("Clarity2", async () => {
+      it("Clarity2", async () => {
         await load_versioned(
           Accounts.WALLET_2,
           "a-trait",

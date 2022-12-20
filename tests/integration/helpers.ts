@@ -48,12 +48,12 @@ export const getBitcoinBlockHeight = (
   return metadata.bitcoin_anchor_block_identifier.index;
 };
 
-export const waitForStacksChainUpdate = (
+export const waitForStacksChainUpdate = async (
   orchestrator: DevnetNetworkOrchestrator,
   targetBitcoinBlockHeight: number
-): StacksChainUpdate => {
+): Promise<StacksChainUpdate> => {
   while (true) {
-    let chainUpdate = orchestrator.waitForStacksBlock();
+    let chainUpdate = await orchestrator.waitForNextStacksBlock();
     let bitcoinBlockHeight = getBitcoinBlockHeight(chainUpdate);
     if (bitcoinBlockHeight >= targetBitcoinBlockHeight) {
       return chainUpdate;
@@ -61,12 +61,12 @@ export const waitForStacksChainUpdate = (
   }
 };
 
-export const waitForStacksTransaction = (
+export const waitForStacksTransaction = async (
   orchestrator: DevnetNetworkOrchestrator,
   sender: string
-): [StacksBlockMetadata, StacksTransactionMetadata] => {
+): Promise<[StacksBlockMetadata, StacksTransactionMetadata]> => {
   while (true) {
-    let chainUpdate = orchestrator.waitForStacksBlock();
+    let chainUpdate = await orchestrator.waitForNextStacksBlock();
     for (const tx of chainUpdate.new_blocks[0].block.transactions) {
       let metadata = <StacksTransactionMetadata>tx.metadata;
       if (metadata.sender == sender) {

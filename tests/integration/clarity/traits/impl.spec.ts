@@ -14,8 +14,10 @@ import {
   getBitcoinBlockHeight,
   waitForStacksChainUpdate,
   waitForStacksTransaction,
+  getNetworkIdFromCtx,
 } from "../../helpers";
 import { DevnetNetworkOrchestrator } from "@hirosystems/stacks-devnet-js";
+import { describe, expect, it, beforeAll, afterAll } from 'vitest'
 
 const STACKS_2_1_EPOCH = 109;
 
@@ -23,8 +25,8 @@ describe("impl", () => {
   let orchestrator: DevnetNetworkOrchestrator;
   let network: StacksNetwork;
 
-  beforeAll(() => {
-    orchestrator = buildDevnetNetworkOrchestrator(
+  beforeAll(async (ctx) => {
+    orchestrator = buildDevnetNetworkOrchestrator(getNetworkIdFromCtx(ctx.id),
       {
         epoch_2_0: 100,
         epoch_2_05: 102,
@@ -37,8 +39,8 @@ describe("impl", () => {
     network = new StacksTestnet({ url: orchestrator.getStacksNodeUrl() });
   });
 
-  afterAll(() => {
-    orchestrator.stop();
+  afterAll(async () => {
+    orchestrator.terminate();
   });
 
   const mathTrait = `(define-trait math (
@@ -51,7 +53,7 @@ describe("impl", () => {
     (define-read-only (sub (x uint) (y uint)) (ok (- x y)) )`;
 
   describe("in 2.05", () => {
-    beforeAll(() => {
+    beforeAll(async (ctx) => {
       // Wait for Stacks 2.05 to start
       waitForStacksChainUpdate(
         orchestrator,
@@ -59,15 +61,15 @@ describe("impl", () => {
       );
     });
 
-    afterAll(() => {
+    afterAll(async () => {
       // Make sure this we stayed in 2.05
-      let chainUpdate = orchestrator.waitForStacksBlock();
+      let chainUpdate = await orchestrator.waitForNextStacksBlock();
       expect(getBitcoinBlockHeight(chainUpdate)).toBeLessThanOrEqual(
         STACKS_2_1_EPOCH
       );
     });
 
-    test("publish the trait", async () => {
+    it("publish the trait", async () => {
       // Build the transaction to deploy the contract
       let deployTxOptions = {
         senderKey: Accounts.DEPLOYER.secretKey,
@@ -86,7 +88,7 @@ describe("impl", () => {
       expect((<TxBroadcastResultOk>result).error).toBeUndefined();
 
       // Wait for the transaction to be processed
-      let [block, tx] = waitForStacksTransaction(
+      let [block, tx] = await waitForStacksTransaction(
         orchestrator,
         Accounts.DEPLOYER.stxAddress
       );
@@ -96,7 +98,7 @@ describe("impl", () => {
       expect(tx.success).toBeTruthy();
     });
 
-    test("implement the trait", async () => {
+    it("implement the trait", async () => {
       // Build the transaction to deploy the contract
       let deployTxOptions = {
         senderKey: Accounts.DEPLOYER.secretKey,
@@ -115,7 +117,7 @@ describe("impl", () => {
       expect((<TxBroadcastResultOk>result).error).toBeUndefined();
 
       // Wait for the transaction to be processed
-      let [block, tx] = waitForStacksTransaction(
+      let [block, tx] = await waitForStacksTransaction(
         orchestrator,
         Accounts.DEPLOYER.stxAddress
       );
@@ -127,12 +129,12 @@ describe("impl", () => {
   });
 
   describe("in 2.1", () => {
-    beforeAll(() => {
+    beforeAll(async (ctx) => {
       // Wait for 2.1 to go live
       waitForStacksChainUpdate(orchestrator, STACKS_2_1_EPOCH);
     });
 
-    test("implement the trait", async () => {
+    it("implement the trait", async () => {
       // Build the transaction to deploy the contract
       let deployTxOptions = {
         senderKey: Accounts.DEPLOYER.secretKey,
@@ -151,7 +153,7 @@ describe("impl", () => {
       expect((<TxBroadcastResultOk>result).error).toBeUndefined();
 
       // Wait for the transaction to be processed
-      let [block, tx] = waitForStacksTransaction(
+      let [block, tx] = await waitForStacksTransaction(
         orchestrator,
         Accounts.DEPLOYER.stxAddress
       );
