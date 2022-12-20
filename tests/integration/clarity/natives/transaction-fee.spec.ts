@@ -54,21 +54,21 @@ describe("transaction-fee", () => {
         waitForStacksChainUpdate(orchestrator, Constants.DEVNET_DEFAULT_EPOCH_2_1);
 
         let deploy = deployContract(orchestrator, network);
-        let tx_foo = await deploy("foo", CONTRACT_TRAIT);
+        let tx_foo = await deploy("foo", CONTRACT_TRAIT, 0);
 
         expect(tx_foo.description).toBe(
             `deployed: ${Accounts.DEPLOYER.stxAddress}.foo`
         );
         expect(tx_foo.success).toBeTruthy();
         
-        let tx_foo_impl = await deploy("foo-impl", CONTRACT_IMPL_TRAIT);
+        let tx_foo_impl = await deploy("foo-impl", CONTRACT_IMPL_TRAIT, 1);
 
         expect(tx_foo_impl.description).toBe(
             `deployed: ${Accounts.DEPLOYER.stxAddress}.foo-impl`
         );
         expect(tx_foo_impl.success).toBeTruthy();
         
-        let tx_foo_test = await deploy("foo-test", CONTRACT_TRIGGER_CHECKERROR);
+        let tx_foo_test = await deploy("foo-test", CONTRACT_TRIGGER_CHECKERROR, 2);
 
         expect(tx_foo_test.description).toBe(
             `deployed: ${Accounts.DEPLOYER.stxAddress}.foo-test`
@@ -80,7 +80,7 @@ describe("transaction-fee", () => {
 });
 
 function deployContract(orchestrator : DevnetNetworkOrchestrator, network : StacksNetwork) {
-    return async (contractName : string, codeBody : string) => {
+    return async (contractName : string, codeBody : string, nonce: number) => {
         let deployTxOptions = {
             senderKey: Accounts.DEPLOYER.secretKey,
             contractName,
@@ -90,12 +90,14 @@ function deployContract(orchestrator : DevnetNetworkOrchestrator, network : Stac
             anchorMode: AnchorMode.OnChainOnly,
             clarityVersion: ClarityVersion.Clarity1,
             postConditionMode: PostConditionMode.Allow,
+            nonce,
         };
 
         let transaction = await makeContractDeploy(deployTxOptions);
 
         // Broadcast transaction
         let result = await broadcastTransaction(transaction, network);
+        console.log(result);
         expect((<TxBroadcastResultOk>result).error).toBeUndefined();
 
         // Wait for the transaction to be processed
