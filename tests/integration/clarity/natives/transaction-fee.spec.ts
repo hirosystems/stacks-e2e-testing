@@ -7,6 +7,9 @@ import {
     makeContractCall,
     SignedContractCallOptions,
     ClarityVersion,
+    ClarityValue,
+    createLPString,
+    contractPrincipalCV,
 } from "@stacks/transactions";
 import { StacksNetwork, StacksTestnet } from "@stacks/network";
 import { Accounts, Constants } from "../../constants";
@@ -80,12 +83,60 @@ describe("transaction-fee", () => {
         let {balance: balanceBeforeFunctionCall} = await getAccount (network, Accounts.DEPLOYER.stxAddress);
         await expectAccountToBe (network, Accounts.DEPLOYER.stxAddress, balanceBeforeFunctionCall, 0);
 
+        let contractPrincipalArg = contractPrincipalCV(
+          Accounts.DEPLOYER.stxAddress,
+          "foo-impl",
+        );
+    
+        let contractName = "foo-test";
+        let functionName = "test";
+        let functionArgs = [contractPrincipalArg];
+
+        let tx_function_call = await callFunction(orchestrator, network)(contractName, functionName, functionArgs, 4);
+        console.log(tx_function_call);
+        
+        //TODO: Expect test to fail
+
+        // Although the function invocation should have failed, the fee should have been charged
+        await expectAccountToBe (network, Accounts.DEPLOYER.stxAddress, balanceBeforeFunctionCall, 0);
+
         orchestrator.stop();
     });
 });
 
+function callFunction(orchestrator : DevnetNetworkOrchestrator, network : StacksNetwork) {
+    return async (contractName: string, functionName: string, functionArgs: ClarityValue[], nonce: number) => {
+        let deployTxOptions = {
+            senderKey: Accounts.DEPLOYER.secretKey,
+            contractAddress: Accounts.DEPLOYER.stxAddress,
+            contractName,
+            functionName,
+            functionArgs,
+            fee: 2000,
+            network,
+            anchorMode: AnchorMode.OnChainOnly,
+            clarityVersion: ClarityVersion.Clarity1,
+            postConditionMode: PostConditionMode.Allow,
+            nonce,
+        };
+
+        let transaction = await makeContractCall(deployTxOptions);
+        
+        // Broadcast transaction
+        let result = await broadcastTransaction(transaction, network);
+        expect((<TxBroadcastResultOk>result).error).toBeUndefined();
+
+        // Wait for the transaction to be processed
+        let [_block, tx] = waitForStacksTransaction(
+            orchestrator,
+            Accounts.DEPLOYER.stxAddress
+        );
+        return tx;
+    }
+}
+
 function deployContract(orchestrator : DevnetNetworkOrchestrator, network : StacksNetwork) {
-    return async (contractName : string, codeBody : string, nonce: number) => {
+    return async (contractName: string, codeBody: string, nonce: number) => {
         let deployTxOptions = {
             senderKey: Accounts.DEPLOYER.secretKey,
             contractName,
@@ -102,7 +153,6 @@ function deployContract(orchestrator : DevnetNetworkOrchestrator, network : Stac
 
         // Broadcast transaction
         let result = await broadcastTransaction(transaction, network);
-        console.log(result);
         expect((<TxBroadcastResultOk>result).error).toBeUndefined();
 
         // Wait for the transaction to be processed
