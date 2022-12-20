@@ -11,9 +11,9 @@ import { StacksNetwork, StacksTestnet } from "@stacks/network";
 import { Accounts, Constants } from "../../constants";
 import {
   buildDevnetNetworkOrchestrator,
-  waitForStacksChainUpdate,
   waitForStacksTransaction,
   getNetworkIdFromCtx,
+  getChainInfo,
 } from "../../helpers";
 import { DevnetNetworkOrchestrator } from "@hirosystems/stacks-devnet-js";
 import { describe, expect, it, beforeAll, afterAll } from 'vitest'
@@ -23,7 +23,8 @@ describe("stx-transfer-memo?", () => {
   let network: StacksNetwork;
 
   beforeAll(async (ctx) => {
-    orchestrator = buildDevnetNetworkOrchestrator(getNetworkIdFromCtx(ctx.id));
+    let networkId = getNetworkIdFromCtx(ctx.id);
+    orchestrator = buildDevnetNetworkOrchestrator(networkId);
     orchestrator.start();
     network = new StacksTestnet({ url: orchestrator.getStacksNodeUrl() });
   });
@@ -40,10 +41,7 @@ describe("stx-transfer-memo?", () => {
       (stx-transfer-memo? u50 'SP3X6QWWETNBZWGBK6DRGTR1KX50S74D3433WDGJY tx-sender 0x00))
 )`;
 
-  it("is invalid in 2.05", async () => {
-    // Wait for Stacks 2.05 to start
-    waitForStacksChainUpdate(orchestrator, Constants.DEVNET_DEFAULT_EPOCH_2_05);
-
+  it("is invalid before 2.1", async () => {
     // Build the transaction to deploy the contract
     let deployTxOptions = {
       senderKey: Accounts.DEPLOYER.secretKey,
@@ -66,7 +64,7 @@ describe("stx-transfer-memo?", () => {
       orchestrator,
       Accounts.DEPLOYER.stxAddress
     );
-    expect(block.bitcoin_anchor_block_identifier.index).toBeLessThan(
+    expect(block.bitcoin_anchor_block_identifier.index).toBeLessThanOrEqual(
       Constants.DEVNET_DEFAULT_EPOCH_2_1
     );
     expect(tx.description).toBe(
@@ -76,12 +74,10 @@ describe("stx-transfer-memo?", () => {
   });
 
   describe("in 2.1", () => {
-    beforeAll(async (ctx) => {
+    beforeAll(async () => {
       // Wait for 2.1 to go live
-      waitForStacksChainUpdate(
-        orchestrator,
-        Constants.DEVNET_DEFAULT_EPOCH_2_1
-      );
+      await orchestrator.waitForStacksBlockAnchoredOnBitcoinBlockOfHeight(Constants.DEVNET_DEFAULT_EPOCH_2_1)
+
     });
 
     it("is valid", async () => {

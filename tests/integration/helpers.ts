@@ -6,6 +6,7 @@ import {
   getIsolatedNetworkConfigUsingNetworkId,
 } from "@hirosystems/stacks-devnet-js";
 import { Constants } from "./constants";
+import { StacksNetwork } from "@stacks/network";
 
 interface EpochTimeline {
     epoch_2_0: number,
@@ -22,10 +23,12 @@ const DEFAULT_EPOCH_TIMELINE = {
 }
 
 export function buildDevnetNetworkOrchestrator(networkId: number, timeline: EpochTimeline = DEFAULT_EPOCH_TIMELINE, logs = true) {
-    let working_dir = `/tmp/stacks-test-${Date.now()}`;
+    let uuid = Date.now();
+    let working_dir = `/tmp/stacks-test-${uuid}-${networkId}`;
     let config = {
         logs,
         devnet: {
+            name: `ephemeral-devnet-${uuid}`,
             bitcoin_controller_block_time: Constants.BITCOIN_BLOCK_TIME,
             epoch_2_0: timeline.epoch_2_0,
             epoch_2_05: timeline.epoch_2_05,
@@ -46,19 +49,6 @@ export const getBitcoinBlockHeight = (
   let metadata = chainUpdate.new_blocks[0].block
     .metadata! as StacksBlockMetadata;
   return metadata.bitcoin_anchor_block_identifier.index;
-};
-
-export const waitForStacksChainUpdate = async (
-  orchestrator: DevnetNetworkOrchestrator,
-  targetBitcoinBlockHeight: number
-): Promise<StacksChainUpdate> => {
-  while (true) {
-    let chainUpdate = await orchestrator.waitForNextStacksBlock();
-    let bitcoinBlockHeight = getBitcoinBlockHeight(chainUpdate);
-    if (bitcoinBlockHeight >= targetBitcoinBlockHeight) {
-      return chainUpdate;
-    }
-  }
 };
 
 export const waitForStacksTransaction = async (
@@ -83,3 +73,19 @@ export const getNetworkIdFromCtx = (task_id: string): number => {
   let networkId = Math.abs(parseInt(task_id))%500;
   return networkId;
 }
+
+const delay = () => new Promise(resolve => setTimeout(resolve, 2000));
+
+export const getChainInfo = async (network: StacksNetwork, retry?: number): Promise<any> => {
+  let retryCountdown = retry ? retry: 20;
+  if (retryCountdown == 0) return Promise.reject();
+  try {
+      let response = await fetch(network.getInfoUrl())
+      let info = await response.json();
+      return info;
+  } catch (e) {
+    await delay();
+    return await getChainInfo(network, retryCountdown - 1);
+  }
+}
+

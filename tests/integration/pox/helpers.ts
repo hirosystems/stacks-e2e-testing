@@ -18,7 +18,6 @@ import {
 } from "@stacks/transactions";
 import { decodeBtcAddress } from '@stacks/stacking';
 import { toBytes } from '@stacks/common';
-import { waitForStacksChainUpdate } from '../helpers';
 
 interface Account {
     stxAddress: string,
@@ -37,7 +36,7 @@ export const getPoxInfo = async (network: StacksNetwork, retry?: number): Promis
         return poxInfo;
     } catch (e) {
       await delay();
-      return getPoxInfo(network, retryCountdown - 1);
+      return await getPoxInfo(network, retryCountdown - 1);
     }
 }
 
@@ -55,7 +54,7 @@ export const getAccount = async (network: StacksNetwork, address: string, retry?
         };
     } catch (e) {
       await delay();
-      return getAccount(network, address, retryCountdown - 1);
+      return await getAccount(network, address, retryCountdown - 1);
     }
 }
 

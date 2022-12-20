@@ -1,4 +1,4 @@
-import { buildDevnetNetworkOrchestrator, getBitcoinBlockHeight, waitForStacksChainUpdate, getNetworkIdFromCtx } from '../../helpers';
+import { buildDevnetNetworkOrchestrator, getBitcoinBlockHeight, getNetworkIdFromCtx } from '../../helpers';
 import { broadcastStackSTX, waitForNextPreparePhase, waitForNextRewardPhase, getPoxInfo, getAccount } from '../helpers'
 import { Accounts } from '../../constants';
 import { StacksTestnet } from "@stacks/network";
@@ -92,7 +92,7 @@ describe('testing stacking under epoch 2.0', () => {
         expect(wallet3.locked).toBe(BigInt(stackedByWallet3));
 
         // Wait for next PoX cycle (Bitcoin block #121)
-        await waitForStacksChainUpdate(orchestrator, 121);
+        await orchestrator.waitForStacksBlockAnchoredOnBitcoinBlockOfHeight(121);
         poxInfo = await getPoxInfo(network);
 
         console.log(poxInfo);

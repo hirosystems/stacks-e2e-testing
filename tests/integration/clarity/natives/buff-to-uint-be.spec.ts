@@ -11,9 +11,9 @@ import { StacksNetwork, StacksTestnet } from "@stacks/network";
 import { Accounts, Constants } from "../../constants";
 import {
   buildDevnetNetworkOrchestrator,
-  waitForStacksChainUpdate,
   waitForStacksTransaction,
   getNetworkIdFromCtx,
+  getChainInfo,
 } from "../../helpers";
 import { DevnetNetworkOrchestrator } from "@hirosystems/stacks-devnet-js";
 import { describe, expect, it, beforeAll, afterAll } from 'vitest'
@@ -42,10 +42,7 @@ describe("buff-to-uint-be", () => {
     (ok (buff-to-uint-be 0x))
 )`;
 
-  it("is invalid in 2.05", async () => {
-    // Wait for Stacks 2.05 to start
-    waitForStacksChainUpdate(orchestrator, Constants.DEVNET_DEFAULT_EPOCH_2_05);
-
+  it("is invalid before 2.1", async () => {
     // Build the transaction to deploy the contract
     let deployTxOptions = {
       senderKey: Accounts.DEPLOYER.secretKey,
@@ -68,7 +65,7 @@ describe("buff-to-uint-be", () => {
       orchestrator,
       Accounts.DEPLOYER.stxAddress
     );
-    expect(block.bitcoin_anchor_block_identifier.index).toBeLessThan(
+    expect(block.bitcoin_anchor_block_identifier.index).toBeLessThanOrEqual(
       Constants.DEVNET_DEFAULT_EPOCH_2_1
     );
     expect(tx.description).toBe(
@@ -78,12 +75,9 @@ describe("buff-to-uint-be", () => {
   });
 
   describe("in 2.1", () => {
-    beforeAll(async (ctx) => {
+    beforeAll(async () => {
       // Wait for 2.1 to go live
-      waitForStacksChainUpdate(
-        orchestrator,
-        Constants.DEVNET_DEFAULT_EPOCH_2_1
-      );
+      await orchestrator.waitForStacksBlockAnchoredOnBitcoinBlockOfHeight(Constants.DEVNET_DEFAULT_EPOCH_2_1)
     });
 
     it("is valid", async () => {

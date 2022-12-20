@@ -8,7 +8,11 @@
   },
   "dependencies": {
     "@hirosystems/stacks-devnet-js": "../clarinet/components/stacks-devnet-js",
+    "@noble/hashes": "^1.1.5",
+    "@noble/secp256k1": "^1.7.0",
     "@scure/base": "^1.1.1",
+    "@scure/bip32": "^1.1.1",
+    "@scure/bip39": "^1.1.0",
     "@stacks/common": "^6.0.0",
     "@stacks/network": "^6.0.0",
     "@stacks/stacking": "^6.0.0",
@@ -23,6 +27,7 @@
   "license": "ISC",
   "devDependencies": {
     "@vitest/ui": "^0.25.8",
+    "vite": "^4.0.1",
     "vitest": "^0.25.8"
   }
 }

@@ -19,9 +19,9 @@ import {
 import {
   buildDevnetNetworkOrchestrator,
   getBitcoinBlockHeight,
-  waitForStacksChainUpdate,
   waitForStacksTransaction,
   getNetworkIdFromCtx,
+  getChainInfo,
 } from "../../helpers";
 import { describe, expect, it, beforeAll, afterAll } from 'vitest'
 
@@ -30,7 +30,8 @@ describe("get-burn-block-info?", () => {
   let network: StacksNetwork;
 
   beforeAll(async (ctx) => {
-    orchestrator = buildDevnetNetworkOrchestrator(getNetworkIdFromCtx(ctx.id));
+    let networkId = getNetworkIdFromCtx(ctx.id);
+    orchestrator = buildDevnetNetworkOrchestrator(networkId);
     orchestrator.start();
     network = new StacksTestnet({ url: orchestrator.getStacksNodeUrl() });
   });
@@ -39,13 +40,7 @@ describe("get-burn-block-info?", () => {
     orchestrator.terminate();
   });
 
-  it("is invalid in 2.05", async () => {
-    // Wait for Stacks 2.05 to start
-    await waitForStacksChainUpdate(
-      orchestrator,
-      Constants.DEVNET_DEFAULT_EPOCH_2_05
-    );
-
+  it("is invalid before 2.1", async () => {
     // Build the transaction to deploy the contract
     let deployTxOptions = {
       senderKey: Accounts.DEPLOYER.secretKey,
@@ -73,7 +68,7 @@ describe("get-burn-block-info?", () => {
       orchestrator,
       Accounts.DEPLOYER.stxAddress
     );
-    expect(block.bitcoin_anchor_block_identifier.index).toBeLessThan(
+    expect(block.bitcoin_anchor_block_identifier.index).toBeLessThanOrEqual(
       Constants.DEVNET_DEFAULT_EPOCH_2_1
     );
     expect(tx.description).toBe(
@@ -85,8 +80,7 @@ describe("get-burn-block-info?", () => {
   describe("in 2.1", () => {
     beforeAll(async () => {
       // Wait for 2.1 to go live
-      await waitForStacksChainUpdate(
-        orchestrator,
+      await orchestrator.waitForStacksBlockAnchoredOnBitcoinBlockOfHeight(
         Constants.DEVNET_DEFAULT_EPOCH_2_1
       );
     });
@@ -159,8 +153,7 @@ describe("get-burn-block-info?", () => {
 
   it("returns valid pox addrs", async () => {
     // Wait for pox-2 activation
-    let chainUpdate = await waitForStacksChainUpdate(
-      orchestrator,
+    let chainUpdate = await orchestrator.waitForStacksBlockAnchoredOnBitcoinBlockOfHeight(
       Constants.DEVNET_DEFAULT_EPOCH_2_1
     );
 
