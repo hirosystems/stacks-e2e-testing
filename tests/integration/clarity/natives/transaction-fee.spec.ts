@@ -98,7 +98,8 @@ describe("transaction-fee", () => {
         //TODO: Expect test to fail
 
         // Although the function invocation should have failed, the fee should have been charged
-        await expectAccountToBe (network, Accounts.DEPLOYER.stxAddress, balanceBeforeFunctionCall, 0);
+        let expectedBalanceAfterFunctionCall = balanceBeforeFunctionCall - 2000;
+        await expectAccountToBe (network, Accounts.DEPLOYER.stxAddress, expectedBalanceAfterFunctionCall, 0);
 
         orchestrator.stop();
     });
