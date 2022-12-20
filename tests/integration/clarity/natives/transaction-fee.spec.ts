@@ -18,6 +18,31 @@ import {
 } from "../../helpers";
 import { DevnetNetworkOrchestrator } from "@hirosystems/stacks-devnet-js";
 
+const CONTRACT_TRAIT = `
+(define-trait foo
+    (
+        (lolwut () (response bool uint))
+    )
+)
+`
+
+const CONTRACT_IMPL_TRAIT = `
+(impl-trait .foo.foo)
+(define-public (lolwut)
+    (ok true)
+)
+`
+
+const CONTRACT_TRIGGER_CHECKERROR = `
+(use-trait trait .foo.foo)
+
+(define-public (test (ref <trait>))
+    (ok (internal (some ref)))
+)
+
+(define-private (internal (ref (optional <trait>))) true)
+`
+
 describe("transaction-fee", () => {
 
     test("fee is charged prior to execution", async () => {
@@ -29,13 +54,26 @@ describe("transaction-fee", () => {
         waitForStacksChainUpdate(orchestrator, Constants.DEVNET_DEFAULT_EPOCH_2_1);
 
         let deploy = deployContract(orchestrator, network);
-        let tx = await deploy("test-2-1", "(define-public (test (p bool)) (ok p))");
+        let tx_foo = await deploy("foo", CONTRACT_TRAIT);
 
-        expect(tx.description).toBe(
-            `deployed: ${Accounts.DEPLOYER.stxAddress}.test-2-1`
+        expect(tx_foo.description).toBe(
+            `deployed: ${Accounts.DEPLOYER.stxAddress}.foo`
         );
-    
-        expect(tx.success).toBeTruthy();
+        expect(tx_foo.success).toBeTruthy();
+        
+        let tx_foo_impl = await deploy("foo-impl", CONTRACT_IMPL_TRAIT);
+
+        expect(tx_foo_impl.description).toBe(
+            `deployed: ${Accounts.DEPLOYER.stxAddress}.foo-impl`
+        );
+        expect(tx_foo_impl.success).toBeTruthy();
+        
+        let tx_foo_test = await deploy("foo-test", CONTRACT_TRIGGER_CHECKERROR);
+
+        expect(tx_foo_test.description).toBe(
+            `deployed: ${Accounts.DEPLOYER.stxAddress}.foo-test`
+        );
+        expect(tx_foo_test.success).toBeTruthy();
 
         orchestrator.stop();
     });
