@@ -19,11 +19,10 @@ import {
 import { DevnetNetworkOrchestrator } from "@hirosystems/stacks-devnet-js";
 import { describe, expect, it, beforeAll, afterAll } from 'vitest'
 
-const STACKS_2_1_EPOCH = 112;
-
 describe("use", () => {
   let orchestrator: DevnetNetworkOrchestrator;
   let network: StacksNetwork;
+  const STACKS_2_1_EPOCH = 112;
 
   beforeAll(async (ctx) => {
     let networkId = getNetworkIdFromCtx(ctx.id);
@@ -81,7 +80,7 @@ describe("use", () => {
       expect((<TxBroadcastResultOk>result).error).toBeUndefined();
 
       // Wait for the transaction to be processed
-      await waitForStacksTransaction(orchestrator, Accounts.DEPLOYER.stxAddress);
+      await waitForStacksTransaction(orchestrator, transaction.txid());
 
       // Build the transaction to deploy the contract
       deployTxOptions = {
@@ -103,7 +102,7 @@ describe("use", () => {
       // Wait for the transaction to be processed
       let [_, tx] = await waitForStacksTransaction(
         orchestrator,
-        Accounts.DEPLOYER.stxAddress
+        transaction.txid()
       );
       expect(tx.description).toBe(
         `deployed: ${Accounts.DEPLOYER.stxAddress}.impl-double-trait-1`
@@ -130,7 +129,7 @@ describe("use", () => {
       // Wait for the transaction to be processed
       [_, tx] = await waitForStacksTransaction(
         orchestrator,
-        Accounts.DEPLOYER.stxAddress
+        transaction.txid()
       );
       expect(tx.description).toBe(
         `deployed: ${Accounts.DEPLOYER.stxAddress}.impl-double-trait-2`
@@ -167,7 +166,7 @@ describe("use", () => {
       // Wait for the transaction to be processed
       let [_, tx] = await waitForStacksTransaction(
         orchestrator,
-        Accounts.DEPLOYER.stxAddress
+        transaction.txid()
       );
       expect(tx.description).toBe(
         `deployed: ${Accounts.DEPLOYER.stxAddress}.impl-double-trait-1-c1`
@@ -195,7 +194,7 @@ describe("use", () => {
       // Wait for the transaction to be processed
       [_, tx] = await waitForStacksTransaction(
         orchestrator,
-        Accounts.DEPLOYER.stxAddress
+        transaction.txid()
       );
       expect(tx.description).toBe(
         `deployed: ${Accounts.DEPLOYER.stxAddress}.impl-double-trait-2-c1`
@@ -225,7 +224,7 @@ describe("use", () => {
       // Wait for the transaction to be processed
       let [_, tx] = await waitForStacksTransaction(
         orchestrator,
-        Accounts.DEPLOYER.stxAddress
+        transaction.txid()
       );
       expect(tx.description).toBe(
         `deployed: ${Accounts.DEPLOYER.stxAddress}.impl-double-trait-1-c2`
@@ -253,7 +252,7 @@ describe("use", () => {
       // Wait for the transaction to be processed
       [_, tx] = await waitForStacksTransaction(
         orchestrator,
-        Accounts.DEPLOYER.stxAddress
+        transaction.txid()
       );
       expect(tx.description).toBe(
         `deployed: ${Accounts.DEPLOYER.stxAddress}.impl-double-trait-2-c2`

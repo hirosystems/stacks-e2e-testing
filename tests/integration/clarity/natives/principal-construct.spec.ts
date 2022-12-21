@@ -67,7 +67,7 @@ describe("principal-construct?", () => {
     // Wait for the transaction to be processed
     let [block, tx] = await waitForStacksTransaction(
       orchestrator,
-      Accounts.DEPLOYER.stxAddress
+      transaction.txid()
     );
     expect(block.bitcoin_anchor_block_identifier.index).toBeLessThanOrEqual(
       Constants.DEVNET_DEFAULT_EPOCH_2_1
@@ -116,7 +116,7 @@ describe("principal-construct?", () => {
       // Wait for the transaction to be processed
       let [block, tx] = await waitForStacksTransaction(
         orchestrator,
-        Accounts.DEPLOYER.stxAddress
+        transaction.txid()
       );
       expect(tx.description).toBe(
         `deployed: ${Accounts.DEPLOYER.stxAddress}.test-2-1`
@@ -146,7 +146,7 @@ describe("principal-construct?", () => {
       // Wait for the transaction to be processed
       let [block, tx] = await waitForStacksTransaction(
         orchestrator,
-        Accounts.WALLET_1.stxAddress
+        transaction.txid()
       );
       expect(tx.description).toBe(
         `invoked: ${Accounts.DEPLOYER.stxAddress}.test-2-1::test-literal-1()`
@@ -177,7 +177,7 @@ describe("principal-construct?", () => {
       // Wait for the transaction to be processed
       let [block, tx] = await waitForStacksTransaction(
         orchestrator,
-        Accounts.WALLET_1.stxAddress
+        transaction.txid()
       );
       expect(tx.description).toBe(
         `invoked: ${Accounts.DEPLOYER.stxAddress}.test-2-1::test-literal-2()`
@@ -216,7 +216,7 @@ describe("principal-construct?", () => {
       // Wait for the transaction to be processed
       let [block, tx] = await waitForStacksTransaction(
         orchestrator,
-        Accounts.WALLET_1.stxAddress
+        transaction.txid()
       );
       expect(tx.description).toBe(
         `invoked: ${Accounts.DEPLOYER.stxAddress}.test-2-1::test-1(0x1a, 0xfa6bf38ed557fe417333710d6033e9419391a320)`
@@ -253,7 +253,7 @@ describe("principal-construct?", () => {
       // Wait for the transaction to be processed
       let [block, tx] = await waitForStacksTransaction(
         orchestrator,
-        Accounts.WALLET_1.stxAddress
+        transaction.txid()
       );
       expect(tx.description).toBe(
         `invoked: ${Accounts.DEPLOYER.stxAddress}.test-2-1::test-2(0x1a, 0xfa6bf38ed557fe417333710d6033e9419391a320, "foo")`
@@ -292,7 +292,7 @@ describe("principal-construct?", () => {
       // Wait for the transaction to be processed
       let [block, tx] = await waitForStacksTransaction(
         orchestrator,
-        Accounts.WALLET_1.stxAddress
+        transaction.txid()
       );
       expect(tx.description).toBe(
         `invoked: ${Accounts.DEPLOYER.stxAddress}.test-2-1::test-1(0x16, 0xfa6bf38ed557fe417333710d6033e9419391a320)`
@@ -331,7 +331,7 @@ describe("principal-construct?", () => {
       // Wait for the transaction to be processed
       let [block, tx] = await waitForStacksTransaction(
         orchestrator,
-        Accounts.WALLET_1.stxAddress
+        transaction.txid()
       );
       expect(tx.description).toBe(
         `invoked: ${Accounts.DEPLOYER.stxAddress}.test-2-1::test-2(0x16, 0xfa6bf38ed557fe417333710d6033e9419391a320, "foo")`
@@ -370,7 +370,7 @@ describe("principal-construct?", () => {
       // Wait for the transaction to be processed
       let [block, tx] = await waitForStacksTransaction(
         orchestrator,
-        Accounts.WALLET_1.stxAddress
+        transaction.txid()
       );
       expect(tx.description).toBe(
         `invoked: ${Accounts.DEPLOYER.stxAddress}.test-2-1::test-1(0x, 0xfa6bf38ed557fe417333710d6033e9419391a320)`
@@ -407,7 +407,7 @@ describe("principal-construct?", () => {
       // Wait for the transaction to be processed
       let [block, tx] = await waitForStacksTransaction(
         orchestrator,
-        Accounts.WALLET_1.stxAddress
+        transaction.txid()
       );
       expect(tx.description).toBe(
         `invoked: ${Accounts.DEPLOYER.stxAddress}.test-2-1::test-1(0x1a, 0xfa6bf38ed557fe417333710d6033e9419391a3)`
@@ -444,7 +444,7 @@ describe("principal-construct?", () => {
       // Wait for the transaction to be processed
       let [block, tx] = await waitForStacksTransaction(
         orchestrator,
-        Accounts.WALLET_1.stxAddress
+        transaction.txid()
       );
       expect(tx.description).toBe(
         `invoked: ${Accounts.DEPLOYER.stxAddress}.test-2-1::test-1(0x20, 0xfa6bf38ed557fe417333710d6033e9419391a320)`
@@ -481,7 +481,7 @@ describe("principal-construct?", () => {
       // Wait for the transaction to be processed
       let [block, tx] = await waitForStacksTransaction(
         orchestrator,
-        Accounts.WALLET_1.stxAddress
+        transaction.txid()
       );
       expect(tx.description).toBe(
         `invoked: ${Accounts.DEPLOYER.stxAddress}.test-2-1::test-2(0x1a, 0xfa6bf38ed557fe417333710d6033e9419391a320, "")`
@@ -518,7 +518,7 @@ describe("principal-construct?", () => {
       // Wait for the transaction to be processed
       let [block, tx] = await waitForStacksTransaction(
         orchestrator,
-        Accounts.WALLET_1.stxAddress
+        transaction.txid()
       );
       expect(tx.description).toBe(
         `invoked: ${Accounts.DEPLOYER.stxAddress}.test-2-1::test-2(0x1a, 0xfa6bf38ed557fe417333710d6033e9419391a320, "foo[")`

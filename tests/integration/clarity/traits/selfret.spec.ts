@@ -19,11 +19,10 @@ import {
 import { DevnetNetworkOrchestrator } from "@hirosystems/stacks-devnet-js";
 import { describe, expect, it, beforeAll, afterAll } from 'vitest'
 
-const STACKS_2_1_EPOCH = 112;
-
 describe("define a trait with duplicate identical methods", () => {
   let orchestrator: DevnetNetworkOrchestrator;
   let network: StacksNetwork;
+  const STACKS_2_1_EPOCH = 112;
 
   beforeAll(async (ctx) => {
     let networkId = getNetworkIdFromCtx(ctx.id);
@@ -70,7 +69,7 @@ describe("define a trait with duplicate identical methods", () => {
     // Wait for the transaction to be processed
     let [block, tx] = await waitForStacksTransaction(
       orchestrator,
-      Accounts.DEPLOYER.stxAddress
+      transaction.txid()
     );
     expect(tx.description).toBe(
       `deployed: ${Accounts.DEPLOYER.stxAddress}.selfret`
@@ -112,7 +111,7 @@ describe("define a trait with duplicate identical methods", () => {
       // Wait for the transaction to be processed
       let [block, tx] = await waitForStacksTransaction(
         orchestrator,
-        Accounts.DEPLOYER.stxAddress
+        transaction.txid()
       );
       expect(tx.description).toBe(
         `deployed: ${Accounts.DEPLOYER.stxAddress}.selfret-2`
@@ -142,7 +141,7 @@ describe("define a trait with duplicate identical methods", () => {
       // Wait for the transaction to be processed
       let [block, tx] = await waitForStacksTransaction(
         orchestrator,
-        Accounts.DEPLOYER.stxAddress
+        transaction.txid()
       );
       expect(tx.description).toBe(
         `deployed: ${Accounts.DEPLOYER.stxAddress}.selfret-3`

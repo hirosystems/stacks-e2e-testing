@@ -59,7 +59,7 @@ export const load_versioned = async (
   }
 
   // Wait for the transaction to be processed
-  let [_, tx] = await waitForStacksTransaction(orchestrator, sender.stxAddress);
+  let [_, tx] = await waitForStacksTransaction(orchestrator, transaction.txid());
   if (!tx.success) {
     return { ok: false, error: Error(tx.description) };
   } else {
@@ -97,7 +97,7 @@ export const contract_call = async (
   }
 
   // Wait for the transaction to be processed
-  let [_, tx] = await waitForStacksTransaction(orchestrator, sender.stxAddress);
+  let [_, tx] = await waitForStacksTransaction(orchestrator, transaction.txid());
   if (!tx.success) {
     return { ok: false, error: Error(tx.description) };
   } else {

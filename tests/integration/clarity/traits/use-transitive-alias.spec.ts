@@ -87,7 +87,7 @@ describe("use transitive trait alias", () => {
     expect((<TxBroadcastResultOk>result).error).toBeUndefined();
 
     // Wait for the transaction to be processed
-    await waitForStacksTransaction(orchestrator, Accounts.DEPLOYER.stxAddress);
+    await waitForStacksTransaction(orchestrator, transaction.txid());
 
     // Build the transaction to deploy the contract
     deployTxOptions = {
@@ -107,7 +107,7 @@ describe("use transitive trait alias", () => {
     expect((<TxBroadcastResultOk>result).error).toBeUndefined();
 
     // Wait for the transaction to be processed
-    await waitForStacksTransaction(orchestrator, Accounts.DEPLOYER.stxAddress);
+    await waitForStacksTransaction(orchestrator, transaction.txid());
 
     // Build the transaction to deploy the contract
     deployTxOptions = {
@@ -129,7 +129,7 @@ describe("use transitive trait alias", () => {
     // Wait for the transaction to be processed
     let [_, tx] = await waitForStacksTransaction(
       orchestrator,
-      Accounts.DEPLOYER.stxAddress
+      transaction.txid()
     );
     expect(tx.description).toBe(
       `deployed: ${Accounts.DEPLOYER.stxAddress}.use-math-trait-transitive-alias`
@@ -171,7 +171,7 @@ describe("use transitive trait alias", () => {
       // Wait for the transaction to be processed
       let [_, tx] = await waitForStacksTransaction(
         orchestrator,
-        Accounts.DEPLOYER.stxAddress
+        transaction.txid()
       );
       expect(tx.description).toBe(
         `deployed: ${Accounts.DEPLOYER.stxAddress}.use-math-trait-transitive-alias-c1`
@@ -202,7 +202,7 @@ describe("use transitive trait alias", () => {
         // Wait for the transaction to be processed
         let [_, tx] = await waitForStacksTransaction(
           orchestrator,
-          Accounts.DEPLOYER.stxAddress
+          transaction.txid()
         );
         expect(tx.description).toBe(
           `deployed: ${Accounts.DEPLOYER.stxAddress}.use-math-trait-transitive-alias-c2`
@@ -230,7 +230,7 @@ describe("use transitive trait alias", () => {
         expect((<TxBroadcastResultOk>result).error).toBeUndefined();
 
         // Wait for the transaction to be processed
-        await waitForStacksTransaction(orchestrator, Accounts.WALLET_1.stxAddress);
+        await waitForStacksTransaction(orchestrator, transaction.txid());
 
         // Build the transaction to deploy the contract
         deployTxOptions = {
@@ -251,7 +251,7 @@ describe("use transitive trait alias", () => {
         expect((<TxBroadcastResultOk>result).error).toBeUndefined();
 
         // Wait for the transaction to be processed
-        await waitForStacksTransaction(orchestrator, Accounts.WALLET_1.stxAddress);
+        await waitForStacksTransaction(orchestrator, transaction.txid());
 
         // Build the transaction to deploy the contract
         deployTxOptions = {
@@ -274,7 +274,7 @@ describe("use transitive trait alias", () => {
         // Wait for the transaction to be processed
         let [_, tx] = await waitForStacksTransaction(
           orchestrator,
-          Accounts.WALLET_1.stxAddress
+          transaction.txid()
         );
         expect(tx.description).toBe(
           `deployed: ${Accounts.WALLET_1.stxAddress}.use-math-trait-transitive-alias`

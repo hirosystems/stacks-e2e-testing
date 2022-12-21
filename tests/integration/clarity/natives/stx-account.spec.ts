@@ -69,7 +69,7 @@ describe("stx-account", () => {
     // Wait for the transaction to be processed
     let [block, tx] = await waitForStacksTransaction(
       orchestrator,
-      Accounts.DEPLOYER.stxAddress
+      transaction.txid()
     );
     expect(block.bitcoin_anchor_block_identifier.index).toBeLessThanOrEqual(
       Constants.DEVNET_DEFAULT_EPOCH_2_1
@@ -83,8 +83,7 @@ describe("stx-account", () => {
   describe("in 2.1", () => {
     beforeAll(async () => {
       // Wait for 2.1 to go live
-      await orchestrator.waitForStacksBlockAnchoredOnBitcoinBlockOfHeight(Constants.DEVNET_DEFAULT_EPOCH_2_1)
-
+      await orchestrator.waitForStacksBlockAnchoredOnBitcoinBlockOfHeight(Constants.DEVNET_DEFAULT_POX_2_ACTIVATION)
     });
 
     it("is valid", async () => {
@@ -116,7 +115,7 @@ describe("stx-account", () => {
       // Wait for the transaction to be processed
       let [block, tx] = await waitForStacksTransaction(
         orchestrator,
-        Accounts.DEPLOYER.stxAddress
+        transaction.txid()
       );
       expect(tx.description).toBe(
         `deployed: ${Accounts.DEPLOYER.stxAddress}.test-2-1`
@@ -146,7 +145,7 @@ describe("stx-account", () => {
       // Wait for the transaction to be processed
       let [block, tx] = await waitForStacksTransaction(
         orchestrator,
-        Accounts.WALLET_1.stxAddress
+        transaction.txid()
       );
       expect(tx.description).toBe(
         `invoked: ${Accounts.DEPLOYER.stxAddress}.test-2-1::test-literal-1()`
@@ -179,7 +178,7 @@ describe("stx-account", () => {
       // Wait for the transaction to be processed
       let [block, tx] = await waitForStacksTransaction(
         orchestrator,
-        Accounts.WALLET_1.stxAddress
+        transaction.txid()
       );
       expect(tx.description).toBe(
         `invoked: ${Accounts.DEPLOYER.stxAddress}.test-2-1::test-literal-2()`
@@ -214,7 +213,7 @@ describe("stx-account", () => {
       // Wait for the transaction to be processed
       let [block, tx] = await waitForStacksTransaction(
         orchestrator,
-        Accounts.WALLET_1.stxAddress
+        transaction.txid()
       );
       expect(tx.description).toBe(
         `invoked: ${Accounts.DEPLOYER.stxAddress}.test-2-1::test(SZ2J6ZY48GV1EZ5V2V5RB9MP66SW86PYKKQ9H6DPR)`
@@ -247,7 +246,7 @@ describe("stx-account", () => {
       // Wait for the transaction to be processed
       let [_, tx] = await waitForStacksTransaction(
         orchestrator,
-        Accounts.WALLET_1.stxAddress
+        transaction.txid()
       );
       expect(tx.description).toBe(
         `invoked: ${Accounts.DEPLOYER.stxAddress}.test-2-1::test(${Accounts.WALLET_1.stxAddress})`
@@ -282,7 +281,7 @@ describe("stx-account", () => {
       // Wait for the transaction to be processed
       let [_, tx] = await waitForStacksTransaction(
         orchestrator,
-        Accounts.WALLET_1.stxAddress
+        transaction.txid()
       );
       expect(tx.description).toBe(
         `invoked: ${Accounts.DEPLOYER.stxAddress}.test-2-1::test(SP3X6QWWETNBZWGBK6DRGTR1KX50S74D3433WDGJY)`
@@ -338,13 +337,13 @@ describe("stx-account", () => {
       // Wait for the transaction to be processed
       let [_, tx] = await waitForStacksTransaction(
         orchestrator,
-        Accounts.WALLET_1.stxAddress
+        transaction.txid()
       );
       expect(tx.description).toBe(
         `invoked: ${Accounts.DEPLOYER.stxAddress}.test-2-1::test(${Accounts.WALLET_1.stxAddress})`
       );
       expect(tx.result).toBe(
-        "(ok (tuple (locked u25000000000000) (unlock-height u240) (unlocked u74999999987000)))"
+        "(ok (tuple (locked u25000000000000) (unlock-height u250) (unlocked u74999999987000)))"
       );
       expect(tx.success).toBeTruthy();
     });

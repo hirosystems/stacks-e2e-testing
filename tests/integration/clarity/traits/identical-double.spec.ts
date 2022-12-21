@@ -71,7 +71,7 @@ describe("define a trait with duplicate identical methods", () => {
     // Wait for the transaction to be processed
     let [block, tx] = await waitForStacksTransaction(
       orchestrator,
-      Accounts.DEPLOYER.stxAddress
+      transaction.txid()
     );
     expect(tx.description).toBe(
       `deployed: ${Accounts.DEPLOYER.stxAddress}.identical-double-trait`
@@ -113,7 +113,7 @@ describe("define a trait with duplicate identical methods", () => {
       // Wait for the transaction to be processed
       let [block, tx] = await waitForStacksTransaction(
         orchestrator,
-        Accounts.DEPLOYER.stxAddress
+        transaction.txid()
       );
       expect(tx.description).toBe(
         `deployed: ${Accounts.DEPLOYER.stxAddress}.identical-double-trait-2`
@@ -143,7 +143,7 @@ describe("define a trait with duplicate identical methods", () => {
       // Wait for the transaction to be processed
       let [block, tx] = await waitForStacksTransaction(
         orchestrator,
-        Accounts.DEPLOYER.stxAddress
+        transaction.txid()
       );
       expect(tx.description).toBe(
         `deployed: ${Accounts.DEPLOYER.stxAddress}.identical-double-trait-3`

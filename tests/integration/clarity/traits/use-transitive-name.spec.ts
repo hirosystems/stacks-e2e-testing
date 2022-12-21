@@ -19,11 +19,10 @@ import {
 import { DevnetNetworkOrchestrator } from "@hirosystems/stacks-devnet-js";
 import { describe, expect, it, beforeAll, afterAll } from 'vitest'
 
-const STACKS_2_1_EPOCH = 112;
-
 describe("use transitive trait name", () => {
   let orchestrator: DevnetNetworkOrchestrator;
   let network: StacksNetwork;
+  const STACKS_2_1_EPOCH = 112;
 
   beforeAll(async (ctx) => {
     let networkId = getNetworkIdFromCtx(ctx.id);
@@ -87,7 +86,7 @@ describe("use transitive trait name", () => {
     expect((<TxBroadcastResultOk>result).error).toBeUndefined();
 
     // Wait for the transaction to be processed
-    await waitForStacksTransaction(orchestrator, Accounts.DEPLOYER.stxAddress);
+    await waitForStacksTransaction(orchestrator, transaction.txid());
 
     // Build the transaction to deploy the contract
     deployTxOptions = {
@@ -107,7 +106,7 @@ describe("use transitive trait name", () => {
     expect((<TxBroadcastResultOk>result).error).toBeUndefined();
 
     // Wait for the transaction to be processed
-    await waitForStacksTransaction(orchestrator, Accounts.DEPLOYER.stxAddress);
+    await waitForStacksTransaction(orchestrator, transaction.txid());
 
     // Build the transaction to deploy the contract
     deployTxOptions = {
@@ -129,7 +128,7 @@ describe("use transitive trait name", () => {
     // Wait for the transaction to be processed
     let [_, tx] = await waitForStacksTransaction(
       orchestrator,
-      Accounts.DEPLOYER.stxAddress
+      transaction.txid()
     );
     expect(tx.description).toBe(
       `deployed: ${Accounts.DEPLOYER.stxAddress}.use-math-trait-transitive-name`
@@ -171,7 +170,7 @@ describe("use transitive trait name", () => {
       // Wait for the transaction to be processed
       let [_, tx] = await waitForStacksTransaction(
         orchestrator,
-        Accounts.DEPLOYER.stxAddress
+        transaction.txid()
       );
       expect(tx.description).toBe(
         `deployed: ${Accounts.DEPLOYER.stxAddress}.use-math-trait-transitive-name-c1`
@@ -202,7 +201,7 @@ describe("use transitive trait name", () => {
         // Wait for the transaction to be processed
         let [_, tx] = await waitForStacksTransaction(
           orchestrator,
-          Accounts.DEPLOYER.stxAddress
+          transaction.txid()
         );
         expect(tx.description).toBe(
           `deployed: ${Accounts.DEPLOYER.stxAddress}.use-math-trait-transitive-name-c2`
@@ -229,7 +228,7 @@ describe("use transitive trait name", () => {
         expect((<TxBroadcastResultOk>result).error).toBeUndefined();
 
         // Wait for the transaction to be processed
-        await waitForStacksTransaction(orchestrator, Accounts.WALLET_1.stxAddress);
+        await waitForStacksTransaction(orchestrator, transaction.txid());
 
         // Build the transaction to deploy the contract
         deployTxOptions = {
@@ -249,7 +248,7 @@ describe("use transitive trait name", () => {
         expect((<TxBroadcastResultOk>result).error).toBeUndefined();
 
         // Wait for the transaction to be processed
-        await waitForStacksTransaction(orchestrator, Accounts.WALLET_1.stxAddress);
+        await waitForStacksTransaction(orchestrator, transaction.txid());
 
         // Build the transaction to deploy the contract
         deployTxOptions = {
@@ -271,7 +270,7 @@ describe("use transitive trait name", () => {
         // Wait for the transaction to be processed
         let [_, tx] = await waitForStacksTransaction(
           orchestrator,
-          Accounts.WALLET_1.stxAddress
+          transaction.txid()
         );
         expect(tx.description).toBe(
           `deployed: ${Accounts.WALLET_1.stxAddress}.use-math-trait-transitive-name`

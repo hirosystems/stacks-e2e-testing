@@ -12,18 +12,16 @@ import { Accounts, Constants } from "../../constants";
 import {
   buildDevnetNetworkOrchestrator,
   getBitcoinBlockHeight,
-  waitForStacksTransaction,
   getNetworkIdFromCtx,
   getChainInfo,
 } from "../../helpers";
-import { DevnetNetworkOrchestrator } from "@hirosystems/stacks-devnet-js";
+import { DevnetNetworkOrchestrator, StacksTransactionMetadata } from "@hirosystems/stacks-devnet-js";
 import { describe, expect, it, beforeAll, afterAll } from 'vitest'
-
-const STACKS_2_1_EPOCH = 112;
 
 describe("use and define trait with same name", () => {
   let orchestrator: DevnetNetworkOrchestrator;
   let network: StacksNetwork;
+  const STACKS_2_1_EPOCH = 112;
 
   beforeAll(async (ctx) => {
     let networkId = getNetworkIdFromCtx(ctx.id);
@@ -70,14 +68,14 @@ describe("use and define trait with same name", () => {
       postConditionMode: PostConditionMode.Allow,
     };
 
-    let transaction = await makeContractDeploy(deployTxOptions);
+    let tx = await makeContractDeploy(deployTxOptions);
 
     // Broadcast transaction
-    let result = await broadcastTransaction(transaction, network);
+    let result = await broadcastTransaction(tx, network);
     expect((<TxBroadcastResultOk>result).error).toBeUndefined();
 
     // Wait for the transaction to be processed
-    await waitForStacksTransaction(orchestrator, Accounts.DEPLOYER.stxAddress);
+    await orchestrator.waitForStacksBlockIncludingTransaction(tx.txid());
 
     // Build the transaction to deploy the contract
     deployTxOptions = {
@@ -90,24 +88,22 @@ describe("use and define trait with same name", () => {
       postConditionMode: PostConditionMode.Allow,
     };
 
-    transaction = await makeContractDeploy(deployTxOptions);
+    tx = await makeContractDeploy(deployTxOptions);
 
     // Broadcast transaction
-    result = await broadcastTransaction(transaction, network);
+    result = await broadcastTransaction(tx, network);
     expect((<TxBroadcastResultOk>result).error).toBeUndefined();
 
     // Wait for the transaction to be processed
-    let [block, tx] = await waitForStacksTransaction(
-      orchestrator,
-      Accounts.DEPLOYER.stxAddress
-    );
-    expect(tx.description).toBe(
+    let { chainUpdate, transaction } = await orchestrator.waitForStacksBlockIncludingTransaction(tx.txid());
+    let metadata = (<StacksTransactionMetadata>transaction.metadata);
+    expect(metadata.description).toBe(
       `deployed: ${Accounts.DEPLOYER.stxAddress}.use-original-and-define-a-trait`
     );
-    expect(tx.success).toBeFalsy();
+    expect(metadata.success).toBeFalsy();
 
     // Make sure we stayed in 2.05
-    expect(block.bitcoin_anchor_block_identifier.index).toBeLessThan(
+    expect(getBitcoinBlockHeight(chainUpdate)).toBeLessThan(
       STACKS_2_1_EPOCH
     );
   });
@@ -131,21 +127,19 @@ describe("use and define trait with same name", () => {
         postConditionMode: PostConditionMode.Allow,
       };
 
-      let transaction = await makeContractDeploy(deployTxOptions);
+      let tx = await makeContractDeploy(deployTxOptions);
 
       // Broadcast transaction
-      let result = await broadcastTransaction(transaction, network);
+      let result = await broadcastTransaction(tx, network);
       expect((<TxBroadcastResultOk>result).error).toBeUndefined();
 
       // Wait for the transaction to be processed
-      let [_, tx] = await waitForStacksTransaction(
-        orchestrator,
-        Accounts.DEPLOYER.stxAddress
-      );
-      expect(tx.description).toBe(
+      let { transaction } = await orchestrator.waitForStacksBlockIncludingTransaction(tx.txid());
+    let metadata = (<StacksTransactionMetadata>transaction.metadata);
+      expect(metadata.description).toBe(
         `deployed: ${Accounts.DEPLOYER.stxAddress}.use-original-and-define-a-trait-c1`
       );
-      expect(tx.success).toBeFalsy();
+      expect(metadata.success).toBeFalsy();
     });
 
     describe("Clarity2", () => {
@@ -162,21 +156,19 @@ describe("use and define trait with same name", () => {
           postConditionMode: PostConditionMode.Allow,
         };
 
-        let transaction = await makeContractDeploy(deployTxOptions);
+        let tx = await makeContractDeploy(deployTxOptions);
 
         // Broadcast transaction
-        let result = await broadcastTransaction(transaction, network);
+        let result = await broadcastTransaction(tx, network);
         expect((<TxBroadcastResultOk>result).error).toBeUndefined();
 
         // Wait for the transaction to be processed
-        let [_, tx] = await waitForStacksTransaction(
-          orchestrator,
-          Accounts.DEPLOYER.stxAddress
-        );
-        expect(tx.description).toBe(
+        let { transaction } = await orchestrator.waitForStacksBlockIncludingTransaction(tx.txid());
+        let metadata = (<StacksTransactionMetadata>transaction.metadata);
+        expect(metadata.description).toBe(
           `deployed: ${Accounts.DEPLOYER.stxAddress}.use-original-and-define-a-trait-c2`
         );
-        expect(tx.success).toBeTruthy();
+        expect(metadata.success).toBeTruthy();
       });
 
       it("using Clarity2 trait", async () => {
@@ -192,14 +184,15 @@ describe("use and define trait with same name", () => {
           postConditionMode: PostConditionMode.Allow,
         };
 
-        let transaction = await makeContractDeploy(deployTxOptions);
+        let tx = await makeContractDeploy(deployTxOptions);
 
         // Broadcast transaction
-        let result = await broadcastTransaction(transaction, network);
+        let result = await broadcastTransaction(tx, network);
         expect((<TxBroadcastResultOk>result).error).toBeUndefined();
 
         // Wait for the transaction to be processed
-        await waitForStacksTransaction(orchestrator, Accounts.WALLET_1.stxAddress);
+        await orchestrator.waitForStacksBlockIncludingTransaction(tx.txid());
+
 
         // Build the transaction to deploy the contract
         deployTxOptions = {
@@ -213,21 +206,19 @@ describe("use and define trait with same name", () => {
           postConditionMode: PostConditionMode.Allow,
         };
 
-        transaction = await makeContractDeploy(deployTxOptions);
+        tx = await makeContractDeploy(deployTxOptions);
 
         // Broadcast transaction
-        result = await broadcastTransaction(transaction, network);
+        result = await broadcastTransaction(tx, network);
         expect((<TxBroadcastResultOk>result).error).toBeUndefined();
 
         // Wait for the transaction to be processed
-        let [_, tx] = await waitForStacksTransaction(
-          orchestrator,
-          Accounts.WALLET_1.stxAddress
-        );
-        expect(tx.description).toBe(
+        let { transaction } = await orchestrator.waitForStacksBlockIncludingTransaction(tx.txid());
+        let metadata = (<StacksTransactionMetadata>transaction.metadata);
+        expect(metadata.description).toBe(
           `deployed: ${Accounts.WALLET_1.stxAddress}.use-original-and-define-a-trait`
         );
-        expect(tx.success).toBeTruthy();
+        expect(metadata.success).toBeTruthy();
       });
     });
   });

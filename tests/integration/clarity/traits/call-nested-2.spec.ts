@@ -11,11 +11,11 @@ import { someCV } from "@stacks/transactions";
 import { contractPrincipalCV } from "@stacks/transactions/dist/clarity/types/principalCV";
 import { describe, expect, it, beforeAll, afterAll } from 'vitest'
 
-const STACKS_2_1_EPOCH = 112;
 
 describe("call functions with nested traits", () => {
   let orchestrator: DevnetNetworkOrchestrator;
   let network: StacksNetwork;
+  const STACKS_2_1_EPOCH = 112;
 
   beforeAll(async (ctx) => {
     let networkId = getNetworkIdFromCtx(ctx.id);

@@ -4,6 +4,7 @@ import {
   DevnetNetworkOrchestrator,
   StacksTransactionMetadata,
   getIsolatedNetworkConfigUsingNetworkId,
+  Transaction,
 } from "@hirosystems/stacks-devnet-js";
 import { Constants } from "./constants";
 import { StacksNetwork } from "@stacks/network";
@@ -53,20 +54,10 @@ export const getBitcoinBlockHeight = (
 
 export const waitForStacksTransaction = async (
   orchestrator: DevnetNetworkOrchestrator,
-  sender: string
+  txid: string
 ): Promise<[StacksBlockMetadata, StacksTransactionMetadata]> => {
-  while (true) {
-    let chainUpdate = await orchestrator.waitForNextStacksBlock();
-    for (const tx of chainUpdate.new_blocks[0].block.transactions) {
-      let metadata = <StacksTransactionMetadata>tx.metadata;
-      if (metadata.sender == sender) {
-        return [
-          <StacksBlockMetadata>chainUpdate.new_blocks[0].block.metadata,
-          metadata,
-        ];
-      }
-    }
-  }
+  let { chainUpdate, transaction } = await orchestrator.waitForStacksBlockIncludingTransaction(txid);
+  return [ <StacksBlockMetadata>chainUpdate.new_blocks[0].block.metadata, <StacksTransactionMetadata>transaction.metadata ]
 };
 
 export const getNetworkIdFromCtx = (task_id: string): number => {

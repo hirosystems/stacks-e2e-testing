@@ -19,11 +19,10 @@ import {
 import { DevnetNetworkOrchestrator } from "@hirosystems/stacks-devnet-js";
 import { describe, expect, it, beforeAll, afterAll } from 'vitest'
 
-const STACKS_2_1_EPOCH = 112;
-
 describe("use", () => {
   let orchestrator: DevnetNetworkOrchestrator;
   let network: StacksNetwork;
+  const STACKS_2_1_EPOCH = 112;
 
   beforeAll(async (ctx) => {
     let networkId = getNetworkIdFromCtx(ctx.id);
@@ -89,7 +88,7 @@ describe("use", () => {
       // Wait for the transaction to be processed
       let [block, tx] = await waitForStacksTransaction(
         orchestrator,
-        Accounts.DEPLOYER.stxAddress
+        transaction.txid()
       );
       expect(tx.description).toBe(
         `deployed: ${Accounts.DEPLOYER.stxAddress}.math-trait`
@@ -120,7 +119,7 @@ describe("use", () => {
       // Wait for the transaction to be processed
       let [block, tx] = await waitForStacksTransaction(
         orchestrator,
-        Accounts.DEPLOYER.stxAddress
+        transaction.txid()
       );
       expect(block.bitcoin_anchor_block_identifier.index).toBeLessThan(
         STACKS_2_1_EPOCH
@@ -161,7 +160,7 @@ describe("use", () => {
         // Wait for the transaction to be processed
         let [_, tx] = await waitForStacksTransaction(
           orchestrator,
-          Accounts.DEPLOYER.stxAddress
+          transaction.txid()
         );
         expect(tx.description).toBe(
           `deployed: ${Accounts.DEPLOYER.stxAddress}.use-math-trait-2`
@@ -191,7 +190,7 @@ describe("use", () => {
         // Wait for the transaction to be processed
         let [_, tx] = await waitForStacksTransaction(
           orchestrator,
-          Accounts.DEPLOYER.stxAddress
+          transaction.txid()
         );
         expect(tx.description).toBe(
           `deployed: ${Accounts.DEPLOYER.stxAddress}.use-math-trait-2`

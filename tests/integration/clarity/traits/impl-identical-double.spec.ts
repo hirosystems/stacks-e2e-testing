@@ -19,11 +19,10 @@ import {
 import { DevnetNetworkOrchestrator } from "@hirosystems/stacks-devnet-js";
 import { describe, expect, it, beforeAll, afterAll } from 'vitest'
 
-const STACKS_2_1_EPOCH = 112;
-
 describe("define a trait with duplicate identical methods", () => {
   let orchestrator: DevnetNetworkOrchestrator;
   let network: StacksNetwork;
+  const STACKS_2_1_EPOCH = 112;
 
   beforeAll(async (ctx) => {
     let networkId = getNetworkIdFromCtx(ctx.id);
@@ -79,7 +78,7 @@ describe("define a trait with duplicate identical methods", () => {
       expect((<TxBroadcastResultOk>result).error).toBeUndefined();
 
       // Wait for the transaction to be processed
-      await waitForStacksTransaction(orchestrator, Accounts.DEPLOYER.stxAddress);
+      await waitForStacksTransaction(orchestrator, transaction.txid());
 
       // Build the transaction to deploy the contract
       deployTxOptions = {
@@ -133,7 +132,7 @@ describe("define a trait with duplicate identical methods", () => {
       // Wait for the transaction to be processed
       let [block, tx] = await waitForStacksTransaction(
         orchestrator,
-        Accounts.DEPLOYER.stxAddress
+        transaction.txid()
       );
       expect(tx.description).toBe(
         `deployed: ${Accounts.DEPLOYER.stxAddress}.impl-identical-double-trait-c1`
@@ -163,7 +162,7 @@ describe("define a trait with duplicate identical methods", () => {
       // Wait for the transaction to be processed
       let [block, tx] = await waitForStacksTransaction(
         orchestrator,
-        Accounts.DEPLOYER.stxAddress
+        transaction.txid()
       );
       expect(tx.description).toBe(
         `deployed: ${Accounts.DEPLOYER.stxAddress}.impl-identical-double-trait-c2`
