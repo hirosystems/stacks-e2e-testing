@@ -49,10 +49,18 @@ const CONTRACT_TRIGGER_CHECKERROR = `
 `
 
 describe("transaction-fee", () => {
+    let orchestrator: DevnetNetworkOrchestrator;
 
-    test("fee is charged prior to execution", async (ctx) => {
-        const orchestrator = buildDevnetNetworkOrchestrator(getNetworkIdFromCtx(ctx.meta.id));
-        orchestrator.start();
+    beforeAll(async (ctx) => {
+        orchestrator = buildDevnetNetworkOrchestrator(getNetworkIdFromCtx(ctx.id));
+        orchestrator.start()
+    });
+
+    afterAll(async () => {
+        orchestrator.terminate();
+    });
+
+    it("fee is charged prior to execution", async (ctx) => {
         const network = new StacksTestnet({ url: orchestrator.getStacksNodeUrl() });
 
         // Wait for Stacks 2.1 to start
@@ -100,8 +108,6 @@ describe("transaction-fee", () => {
         // Although the function invocation should have failed, the fee should have been charged
         let expectedBalanceAfterFunctionCall = balanceBeforeFunctionCall - 2000;
         await expectAccountToBe (network, Accounts.DEPLOYER.stxAddress, expectedBalanceAfterFunctionCall, 0);
-
-        orchestrator.terminate();
     });
 });
 
