@@ -50,7 +50,7 @@ const CONTRACT_TRIGGER_CHECKERROR = `
 describe("transaction-fee", () => {
 
     test("fee is charged prior to execution", async () => {
-        const orchestrator = buildDevnetNetworkOrchestrator(3);
+        const orchestrator = buildDevnetNetworkOrchestrator(5);
         orchestrator.start();
         const network = new StacksTestnet({ url: orchestrator.getStacksNodeUrl() });
 
@@ -81,19 +81,18 @@ describe("transaction-fee", () => {
 
         //TODO: Get balance of current user. Call foo-test. Verify test failure, check balance after execution.
         let {balance: balanceBeforeFunctionCall} = await getAccount (network, Accounts.DEPLOYER.stxAddress);
-        await expectAccountToBe (network, Accounts.DEPLOYER.stxAddress, balanceBeforeFunctionCall, 0);
+        // await expectAccountToBe (network, Accounts.DEPLOYER.stxAddress, balanceBeforeFunctionCall, 0);
 
         let contractPrincipalArg = contractPrincipalCV(
           Accounts.DEPLOYER.stxAddress,
           "foo-impl",
         );
     
-        let contractName = "foo-test";
-        let functionName = "test";
-        let functionArgs = [contractPrincipalArg];
+        let call = callFunction(orchestrator, network);
+        let tx_function_call_1 = await call("foo-impl", "lolwut", [], 3)
 
-        let tx_function_call = await callFunction(orchestrator, network)(contractName, functionName, functionArgs, 4);
-        console.log(tx_function_call);
+        call = callFunction(orchestrator, network);
+        let tx_function_call_2 = await call("foo-test", "test", [contractPrincipalArg], 4)
         
         //TODO: Expect test to fail
 
@@ -116,7 +115,6 @@ function callFunction(orchestrator : DevnetNetworkOrchestrator, network : Stacks
             fee: 2000,
             network,
             anchorMode: AnchorMode.OnChainOnly,
-            clarityVersion: ClarityVersion.Clarity1,
             postConditionMode: PostConditionMode.Allow,
             nonce,
         };
@@ -132,7 +130,7 @@ function callFunction(orchestrator : DevnetNetworkOrchestrator, network : Stacks
             orchestrator,
             tx.txid()
         );
-        return tx;
+        return transaction;
     }
 }
 
