@@ -11,33 +11,33 @@ import { StacksNetwork, StacksTestnet } from "@stacks/network";
 import { Accounts, Constants } from "../../constants";
 import {
   buildDevnetNetworkOrchestrator,
-  waitForStacksChainUpdate,
   waitForStacksTransaction,
+  getNetworkIdFromCtx,
+  getChainInfo,
 } from "../../helpers";
 import { DevnetNetworkOrchestrator } from "@hirosystems/stacks-devnet-js";
+import { describe, expect, it, beforeAll, afterAll } from 'vitest'
 
 describe("chain-id", () => {
   let orchestrator: DevnetNetworkOrchestrator;
   let network: StacksNetwork;
 
-  beforeAll(() => {
-    orchestrator = buildDevnetNetworkOrchestrator();
+  beforeAll(async (ctx) => {
+    let networkId = getNetworkIdFromCtx(ctx.id);
+    orchestrator = buildDevnetNetworkOrchestrator(networkId);
     orchestrator.start();
     network = new StacksTestnet({ url: orchestrator.getStacksNodeUrl() });
   });
 
-  afterAll(() => {
-    orchestrator.stop();
+  afterAll(async () => {
+    orchestrator.terminate();
   });
 
   const codeBody = `(define-public (test-1)
     (ok chain-id)
 )`;
 
-  test("is invalid in 2.05", async () => {
-    // Wait for Stacks 2.05 to start
-    waitForStacksChainUpdate(orchestrator, Constants.DEVNET_DEFAULT_EPOCH_2_05);
-
+  it("is invalid before 2.1", async () => {
     // Build the transaction to deploy the contract
     let deployTxOptions = {
       senderKey: Accounts.DEPLOYER.secretKey,
@@ -56,11 +56,11 @@ describe("chain-id", () => {
     expect((<TxBroadcastResultOk>result).error).toBeUndefined();
 
     // Wait for the transaction to be processed
-    let [block, tx] = waitForStacksTransaction(
+    let [block, tx] = await waitForStacksTransaction(
       orchestrator,
-      Accounts.DEPLOYER.stxAddress
+      transaction.txid()
     );
-    expect(block.bitcoin_anchor_block_identifier.index).toBeLessThan(
+    expect(block.bitcoin_anchor_block_identifier.index).toBeLessThanOrEqual(
       Constants.DEVNET_DEFAULT_EPOCH_2_1
     );
     expect(tx.description).toBe(
@@ -70,15 +70,12 @@ describe("chain-id", () => {
   });
 
   describe("in 2.1", () => {
-    beforeAll(() => {
+    beforeAll(async () => {
       // Wait for 2.1 to go live
-      waitForStacksChainUpdate(
-        orchestrator,
-        Constants.DEVNET_DEFAULT_EPOCH_2_1
-      );
+      await orchestrator.waitForStacksBlockAnchoredOnBitcoinBlockOfHeight(Constants.DEVNET_DEFAULT_EPOCH_2_1)
     });
 
-    test("is valid", async () => {
+    it("is valid", async () => {
       // Build the transaction to deploy the contract
       let deployTxOptions = {
         senderKey: Accounts.DEPLOYER.secretKey,
@@ -97,9 +94,9 @@ describe("chain-id", () => {
       expect((<TxBroadcastResultOk>result).error).toBeUndefined();
 
       // Wait for the transaction to be processed
-      let [block, tx] = waitForStacksTransaction(
+      let [block, tx] = await waitForStacksTransaction(
         orchestrator,
-        Accounts.DEPLOYER.stxAddress
+        transaction.txid()
       );
       expect(tx.description).toBe(
         `deployed: ${Accounts.DEPLOYER.stxAddress}.test-2-1`
@@ -107,7 +104,7 @@ describe("chain-id", () => {
       expect(tx.success).toBeTruthy();
     });
 
-    test("works", async () => {
+    it("works", async () => {
       // Build a transaction to call the contract
       let callTxOptions: SignedContractCallOptions = {
         senderKey: Accounts.WALLET_1.secretKey,
@@ -127,9 +124,9 @@ describe("chain-id", () => {
       expect((<TxBroadcastResultOk>result).error).toBeUndefined();
 
       // Wait for the transaction to be processed
-      let [block, tx] = waitForStacksTransaction(
+      let [block, tx] = await waitForStacksTransaction(
         orchestrator,
-        Accounts.WALLET_1.stxAddress
+        transaction.txid()
       );
       expect(tx.description).toBe(
         `invoked: ${Accounts.DEPLOYER.stxAddress}.test-2-1::test-1()`

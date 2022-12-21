@@ -4,8 +4,10 @@ import {
   DevnetNetworkOrchestrator,
   StacksTransactionMetadata,
   getIsolatedNetworkConfigUsingNetworkId,
+  Transaction,
 } from "@hirosystems/stacks-devnet-js";
 import { Constants } from "./constants";
+import { StacksNetwork } from "@stacks/network";
 
 interface EpochTimeline {
     epoch_2_0: number,
@@ -21,11 +23,13 @@ const DEFAULT_EPOCH_TIMELINE = {
     pox_2_activation: Constants.DEVNET_DEFAULT_POX_2_ACTIVATION,
 }
 
-export function buildDevnetNetworkOrchestrator(timeline: EpochTimeline = DEFAULT_EPOCH_TIMELINE, logs = true) {
-    let working_dir = `/tmp/stacks-test-${Date.now()}`;
+export function buildDevnetNetworkOrchestrator(networkId: number, timeline: EpochTimeline = DEFAULT_EPOCH_TIMELINE, logs = true) {
+    let uuid = Date.now();
+    let working_dir = `/tmp/stacks-test-${uuid}-${networkId}`;
     let config = {
         logs,
         devnet: {
+            name: `ephemeral-devnet-${uuid}`,
             bitcoin_controller_block_time: Constants.BITCOIN_BLOCK_TIME,
             epoch_2_0: timeline.epoch_2_0,
             epoch_2_05: timeline.epoch_2_05,
@@ -35,7 +39,6 @@ export function buildDevnetNetworkOrchestrator(timeline: EpochTimeline = DEFAULT
             working_dir,
         }
     };
-    let networkId = parseInt(process.env.JEST_WORKER_ID!);
     let consolidatedConfig = getIsolatedNetworkConfigUsingNetworkId(networkId, config);
     let orchestrator = new DevnetNetworkOrchestrator(consolidatedConfig);
     return orchestrator;
@@ -49,33 +52,31 @@ export const getBitcoinBlockHeight = (
   return metadata.bitcoin_anchor_block_identifier.index;
 };
 
-export const waitForStacksChainUpdate = (
+export const waitForStacksTransaction = async (
   orchestrator: DevnetNetworkOrchestrator,
-  targetBitcoinBlockHeight: number
-): StacksChainUpdate => {
-  while (true) {
-    let chainUpdate = orchestrator.waitForStacksBlock();
-    let bitcoinBlockHeight = getBitcoinBlockHeight(chainUpdate);
-    if (bitcoinBlockHeight >= targetBitcoinBlockHeight) {
-      return chainUpdate;
-    }
-  }
+  txid: string
+): Promise<[StacksBlockMetadata, StacksTransactionMetadata]> => {
+  let { chainUpdate, transaction } = await orchestrator.waitForStacksBlockIncludingTransaction(txid);
+  return [ <StacksBlockMetadata>chainUpdate.new_blocks[0].block.metadata, <StacksTransactionMetadata>transaction.metadata ]
 };
 
-export const waitForStacksTransaction = (
-  orchestrator: DevnetNetworkOrchestrator,
-  sender: string
-): [StacksBlockMetadata, StacksTransactionMetadata] => {
-  while (true) {
-    let chainUpdate = orchestrator.waitForStacksBlock();
-    for (const tx of chainUpdate.new_blocks[0].block.transactions) {
-      let metadata = <StacksTransactionMetadata>tx.metadata;
-      if (metadata.sender == sender) {
-        return [
-          <StacksBlockMetadata>chainUpdate.new_blocks[0].block.metadata,
-          metadata,
-        ];
-      }
-    }
+export const getNetworkIdFromCtx = (task_id: string): number => {
+  let networkId = Math.abs(parseInt(task_id))%500;
+  return networkId;
+}
+
+const delay = () => new Promise(resolve => setTimeout(resolve, 2000));
+
+export const getChainInfo = async (network: StacksNetwork, retry?: number): Promise<any> => {
+  let retryCountdown = retry ? retry: 20;
+  if (retryCountdown == 0) return Promise.reject();
+  try {
+      let response = await fetch(network.getInfoUrl())
+      let info = await response.json();
+      return info;
+  } catch (e) {
+    await delay();
+    return await getChainInfo(network, retryCountdown - 1);
   }
-};
+}
+

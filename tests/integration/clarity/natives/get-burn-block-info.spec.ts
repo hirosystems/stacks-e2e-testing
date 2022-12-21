@@ -19,31 +19,28 @@ import {
 import {
   buildDevnetNetworkOrchestrator,
   getBitcoinBlockHeight,
-  waitForStacksChainUpdate,
   waitForStacksTransaction,
+  getNetworkIdFromCtx,
+  getChainInfo,
 } from "../../helpers";
+import { describe, expect, it, beforeAll, afterAll } from 'vitest'
 
 describe("get-burn-block-info?", () => {
   let orchestrator: DevnetNetworkOrchestrator;
   let network: StacksNetwork;
 
-  beforeAll(() => {
-    orchestrator = buildDevnetNetworkOrchestrator();
+  beforeAll(async (ctx) => {
+    let networkId = getNetworkIdFromCtx(ctx.id);
+    orchestrator = buildDevnetNetworkOrchestrator(networkId);
     orchestrator.start();
     network = new StacksTestnet({ url: orchestrator.getStacksNodeUrl() });
   });
 
-  afterAll(() => {
-    orchestrator.stop();
+  afterAll(async () => {
+    orchestrator.terminate();
   });
 
-  test("is invalid in 2.05", async () => {
-    // Wait for Stacks 2.05 to start
-    await waitForStacksChainUpdate(
-      orchestrator,
-      Constants.DEVNET_DEFAULT_EPOCH_2_05
-    );
-
+  it("is invalid before 2.1", async () => {
     // Build the transaction to deploy the contract
     let deployTxOptions = {
       senderKey: Accounts.DEPLOYER.secretKey,
@@ -67,11 +64,11 @@ describe("get-burn-block-info?", () => {
     expect((<TxBroadcastResultOk>result).error).toBeUndefined();
 
     // Wait for the transaction to be processed
-    let [block, tx] = waitForStacksTransaction(
+    let [block, tx] = await waitForStacksTransaction(
       orchestrator,
-      Accounts.DEPLOYER.stxAddress
+      transaction.txid()
     );
-    expect(block.bitcoin_anchor_block_identifier.index).toBeLessThan(
+    expect(block.bitcoin_anchor_block_identifier.index).toBeLessThanOrEqual(
       Constants.DEVNET_DEFAULT_EPOCH_2_1
     );
     expect(tx.description).toBe(
@@ -83,13 +80,12 @@ describe("get-burn-block-info?", () => {
   describe("in 2.1", () => {
     beforeAll(async () => {
       // Wait for 2.1 to go live
-      await waitForStacksChainUpdate(
-        orchestrator,
+      await orchestrator.waitForStacksBlockAnchoredOnBitcoinBlockOfHeight(
         Constants.DEVNET_DEFAULT_EPOCH_2_1
       );
     });
 
-    test("is valid", async () => {
+    it("is valid", async () => {
       // Build the transaction to deploy the contract
       let deployTxOptions = {
         senderKey: Accounts.DEPLOYER.secretKey,
@@ -113,9 +109,9 @@ describe("get-burn-block-info?", () => {
       expect((<TxBroadcastResultOk>result).error).toBeUndefined();
 
       // Wait for the transaction to be processed
-      let [_, tx] = waitForStacksTransaction(
+      let [_, tx] = await waitForStacksTransaction(
         orchestrator,
-        Accounts.DEPLOYER.stxAddress
+        transaction.txid()
       );
       expect(tx.description).toBe(
         `deployed: ${Accounts.DEPLOYER.stxAddress}.test-2-1`
@@ -123,7 +119,7 @@ describe("get-burn-block-info?", () => {
       expect(tx.success).toBeTruthy();
     });
 
-    test("returns valid header hash", async () => {
+    it("returns valid header hash", async () => {
       // Build a transaction to call the contract
       let callTxOptions: SignedContractCallOptions = {
         senderKey: Accounts.WALLET_1.secretKey,
@@ -143,9 +139,9 @@ describe("get-burn-block-info?", () => {
       expect((<TxBroadcastResultOk>result).error).toBeUndefined();
 
       // Wait for the transaction to be processed
-      let [_, tx] = waitForStacksTransaction(
+      let [_, tx] = await waitForStacksTransaction(
         orchestrator,
-        Accounts.WALLET_1.stxAddress
+        transaction.txid()
       );
       expect(tx.description).toBe(
         `invoked: ${Accounts.DEPLOYER.stxAddress}.test-2-1::test-1()`
@@ -155,22 +151,16 @@ describe("get-burn-block-info?", () => {
     });
   });
 
-  test("returns valid pox addrs", async () => {
-    // Wait for pox-2 activation
-    let chainUpdate = await waitForStacksChainUpdate(
-      orchestrator,
-      Constants.DEVNET_DEFAULT_EPOCH_2_1
-    );
-
+  it("returns valid pox addrs", async () => {
     // Wait for block N-2 where N is the height of the next prepare phase
-    chainUpdate = await waitForNextPreparePhase(network, orchestrator, -2);
+    let chainUpdate = await waitForNextPreparePhase(network, orchestrator, -2);
     let blockHeight = getBitcoinBlockHeight(chainUpdate);
 
     // Broadcast some STX stacking orders
     let response = await broadcastStackSTX(
       2,
       network,
-      25_000_000_000_000,
+      90_000_000_000_000,
       Accounts.WALLET_1,
       blockHeight,
       12,
@@ -201,9 +191,9 @@ describe("get-burn-block-info?", () => {
     expect((<TxBroadcastResultOk>result).error).toBeUndefined();
 
     // Wait for the transaction to be processed
-    let [_, tx] = waitForStacksTransaction(
+    let [_, tx] = await waitForStacksTransaction(
       orchestrator,
-      Accounts.WALLET_1.stxAddress
+      transaction.txid()
     );
 
     expect(tx.description).toBe(
@@ -211,7 +201,7 @@ describe("get-burn-block-info?", () => {
     );
     // FIXME: verify this output once everything is working
     expect(tx.result).toBe(
-      "(ok (some (tuple (addrs ((tuple (hashbytes 0x) (version 0x00)) (tuple (hashbytes 0x0000000000000000000000000000000000000000) (version 0x00)))) (payout u10000))))"
+      "(ok (some (tuple (addrs ((tuple (hashbytes 0x7321b74e2b6a7e949e6c4ad313035b1665095017) (version 0x00)) (tuple (hashbytes 0x7321b74e2b6a7e949e6c4ad313035b1665095017) (version 0x00)))) (payout u10000))))"
     );
     expect(tx.success).toBeTruthy();
   });
