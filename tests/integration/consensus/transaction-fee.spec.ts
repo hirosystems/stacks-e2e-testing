@@ -17,6 +17,7 @@ import { getAccount, expectAccountToBe } from '../pox/helpers'
 import { principalCV } from "@stacks/transactions/dist/clarity/types/principalCV";
 import {
     buildDevnetNetworkOrchestrator,
+    getNetworkIdFromCtx,
     waitForStacksTransaction,
 } from "../helpers";
 import { DevnetNetworkOrchestrator } from "@hirosystems/stacks-devnet-js";
@@ -49,8 +50,8 @@ const CONTRACT_TRIGGER_CHECKERROR = `
 
 describe("transaction-fee", () => {
 
-    test("fee is charged prior to execution", async () => {
-        const orchestrator = buildDevnetNetworkOrchestrator(5);
+    test("fee is charged prior to execution", async (ctx) => {
+        const orchestrator = buildDevnetNetworkOrchestrator(getNetworkIdFromCtx(ctx.meta.id));
         orchestrator.start();
         const network = new StacksTestnet({ url: orchestrator.getStacksNodeUrl() });
 

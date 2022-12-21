@@ -14,5 +14,7 @@ export default defineConfig({
     // minThreads: 2,
     // maxThreads: 4,
     // silent: true,
+    // maxConcurrency: 5,
+    // slowTestThreshold: 120_000;
   },
 });
