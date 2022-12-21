@@ -12,29 +12,29 @@ import { Accounts, Constants } from "../../constants";
 import { principalCV } from "@stacks/transactions/dist/clarity/types/principalCV";
 import {
   buildDevnetNetworkOrchestrator,
-  waitForStacksChainUpdate,
   waitForStacksTransaction,
+  getNetworkIdFromCtx,
+  getChainInfo,
 } from "../../helpers";
 import { DevnetNetworkOrchestrator } from "@hirosystems/stacks-devnet-js";
+import { describe, expect, it, beforeAll, afterAll } from 'vitest'
 
 describe("principal-destruct?", () => {
   let orchestrator: DevnetNetworkOrchestrator;
   let network: StacksNetwork;
 
-  beforeAll(() => {
-    orchestrator = buildDevnetNetworkOrchestrator();
+  beforeAll(async (ctx) => {
+    let networkId = getNetworkIdFromCtx(ctx.id);
+    orchestrator = buildDevnetNetworkOrchestrator(networkId);
     orchestrator.start();
     network = new StacksTestnet({ url: orchestrator.getStacksNodeUrl() });
   });
 
-  afterAll(() => {
-    orchestrator.stop();
+  afterAll(async () => {
+    orchestrator.terminate();
   });
 
-  test("is invalid in 2.05", async () => {
-    // Wait for Stacks 2.05 to start
-    waitForStacksChainUpdate(orchestrator, Constants.DEVNET_DEFAULT_EPOCH_2_05);
-
+  it("is invalid before 2.1", async () => {
     // Build the transaction to deploy the contract
     let deployTxOptions = {
       senderKey: Accounts.DEPLOYER.secretKey,
@@ -61,11 +61,11 @@ describe("principal-destruct?", () => {
     expect((<TxBroadcastResultOk>result).error).toBeUndefined();
 
     // Wait for the transaction to be processed
-    let [block, tx] = waitForStacksTransaction(
+    let [block, tx] = await waitForStacksTransaction(
       orchestrator,
-      Accounts.DEPLOYER.stxAddress
+      transaction.txid()
     );
-    expect(block.bitcoin_anchor_block_identifier.index).toBeLessThan(
+    expect(block.bitcoin_anchor_block_identifier.index).toBeLessThanOrEqual(
       Constants.DEVNET_DEFAULT_EPOCH_2_1
     );
     expect(tx.description).toBe(
@@ -75,15 +75,12 @@ describe("principal-destruct?", () => {
   });
 
   describe("in 2.1", () => {
-    beforeAll(() => {
+    beforeAll(async () => {
       // Wait for 2.1 to go live
-      waitForStacksChainUpdate(
-        orchestrator,
-        Constants.DEVNET_DEFAULT_EPOCH_2_1
-      );
+      await orchestrator.waitForStacksBlockAnchoredOnBitcoinBlockOfHeight(Constants.DEVNET_DEFAULT_EPOCH_2_1)
     });
 
-    test("is valid", async () => {
+    it("is valid", async () => {
       // Build the transaction to deploy the contract
       let deployTxOptions = {
         senderKey: Accounts.DEPLOYER.secretKey,
@@ -110,9 +107,9 @@ describe("principal-destruct?", () => {
       expect((<TxBroadcastResultOk>result).error).toBeUndefined();
 
       // Wait for the transaction to be processed
-      let [block, tx] = waitForStacksTransaction(
+      let [block, tx] = await waitForStacksTransaction(
         orchestrator,
-        Accounts.DEPLOYER.stxAddress
+        transaction.txid()
       );
       expect(tx.description).toBe(
         `deployed: ${Accounts.DEPLOYER.stxAddress}.test-2-1`
@@ -120,7 +117,7 @@ describe("principal-destruct?", () => {
       expect(tx.success).toBeTruthy();
     });
 
-    test("works for a literal standard principal", async () => {
+    it("works for a literal standard principal", async () => {
       // Build a transaction to call the contract
       let callTxOptions: SignedContractCallOptions = {
         senderKey: Accounts.WALLET_1.secretKey,
@@ -140,9 +137,9 @@ describe("principal-destruct?", () => {
       expect((<TxBroadcastResultOk>result).error).toBeUndefined();
 
       // Wait for the transaction to be processed
-      let [block, tx] = waitForStacksTransaction(
+      let [block, tx] = await waitForStacksTransaction(
         orchestrator,
-        Accounts.WALLET_1.stxAddress
+        transaction.txid()
       );
       expect(tx.description).toBe(
         `invoked: ${Accounts.DEPLOYER.stxAddress}.test-2-1::test-literal-1()`
@@ -153,7 +150,7 @@ describe("principal-destruct?", () => {
       expect(tx.success).toBeTruthy();
     });
 
-    test("works for a literal contract principal", async () => {
+    it("works for a literal contract principal", async () => {
       // Build a transaction to call the contract
       let callTxOptions = {
         senderKey: Accounts.WALLET_1.secretKey,
@@ -173,9 +170,9 @@ describe("principal-destruct?", () => {
       expect((<TxBroadcastResultOk>result).error).toBeUndefined();
 
       // Wait for the transaction to be processed
-      let [_, tx] = waitForStacksTransaction(
+      let [_, tx] = await waitForStacksTransaction(
         orchestrator,
-        Accounts.WALLET_1.stxAddress
+        transaction.txid()
       );
       expect(tx.description).toBe(
         `invoked: ${Accounts.DEPLOYER.stxAddress}.test-2-1::test-literal-2()`
@@ -186,7 +183,7 @@ describe("principal-destruct?", () => {
       expect(tx.success).toBeTruthy();
     });
 
-    test("works for a standard principal", async () => {
+    it("works for a standard principal", async () => {
       // Build a transaction to call the contract
       let callTxOptions: SignedContractCallOptions = {
         senderKey: Accounts.WALLET_1.secretKey,
@@ -206,9 +203,9 @@ describe("principal-destruct?", () => {
       expect((<TxBroadcastResultOk>result).error).toBeUndefined();
 
       // Wait for the transaction to be processed
-      let [block, tx] = waitForStacksTransaction(
+      let [block, tx] = await waitForStacksTransaction(
         orchestrator,
-        Accounts.WALLET_1.stxAddress
+        transaction.txid()
       );
       expect(tx.description).toBe(
         `invoked: ${Accounts.DEPLOYER.stxAddress}.test-2-1::test(STB44HYPYAT2BB2QE513NSP81HTMYWBJP02HPGK6)`
@@ -219,7 +216,7 @@ describe("principal-destruct?", () => {
       expect(tx.success).toBeTruthy();
     });
 
-    test("works for a contract principal", async () => {
+    it("works for a contract principal", async () => {
       // Build a transaction to call the contract
       let callTxOptions = {
         senderKey: Accounts.WALLET_1.secretKey,
@@ -241,9 +238,9 @@ describe("principal-destruct?", () => {
       expect((<TxBroadcastResultOk>result).error).toBeUndefined();
 
       // Wait for the transaction to be processed
-      let [_, tx] = waitForStacksTransaction(
+      let [_, tx] = await waitForStacksTransaction(
         orchestrator,
-        Accounts.WALLET_1.stxAddress
+        transaction.txid()
       );
       expect(tx.description).toBe(
         `invoked: ${Accounts.DEPLOYER.stxAddress}.test-2-1::test(STB44HYPYAT2BB2QE513NSP81HTMYWBJP02HPGK6.foo)`
@@ -254,7 +251,7 @@ describe("principal-destruct?", () => {
       expect(tx.success).toBeTruthy();
     });
 
-    test("fails for an invalid principal", async () => {
+    it("fails for an invalid principal", async () => {
       // Build a transaction to call the contract
       let callTxOptions = {
         senderKey: Accounts.WALLET_1.secretKey,
@@ -276,9 +273,9 @@ describe("principal-destruct?", () => {
       expect((<TxBroadcastResultOk>result).error).toBeUndefined();
 
       // Wait for the transaction to be processed
-      let [_, tx] = waitForStacksTransaction(
+      let [_, tx] = await waitForStacksTransaction(
         orchestrator,
-        Accounts.WALLET_1.stxAddress
+        transaction.txid()
       );
       expect(tx.description).toBe(
         `invoked: ${Accounts.DEPLOYER.stxAddress}.test-2-1::test(SP3X6QWWETNBZWGBK6DRGTR1KX50S74D3433WDGJY)`
@@ -289,7 +286,7 @@ describe("principal-destruct?", () => {
       expect(tx.success).toBeFalsy();
     });
 
-    test("fails for an invalid contract principal", async () => {
+    it("fails for an invalid contract principal", async () => {
       // Build a transaction to call the contract
       let callTxOptions = {
         senderKey: Accounts.WALLET_1.secretKey,
@@ -311,9 +308,9 @@ describe("principal-destruct?", () => {
       expect((<TxBroadcastResultOk>result).error).toBeUndefined();
 
       // Wait for the transaction to be processed
-      let [_, tx] = waitForStacksTransaction(
+      let [_, tx] = await waitForStacksTransaction(
         orchestrator,
-        Accounts.WALLET_1.stxAddress
+        transaction.txid()
       );
       expect(tx.description).toBe(
         `invoked: ${Accounts.DEPLOYER.stxAddress}.test-2-1::test(SP3X6QWWETNBZWGBK6DRGTR1KX50S74D3433WDGJY.foo)`

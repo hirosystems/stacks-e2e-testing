@@ -12,24 +12,26 @@ import { Accounts, Constants } from "../../constants";
 import {
   buildDevnetNetworkOrchestrator,
   getBitcoinBlockHeight,
-  waitForStacksChainUpdate,
   waitForStacksTransaction,
+  getNetworkIdFromCtx,
+  getChainInfo,
 } from "../../helpers";
 import { DevnetNetworkOrchestrator } from "@hirosystems/stacks-devnet-js";
-
-const STACKS_2_1_EPOCH = 109;
+import { describe, expect, it, beforeAll, afterAll } from 'vitest'
 
 describe("use", () => {
   let orchestrator: DevnetNetworkOrchestrator;
   let network: StacksNetwork;
+  const STACKS_2_1_EPOCH = 112;
 
-  beforeAll(() => {
-    orchestrator = buildDevnetNetworkOrchestrator(
+  beforeAll(async (ctx) => {
+    let networkId = getNetworkIdFromCtx(ctx.id);
+    orchestrator = buildDevnetNetworkOrchestrator(networkId,
       {
         epoch_2_0: 100,
         epoch_2_05: 102,
         epoch_2_1: STACKS_2_1_EPOCH,
-        pox_2_activation: 112,
+        pox_2_activation: 120,
       },
       false
     );
@@ -37,8 +39,8 @@ describe("use", () => {
     network = new StacksTestnet({ url: orchestrator.getStacksNodeUrl() });
   });
 
-  afterAll(() => {
-    orchestrator.stop();
+  afterAll(async () => {
+    orchestrator.terminate();
   });
 
   const doubleTrait = `(define-trait double-method (
@@ -51,23 +53,15 @@ describe("use", () => {
   (define-read-only (foo (x bool)) (ok x) )`;
 
   describe("in 2.05", () => {
-    beforeAll(() => {
-      // Wait for Stacks 2.05 to start
-      waitForStacksChainUpdate(
-        orchestrator,
-        Constants.DEVNET_DEFAULT_EPOCH_2_05
-      );
-    });
-
-    afterAll(() => {
+    afterAll(async () => {
       // Make sure this we stayed in 2.05
-      let chainUpdate = orchestrator.waitForStacksBlock();
-      expect(getBitcoinBlockHeight(chainUpdate)).toBeLessThanOrEqual(
+      let chainInfo = await getChainInfo(network);
+      expect(chainInfo.burn_block_height).toBeLessThanOrEqual(
         STACKS_2_1_EPOCH
       );
     });
 
-    test("implement a trait with duplicate method names", async () => {
+    it("implement a trait with duplicate method names", async () => {
       // Build the transaction to deploy the contract
       let deployTxOptions = {
         senderKey: Accounts.DEPLOYER.secretKey,
@@ -86,7 +80,7 @@ describe("use", () => {
       expect((<TxBroadcastResultOk>result).error).toBeUndefined();
 
       // Wait for the transaction to be processed
-      waitForStacksTransaction(orchestrator, Accounts.DEPLOYER.stxAddress);
+      await waitForStacksTransaction(orchestrator, transaction.txid());
 
       // Build the transaction to deploy the contract
       deployTxOptions = {
@@ -106,9 +100,9 @@ describe("use", () => {
       expect((<TxBroadcastResultOk>result).error).toBeUndefined();
 
       // Wait for the transaction to be processed
-      let [_, tx] = waitForStacksTransaction(
+      let [_, tx] = await waitForStacksTransaction(
         orchestrator,
-        Accounts.DEPLOYER.stxAddress
+        transaction.txid()
       );
       expect(tx.description).toBe(
         `deployed: ${Accounts.DEPLOYER.stxAddress}.impl-double-trait-1`
@@ -133,9 +127,9 @@ describe("use", () => {
       expect((<TxBroadcastResultOk>result).error).toBeUndefined();
 
       // Wait for the transaction to be processed
-      [_, tx] = waitForStacksTransaction(
+      [_, tx] = await waitForStacksTransaction(
         orchestrator,
-        Accounts.DEPLOYER.stxAddress
+        transaction.txid()
       );
       expect(tx.description).toBe(
         `deployed: ${Accounts.DEPLOYER.stxAddress}.impl-double-trait-2`
@@ -145,12 +139,12 @@ describe("use", () => {
   });
 
   describe("in 2.1", () => {
-    beforeAll(() => {
+    beforeAll(async () => {
       // Wait for 2.1 to go live
-      waitForStacksChainUpdate(orchestrator, STACKS_2_1_EPOCH);
+      await orchestrator.waitForStacksBlockAnchoredOnBitcoinBlockOfHeight(STACKS_2_1_EPOCH)
     });
 
-    test("Clarity1", async () => {
+    it("Clarity1", async () => {
       // Build the transaction to deploy the contract
       let deployTxOptions = {
         clarityVersion: 1,
@@ -170,9 +164,9 @@ describe("use", () => {
       expect((<TxBroadcastResultOk>result).error).toBeUndefined();
 
       // Wait for the transaction to be processed
-      let [_, tx] = waitForStacksTransaction(
+      let [_, tx] = await waitForStacksTransaction(
         orchestrator,
-        Accounts.DEPLOYER.stxAddress
+        transaction.txid()
       );
       expect(tx.description).toBe(
         `deployed: ${Accounts.DEPLOYER.stxAddress}.impl-double-trait-1-c1`
@@ -198,9 +192,9 @@ describe("use", () => {
       expect((<TxBroadcastResultOk>result).error).toBeUndefined();
 
       // Wait for the transaction to be processed
-      [_, tx] = waitForStacksTransaction(
+      [_, tx] = await waitForStacksTransaction(
         orchestrator,
-        Accounts.DEPLOYER.stxAddress
+        transaction.txid()
       );
       expect(tx.description).toBe(
         `deployed: ${Accounts.DEPLOYER.stxAddress}.impl-double-trait-2-c1`
@@ -208,7 +202,7 @@ describe("use", () => {
       expect(tx.success).toBeTruthy();
     });
 
-    test("Clarity2", async () => {
+    it("Clarity2", async () => {
       // Build the transaction to deploy the contract
       let deployTxOptions = {
         clarityVersion: 2,
@@ -228,9 +222,9 @@ describe("use", () => {
       expect((<TxBroadcastResultOk>result).error).toBeUndefined();
 
       // Wait for the transaction to be processed
-      let [_, tx] = waitForStacksTransaction(
+      let [_, tx] = await waitForStacksTransaction(
         orchestrator,
-        Accounts.DEPLOYER.stxAddress
+        transaction.txid()
       );
       expect(tx.description).toBe(
         `deployed: ${Accounts.DEPLOYER.stxAddress}.impl-double-trait-1-c2`
@@ -256,9 +250,9 @@ describe("use", () => {
       expect((<TxBroadcastResultOk>result).error).toBeUndefined();
 
       // Wait for the transaction to be processed
-      [_, tx] = waitForStacksTransaction(
+      [_, tx] = await waitForStacksTransaction(
         orchestrator,
-        Accounts.DEPLOYER.stxAddress
+        transaction.txid()
       );
       expect(tx.description).toBe(
         `deployed: ${Accounts.DEPLOYER.stxAddress}.impl-double-trait-2-c2`

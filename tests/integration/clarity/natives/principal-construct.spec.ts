@@ -12,30 +12,30 @@ import { StacksNetwork, StacksTestnet } from "@stacks/network";
 import { Accounts, Constants } from "../../constants";
 import {
   buildDevnetNetworkOrchestrator,
-  waitForStacksChainUpdate,
   waitForStacksTransaction,
+  getNetworkIdFromCtx,
+  getChainInfo,
 } from "../../helpers";
 import { DevnetNetworkOrchestrator } from "@hirosystems/stacks-devnet-js";
 import { stringCV } from "@stacks/transactions/dist/clarity/types/stringCV";
+import { describe, expect, it, beforeAll, afterAll } from 'vitest'
 
 describe("principal-construct?", () => {
   let orchestrator: DevnetNetworkOrchestrator;
   let network: StacksNetwork;
 
-  beforeAll(() => {
-    orchestrator = buildDevnetNetworkOrchestrator();
+  beforeAll(async (ctx) => {
+    let networkId = getNetworkIdFromCtx(ctx.id);
+    orchestrator = buildDevnetNetworkOrchestrator(networkId);
     orchestrator.start();
     network = new StacksTestnet({ url: orchestrator.getStacksNodeUrl() });
   });
 
-  afterAll(() => {
-    orchestrator.stop();
+  afterAll(async () => {
+    orchestrator.terminate();
   });
 
-  test("is invalid in 2.05", async () => {
-    // Wait for Stacks 2.05 to start
-    waitForStacksChainUpdate(orchestrator, Constants.DEVNET_DEFAULT_EPOCH_2_05);
-
+  it("is invalid before 2.1", async () => {
     // Build the transaction to deploy the contract
     let deployTxOptions = {
       senderKey: Accounts.DEPLOYER.secretKey,
@@ -65,11 +65,11 @@ describe("principal-construct?", () => {
     expect((<TxBroadcastResultOk>result).error).toBeUndefined();
 
     // Wait for the transaction to be processed
-    let [block, tx] = waitForStacksTransaction(
+    let [block, tx] = await waitForStacksTransaction(
       orchestrator,
-      Accounts.DEPLOYER.stxAddress
+      transaction.txid()
     );
-    expect(block.bitcoin_anchor_block_identifier.index).toBeLessThan(
+    expect(block.bitcoin_anchor_block_identifier.index).toBeLessThanOrEqual(
       Constants.DEVNET_DEFAULT_EPOCH_2_1
     );
     expect(tx.description).toBe(
@@ -79,15 +79,12 @@ describe("principal-construct?", () => {
   });
 
   describe("in 2.1", () => {
-    beforeAll(() => {
+    beforeAll(async () => {
       // Wait for 2.1 to go live
-      waitForStacksChainUpdate(
-        orchestrator,
-        Constants.DEVNET_DEFAULT_EPOCH_2_1
-      );
+      await orchestrator.waitForStacksBlockAnchoredOnBitcoinBlockOfHeight(Constants.DEVNET_DEFAULT_EPOCH_2_1)
     });
 
-    test("is valid", async () => {
+    it("is valid", async () => {
       // Build the transaction to deploy the contract
       let deployTxOptions = {
         senderKey: Accounts.DEPLOYER.secretKey,
@@ -117,9 +114,9 @@ describe("principal-construct?", () => {
       expect((<TxBroadcastResultOk>result).error).toBeUndefined();
 
       // Wait for the transaction to be processed
-      let [block, tx] = waitForStacksTransaction(
+      let [block, tx] = await waitForStacksTransaction(
         orchestrator,
-        Accounts.DEPLOYER.stxAddress
+        transaction.txid()
       );
       expect(tx.description).toBe(
         `deployed: ${Accounts.DEPLOYER.stxAddress}.test-2-1`
@@ -127,7 +124,7 @@ describe("principal-construct?", () => {
       expect(tx.success).toBeTruthy();
     });
 
-    test("works with literals for a standard principal", async () => {
+    it("works with literals for a standard principal", async () => {
       // Build a transaction to call the contract
       let callTxOptions: SignedContractCallOptions = {
         senderKey: Accounts.WALLET_1.secretKey,
@@ -147,9 +144,9 @@ describe("principal-construct?", () => {
       expect((<TxBroadcastResultOk>result).error).toBeUndefined();
 
       // Wait for the transaction to be processed
-      let [block, tx] = waitForStacksTransaction(
+      let [block, tx] = await waitForStacksTransaction(
         orchestrator,
-        Accounts.WALLET_1.stxAddress
+        transaction.txid()
       );
       expect(tx.description).toBe(
         `invoked: ${Accounts.DEPLOYER.stxAddress}.test-2-1::test-literal-1()`
@@ -158,7 +155,7 @@ describe("principal-construct?", () => {
       expect(tx.success).toBeTruthy();
     });
 
-    test("works with literals for a contract principal", async () => {
+    it("works with literals for a contract principal", async () => {
       // Build a transaction to call the contract
       let callTxOptions: SignedContractCallOptions = {
         senderKey: Accounts.WALLET_1.secretKey,
@@ -178,9 +175,9 @@ describe("principal-construct?", () => {
       expect((<TxBroadcastResultOk>result).error).toBeUndefined();
 
       // Wait for the transaction to be processed
-      let [block, tx] = waitForStacksTransaction(
+      let [block, tx] = await waitForStacksTransaction(
         orchestrator,
-        Accounts.WALLET_1.stxAddress
+        transaction.txid()
       );
       expect(tx.description).toBe(
         `invoked: ${Accounts.DEPLOYER.stxAddress}.test-2-1::test-literal-2()`
@@ -191,7 +188,7 @@ describe("principal-construct?", () => {
       expect(tx.success).toBeTruthy();
     });
 
-    test("works for a standard principal", async () => {
+    it("works for a standard principal", async () => {
       // Build a transaction to call the contract
       let version = bufferCV(Uint8Array.from(Buffer.from("1a", "hex")));
       let pkh = bufferCV(
@@ -217,9 +214,9 @@ describe("principal-construct?", () => {
       expect((<TxBroadcastResultOk>result).error).toBeUndefined();
 
       // Wait for the transaction to be processed
-      let [block, tx] = waitForStacksTransaction(
+      let [block, tx] = await waitForStacksTransaction(
         orchestrator,
-        Accounts.WALLET_1.stxAddress
+        transaction.txid()
       );
       expect(tx.description).toBe(
         `invoked: ${Accounts.DEPLOYER.stxAddress}.test-2-1::test-1(0x1a, 0xfa6bf38ed557fe417333710d6033e9419391a320)`
@@ -228,7 +225,7 @@ describe("principal-construct?", () => {
       expect(tx.success).toBeTruthy();
     });
 
-    test("works for a contract principal", async () => {
+    it("works for a contract principal", async () => {
       // Build a transaction to call the contract
       let version = bufferCV(Uint8Array.from(Buffer.from("1a", "hex")));
       let pkh = bufferCV(
@@ -254,9 +251,9 @@ describe("principal-construct?", () => {
       expect((<TxBroadcastResultOk>result).error).toBeUndefined();
 
       // Wait for the transaction to be processed
-      let [block, tx] = waitForStacksTransaction(
+      let [block, tx] = await waitForStacksTransaction(
         orchestrator,
-        Accounts.WALLET_1.stxAddress
+        transaction.txid()
       );
       expect(tx.description).toBe(
         `invoked: ${Accounts.DEPLOYER.stxAddress}.test-2-1::test-2(0x1a, 0xfa6bf38ed557fe417333710d6033e9419391a320, "foo")`
@@ -267,7 +264,7 @@ describe("principal-construct?", () => {
       expect(tx.success).toBeTruthy();
     });
 
-    test("gives proper error for invalid version", async () => {
+    it("gives proper error for invalid version", async () => {
       // Build a transaction to call the contract
       let version = bufferCV(Uint8Array.from(Buffer.from("16", "hex")));
       let pkh = bufferCV(
@@ -293,9 +290,9 @@ describe("principal-construct?", () => {
       expect((<TxBroadcastResultOk>result).error).toBeUndefined();
 
       // Wait for the transaction to be processed
-      let [block, tx] = waitForStacksTransaction(
+      let [block, tx] = await waitForStacksTransaction(
         orchestrator,
-        Accounts.WALLET_1.stxAddress
+        transaction.txid()
       );
       expect(tx.description).toBe(
         `invoked: ${Accounts.DEPLOYER.stxAddress}.test-2-1::test-1(0x16, 0xfa6bf38ed557fe417333710d6033e9419391a320)`
@@ -306,7 +303,7 @@ describe("principal-construct?", () => {
       expect(tx.success).toBeFalsy();
     });
 
-    test("gives proper error for invalid version (contract principal)", async () => {
+    it("gives proper error for invalid version (contract principal)", async () => {
       // Build a transaction to call the contract
       let version = bufferCV(Uint8Array.from(Buffer.from("16", "hex")));
       let pkh = bufferCV(
@@ -332,9 +329,9 @@ describe("principal-construct?", () => {
       expect((<TxBroadcastResultOk>result).error).toBeUndefined();
 
       // Wait for the transaction to be processed
-      let [block, tx] = waitForStacksTransaction(
+      let [block, tx] = await waitForStacksTransaction(
         orchestrator,
-        Accounts.WALLET_1.stxAddress
+        transaction.txid()
       );
       expect(tx.description).toBe(
         `invoked: ${Accounts.DEPLOYER.stxAddress}.test-2-1::test-2(0x16, 0xfa6bf38ed557fe417333710d6033e9419391a320, "foo")`
@@ -345,7 +342,7 @@ describe("principal-construct?", () => {
       expect(tx.success).toBeFalsy();
     });
 
-    test("gives proper error for bad version length (0)", async () => {
+    it("gives proper error for bad version length (0)", async () => {
       // Build a transaction to call the contract
       let version = bufferCV(new Uint8Array());
       let pkh = bufferCV(
@@ -371,9 +368,9 @@ describe("principal-construct?", () => {
       expect((<TxBroadcastResultOk>result).error).toBeUndefined();
 
       // Wait for the transaction to be processed
-      let [block, tx] = waitForStacksTransaction(
+      let [block, tx] = await waitForStacksTransaction(
         orchestrator,
-        Accounts.WALLET_1.stxAddress
+        transaction.txid()
       );
       expect(tx.description).toBe(
         `invoked: ${Accounts.DEPLOYER.stxAddress}.test-2-1::test-1(0x, 0xfa6bf38ed557fe417333710d6033e9419391a320)`
@@ -382,7 +379,7 @@ describe("principal-construct?", () => {
       expect(tx.success).toBeFalsy();
     });
 
-    test("gives proper error for bad pkh length", async () => {
+    it("gives proper error for bad pkh length", async () => {
       // Build a transaction to call the contract
       let version = bufferCV(Uint8Array.from(Buffer.from("1a", "hex")));
       let pkh = bufferCV(
@@ -408,9 +405,9 @@ describe("principal-construct?", () => {
       expect((<TxBroadcastResultOk>result).error).toBeUndefined();
 
       // Wait for the transaction to be processed
-      let [block, tx] = waitForStacksTransaction(
+      let [block, tx] = await waitForStacksTransaction(
         orchestrator,
-        Accounts.WALLET_1.stxAddress
+        transaction.txid()
       );
       expect(tx.description).toBe(
         `invoked: ${Accounts.DEPLOYER.stxAddress}.test-2-1::test-1(0x1a, 0xfa6bf38ed557fe417333710d6033e9419391a3)`
@@ -419,7 +416,7 @@ describe("principal-construct?", () => {
       expect(tx.success).toBeFalsy();
     });
 
-    test("gives proper error for bad version length (2)", async () => {
+    it("gives proper error for bad version length (2)", async () => {
       // Build a transaction to call the contract
       let version = bufferCV(Uint8Array.from(Buffer.from("20", "hex")));
       let pkh = bufferCV(
@@ -445,9 +442,9 @@ describe("principal-construct?", () => {
       expect((<TxBroadcastResultOk>result).error).toBeUndefined();
 
       // Wait for the transaction to be processed
-      let [block, tx] = waitForStacksTransaction(
+      let [block, tx] = await waitForStacksTransaction(
         orchestrator,
-        Accounts.WALLET_1.stxAddress
+        transaction.txid()
       );
       expect(tx.description).toBe(
         `invoked: ${Accounts.DEPLOYER.stxAddress}.test-2-1::test-1(0x20, 0xfa6bf38ed557fe417333710d6033e9419391a320)`
@@ -456,7 +453,7 @@ describe("principal-construct?", () => {
       expect(tx.success).toBeFalsy();
     });
 
-    test("gives proper error for empty contract name", async () => {
+    it("gives proper error for empty contract name", async () => {
       // Build a transaction to call the contract
       let version = bufferCV(Uint8Array.from(Buffer.from("1a", "hex")));
       let pkh = bufferCV(
@@ -482,9 +479,9 @@ describe("principal-construct?", () => {
       expect((<TxBroadcastResultOk>result).error).toBeUndefined();
 
       // Wait for the transaction to be processed
-      let [block, tx] = waitForStacksTransaction(
+      let [block, tx] = await waitForStacksTransaction(
         orchestrator,
-        Accounts.WALLET_1.stxAddress
+        transaction.txid()
       );
       expect(tx.description).toBe(
         `invoked: ${Accounts.DEPLOYER.stxAddress}.test-2-1::test-2(0x1a, 0xfa6bf38ed557fe417333710d6033e9419391a320, "")`
@@ -493,7 +490,7 @@ describe("principal-construct?", () => {
       expect(tx.success).toBeFalsy();
     });
 
-    test("gives proper error for illegal contract name", async () => {
+    it("gives proper error for illegal contract name", async () => {
       // Build a transaction to call the contract
       let version = bufferCV(Uint8Array.from(Buffer.from("1a", "hex")));
       let pkh = bufferCV(
@@ -519,9 +516,9 @@ describe("principal-construct?", () => {
       expect((<TxBroadcastResultOk>result).error).toBeUndefined();
 
       // Wait for the transaction to be processed
-      let [block, tx] = waitForStacksTransaction(
+      let [block, tx] = await waitForStacksTransaction(
         orchestrator,
-        Accounts.WALLET_1.stxAddress
+        transaction.txid()
       );
       expect(tx.description).toBe(
         `invoked: ${Accounts.DEPLOYER.stxAddress}.test-2-1::test-2(0x1a, 0xfa6bf38ed557fe417333710d6033e9419391a320, "foo[")`
