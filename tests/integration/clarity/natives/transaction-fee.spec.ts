@@ -92,7 +92,7 @@ describe("transaction-fee", () => {
         let functionName = "test";
         let functionArgs = [contractPrincipalArg];
 
-        let tx_function_call = await callFunction(orchestrator, network)(contractName, functionName, functionArgs, 4);
+        let tx_function_call = await callFunction(orchestrator, network)(contractName, functionName, functionArgs, 3);
         console.log(tx_function_call);
         
         //TODO: Expect test to fail
