@@ -27,16 +27,12 @@ describe("define a trait with duplicate identical methods", () => {
 
   beforeAll(async (ctx) => {
     let networkId = getNetworkIdFromCtx(ctx.id);
-    orchestrator = buildDevnetNetworkOrchestrator(
-      networkId,
-      {
-        epoch_2_0: 100,
-        epoch_2_05: 102,
-        epoch_2_1: STACKS_2_1_EPOCH,
-        pox_2_activation: 120,
-      },
-      false
-    );
+    orchestrator = buildDevnetNetworkOrchestrator(networkId, {
+      epoch_2_0: 100,
+      epoch_2_05: 102,
+      epoch_2_1: STACKS_2_1_EPOCH,
+      pox_2_activation: 120,
+    });
     orchestrator.start();
     network = new StacksTestnet({ url: orchestrator.getStacksNodeUrl() });
   });

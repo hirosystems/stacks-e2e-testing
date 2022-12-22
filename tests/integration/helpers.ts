@@ -27,7 +27,7 @@ const DEFAULT_EPOCH_TIMELINE = {
 export function buildDevnetNetworkOrchestrator(
   networkId: number,
   timeline: EpochTimeline = DEFAULT_EPOCH_TIMELINE,
-  logs = true
+  logs = false
 ) {
   let uuid = Date.now();
   let working_dir = `/tmp/stacks-test-${uuid}-${networkId}`;
