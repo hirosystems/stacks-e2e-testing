@@ -8,6 +8,7 @@ import {
 } from "@hirosystems/stacks-devnet-js";
 import { Constants } from "./constants";
 import { StacksNetwork } from "@stacks/network";
+import fetch from "node-fetch";
 
 interface EpochTimeline {
   epoch_2_0: number;
@@ -85,7 +86,7 @@ export const getChainInfo = async (
   let retryCountdown = retry ? retry : 20;
   if (retryCountdown == 0) return Promise.reject();
   try {
-    let response = await fetch(network.getInfoUrl());
+    let response = await fetch(network.getInfoUrl(), {});
     let info = await response.json();
     return info;
   } catch (e) {

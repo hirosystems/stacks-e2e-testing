@@ -18,6 +18,7 @@ import {
 } from "@stacks/transactions";
 import { decodeBtcAddress } from "@stacks/stacking";
 import { toBytes } from "@stacks/common";
+import fetch from "node-fetch";
 
 interface Account {
   stxAddress: string;
@@ -34,7 +35,7 @@ export const getPoxInfo = async (
   let retryCountdown = retry ? retry : 20;
   if (retryCountdown == 0) return Promise.reject();
   try {
-    let response = await fetch(network.getPoxInfoUrl());
+    let response = await fetch(network.getPoxInfoUrl(), {});
     let poxInfo = await response.json();
     return poxInfo;
   } catch (e) {
@@ -51,8 +52,8 @@ export const getAccount = async (
   let retryCountdown = retry ? retry : 20;
   if (retryCountdown == 0) return Promise.reject();
   try {
-    let response = await fetch(network.getAccountApiUrl(address));
-    let payload = await response.json();
+    let response = await fetch(network.getAccountApiUrl(address), {});
+    let payload: any = await response.json();
     return {
       balance: BigInt(payload.balance),
       locked: BigInt(payload.locked),
