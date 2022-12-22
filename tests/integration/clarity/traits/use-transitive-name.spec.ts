@@ -4,8 +4,6 @@ import {
   AnchorMode,
   PostConditionMode,
   TxBroadcastResultOk,
-  makeContractCall,
-  SignedContractCallOptions,
 } from "@stacks/transactions";
 import { StacksNetwork, StacksTestnet } from "@stacks/network";
 import { Accounts, Constants } from "../../constants";
@@ -14,7 +12,6 @@ import {
   getBitcoinBlockHeight,
   waitForStacksTransaction,
   getNetworkIdFromCtx,
-  getChainInfo,
 } from "../../helpers";
 import { DevnetNetworkOrchestrator } from "@hirosystems/stacks-devnet-js";
 import { describe, expect, it, beforeAll, afterAll } from "vitest";
@@ -73,6 +70,7 @@ describe("use transitive trait name", () => {
       network,
       anchorMode: AnchorMode.OnChainOnly,
       postConditionMode: PostConditionMode.Allow,
+      nonce: 0,
     };
 
     let transaction = await makeContractDeploy(deployTxOptions);
@@ -93,6 +91,7 @@ describe("use transitive trait name", () => {
       network,
       anchorMode: AnchorMode.OnChainOnly,
       postConditionMode: PostConditionMode.Allow,
+      nonce: 1,
     };
 
     transaction = await makeContractDeploy(deployTxOptions);
@@ -113,6 +112,7 @@ describe("use transitive trait name", () => {
       network,
       anchorMode: AnchorMode.OnChainOnly,
       postConditionMode: PostConditionMode.Allow,
+      nonce: 2,
     };
 
     transaction = await makeContractDeploy(deployTxOptions);
@@ -157,6 +157,7 @@ describe("use transitive trait name", () => {
         network,
         anchorMode: AnchorMode.OnChainOnly,
         postConditionMode: PostConditionMode.Allow,
+        nonce: 3,
       };
 
       let transaction = await makeContractDeploy(deployTxOptions);
@@ -188,6 +189,7 @@ describe("use transitive trait name", () => {
           network,
           anchorMode: AnchorMode.OnChainOnly,
           postConditionMode: PostConditionMode.Allow,
+          nonce: 4,
         };
 
         let transaction = await makeContractDeploy(deployTxOptions);
@@ -217,6 +219,7 @@ describe("use transitive trait name", () => {
           network,
           anchorMode: AnchorMode.OnChainOnly,
           postConditionMode: PostConditionMode.Allow,
+          nonce: 0,
         };
 
         let transaction = await makeContractDeploy(deployTxOptions);
@@ -237,6 +240,7 @@ describe("use transitive trait name", () => {
           network,
           anchorMode: AnchorMode.OnChainOnly,
           postConditionMode: PostConditionMode.Allow,
+          nonce: 1,
         };
 
         transaction = await makeContractDeploy(deployTxOptions);
@@ -257,6 +261,7 @@ describe("use transitive trait name", () => {
           network,
           anchorMode: AnchorMode.OnChainOnly,
           postConditionMode: PostConditionMode.Allow,
+          nonce: 2,
         };
 
         transaction = await makeContractDeploy(deployTxOptions);

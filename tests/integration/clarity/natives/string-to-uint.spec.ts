@@ -21,12 +21,14 @@ import { describe, expect, it, beforeAll, afterAll } from "vitest";
 describe("string-to-uint?", () => {
   let orchestrator: DevnetNetworkOrchestrator;
   let network: StacksNetwork;
+  let nonce: number;
 
   beforeAll(async (ctx) => {
     let networkId = getNetworkIdFromCtx(ctx.id);
     orchestrator = buildDevnetNetworkOrchestrator(networkId);
     orchestrator.start();
     network = new StacksTestnet({ url: orchestrator.getStacksNodeUrl() });
+    nonce = 0;
   });
 
   afterAll(async () => {
@@ -124,6 +126,7 @@ describe("string-to-uint?", () => {
         network,
         anchorMode: AnchorMode.OnChainOnly,
         postConditionMode: PostConditionMode.Allow,
+        nonce,
       };
       let transaction = await makeContractCall(callTxOptions);
 
@@ -141,6 +144,7 @@ describe("string-to-uint?", () => {
       );
       expect(tx.result).toBe("(ok (some u1))");
       expect(tx.success).toBeTruthy();
+      nonce += 1;
     });
 
     it("works for a UTF8 string", async () => {
@@ -155,6 +159,7 @@ describe("string-to-uint?", () => {
         network,
         anchorMode: AnchorMode.OnChainOnly,
         postConditionMode: PostConditionMode.Allow,
+        nonce,
       };
       let transaction = await makeContractCall(callTxOptions);
 
@@ -172,6 +177,7 @@ describe("string-to-uint?", () => {
       );
       expect(tx.result).toBe("(ok (some u1))");
       expect(tx.success).toBeTruthy();
+      nonce += 1;
     });
 
     it("returns none for something not a number", async () => {
@@ -186,6 +192,7 @@ describe("string-to-uint?", () => {
         network,
         anchorMode: AnchorMode.OnChainOnly,
         postConditionMode: PostConditionMode.Allow,
+        nonce,
       };
       let transaction = await makeContractCall(callTxOptions);
 

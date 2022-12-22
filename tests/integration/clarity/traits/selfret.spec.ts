@@ -54,6 +54,7 @@ describe("define a trait with duplicate identical methods", () => {
       network,
       anchorMode: AnchorMode.OnChainOnly,
       postConditionMode: PostConditionMode.Allow,
+      nonce: 0,
     };
 
     let transaction = await makeContractDeploy(deployTxOptions);
@@ -98,6 +99,7 @@ describe("define a trait with duplicate identical methods", () => {
         network,
         anchorMode: AnchorMode.OnChainOnly,
         postConditionMode: PostConditionMode.Allow,
+        nonce: 1,
       };
 
       let transaction = await makeContractDeploy(deployTxOptions);
@@ -128,6 +130,7 @@ describe("define a trait with duplicate identical methods", () => {
         network,
         anchorMode: AnchorMode.OnChainOnly,
         postConditionMode: PostConditionMode.Allow,
+        nonce: 2,
       };
 
       let transaction = await makeContractDeploy(deployTxOptions);

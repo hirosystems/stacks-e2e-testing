@@ -11,10 +11,7 @@ import {
 import { StacksNetwork, StacksTestnet } from "@stacks/network";
 import { Accounts, Constants } from "../../constants";
 import { DevnetNetworkOrchestrator } from "@hirosystems/stacks-devnet-js";
-import {
-  broadcastStackSTX,
-  waitForNextRewardPhase,
-} from "../../pox/helpers";
+import { broadcastStackSTX, waitForNextRewardPhase } from "../../pox/helpers";
 import {
   buildDevnetNetworkOrchestrator,
   getBitcoinBlockHeight,

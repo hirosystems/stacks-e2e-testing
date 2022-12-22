@@ -32,16 +32,24 @@ describe("use trait from contract that redefines it", () => {
   });
 
   it("in 2.05", async () => {
-    await load_versioned(Accounts.DEPLOYER, "a-trait", network, orchestrator);
+    await load_versioned(
+      Accounts.DEPLOYER,
+      "a-trait",
+      0,
+      network,
+      orchestrator
+    );
     await load_versioned(
       Accounts.DEPLOYER,
       "use-and-define-a-trait",
+      1,
       network,
       orchestrator
     );
     let res = await load_versioned(
       Accounts.DEPLOYER,
       "use-a-trait-transitive-original",
+      2,
       network,
       orchestrator
     );
@@ -65,18 +73,21 @@ describe("use trait from contract that redefines it", () => {
         await load_versioned(
           Accounts.WALLET_1,
           "a-trait",
+          0,
           network,
           orchestrator
         );
         await load_versioned(
           Accounts.WALLET_1,
           "use-and-define-a-trait",
+          1,
           network,
           orchestrator
         );
         let res = await load_versioned(
           Accounts.WALLET_1,
           "use-a-trait-transitive-original",
+          2,
           network,
           orchestrator,
           1,
@@ -89,18 +100,21 @@ describe("use trait from contract that redefines it", () => {
         await load_versioned(
           Accounts.WALLET_2,
           "a-trait",
+          0,
           network,
           orchestrator
         );
         await load_versioned(
           Accounts.WALLET_2,
           "use-and-define-a-trait",
+          1,
           network,
           orchestrator
         );
         let res = await load_versioned(
           Accounts.WALLET_2,
           "use-a-trait-transitive-original",
+          2,
           network,
           orchestrator,
           2,

@@ -21,11 +21,13 @@ import { describe, expect, it, beforeAll, afterAll } from "vitest";
 describe("buff-to-int-le", () => {
   let orchestrator: DevnetNetworkOrchestrator;
   let network: StacksNetwork;
+  let nonce: number;
 
   beforeAll(async (ctx) => {
     orchestrator = buildDevnetNetworkOrchestrator(getNetworkIdFromCtx(ctx.id));
     orchestrator.start();
     network = new StacksTestnet({ url: orchestrator.getStacksNodeUrl() });
+    nonce = 0;
   });
 
   afterAll(async () => {
@@ -123,6 +125,7 @@ describe("buff-to-int-le", () => {
         network,
         anchorMode: AnchorMode.OnChainOnly,
         postConditionMode: PostConditionMode.Allow,
+        nonce,
       };
       let transaction = await makeContractCall(callTxOptions);
 
@@ -140,6 +143,7 @@ describe("buff-to-int-le", () => {
       );
       expect(tx.result).toBe("(ok 1)");
       expect(tx.success).toBeTruthy();
+      nonce += 1;
     });
 
     it("works for a negative int", async () => {
@@ -154,6 +158,7 @@ describe("buff-to-int-le", () => {
         network,
         anchorMode: AnchorMode.OnChainOnly,
         postConditionMode: PostConditionMode.Allow,
+        nonce,
       };
       let transaction = await makeContractCall(callTxOptions);
 
@@ -171,6 +176,7 @@ describe("buff-to-int-le", () => {
       );
       expect(tx.result).toBe("(ok -1)");
       expect(tx.success).toBeTruthy();
+      nonce += 1;
     });
 
     it("works for 0x", async () => {
@@ -185,6 +191,7 @@ describe("buff-to-int-le", () => {
         network,
         anchorMode: AnchorMode.OnChainOnly,
         postConditionMode: PostConditionMode.Allow,
+        nonce,
       };
       let transaction = await makeContractCall(callTxOptions);
 

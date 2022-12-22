@@ -192,7 +192,7 @@ describe("element-at?", () => {
         network,
         anchorMode: AnchorMode.OnChainOnly,
         postConditionMode: PostConditionMode.Allow,
-        nonce
+        nonce,
       };
       let transaction = await makeContractCall(callTxOptions);
 

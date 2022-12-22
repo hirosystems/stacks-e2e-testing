@@ -35,30 +35,35 @@ describe("use redefined trait from contract that redefines it", () => {
     await load_versioned(
       Accounts.DEPLOYER,
       "empty-trait",
+      0,
       network,
       orchestrator
     );
     await load_versioned(
       Accounts.DEPLOYER,
       "nested-trait-1",
+      1,
       network,
       orchestrator
     );
     await load_versioned(
       Accounts.DEPLOYER,
       "nested-trait-2",
+      2,
       network,
       orchestrator
     );
     await load_versioned(
       Accounts.DEPLOYER,
       "nested-trait-3",
+      3,
       network,
       orchestrator
     );
     let res = await load_versioned(
       Accounts.DEPLOYER,
       "nested-trait-4",
+      4,
       network,
       orchestrator
     );
@@ -81,6 +86,7 @@ describe("use redefined trait from contract that redefines it", () => {
       await load_versioned(
         Accounts.WALLET_1,
         "empty-trait",
+        0,
         network,
         orchestrator,
         1
@@ -88,6 +94,7 @@ describe("use redefined trait from contract that redefines it", () => {
       await load_versioned(
         Accounts.WALLET_1,
         "nested-trait-1",
+        1,
         network,
         orchestrator,
         1
@@ -95,6 +102,7 @@ describe("use redefined trait from contract that redefines it", () => {
       await load_versioned(
         Accounts.WALLET_1,
         "nested-trait-2",
+        2,
         network,
         orchestrator,
         1
@@ -102,6 +110,7 @@ describe("use redefined trait from contract that redefines it", () => {
       await load_versioned(
         Accounts.WALLET_1,
         "nested-trait-3",
+        3,
         network,
         orchestrator,
         1
@@ -109,6 +118,7 @@ describe("use redefined trait from contract that redefines it", () => {
       let res = await load_versioned(
         Accounts.WALLET_1,
         "nested-trait-4",
+        4,
         network,
         orchestrator,
         1
@@ -120,6 +130,7 @@ describe("use redefined trait from contract that redefines it", () => {
       await load_versioned(
         Accounts.WALLET_2,
         "empty-trait",
+        0,
         network,
         orchestrator,
         2
@@ -127,6 +138,7 @@ describe("use redefined trait from contract that redefines it", () => {
       await load_versioned(
         Accounts.WALLET_2,
         "nested-trait-1",
+        1,
         network,
         orchestrator,
         2
@@ -134,6 +146,7 @@ describe("use redefined trait from contract that redefines it", () => {
       await load_versioned(
         Accounts.WALLET_2,
         "nested-trait-2",
+        2,
         network,
         orchestrator,
         2
@@ -141,6 +154,7 @@ describe("use redefined trait from contract that redefines it", () => {
       await load_versioned(
         Accounts.WALLET_2,
         "nested-trait-3",
+        3,
         network,
         orchestrator,
         2
@@ -148,6 +162,7 @@ describe("use redefined trait from contract that redefines it", () => {
       let res = await load_versioned(
         Accounts.WALLET_2,
         "nested-trait-4",
+        4,
         network,
         orchestrator,
         2

@@ -22,12 +22,14 @@ import { describe, expect, it, beforeAll, afterAll } from "vitest";
 describe("principal-destruct?", () => {
   let orchestrator: DevnetNetworkOrchestrator;
   let network: StacksNetwork;
+  let nonce: number;
 
   beforeAll(async (ctx) => {
     let networkId = getNetworkIdFromCtx(ctx.id);
     orchestrator = buildDevnetNetworkOrchestrator(networkId);
     orchestrator.start();
     network = new StacksTestnet({ url: orchestrator.getStacksNodeUrl() });
+    nonce = 0;
   });
 
   afterAll(async () => {
@@ -131,6 +133,7 @@ describe("principal-destruct?", () => {
         network,
         anchorMode: AnchorMode.OnChainOnly,
         postConditionMode: PostConditionMode.Allow,
+        nonce,
       };
       let transaction = await makeContractCall(callTxOptions);
 
@@ -150,6 +153,7 @@ describe("principal-destruct?", () => {
         "(ok (tuple (hash-bytes 0x164247d6f2b425ac5771423ae6c80c754f7172b0) (name none) (version 0x1a)))"
       );
       expect(tx.success).toBeTruthy();
+      nonce += 1;
     });
 
     it("works for a literal contract principal", async () => {
@@ -164,6 +168,7 @@ describe("principal-destruct?", () => {
         network,
         anchorMode: AnchorMode.OnChainOnly,
         postConditionMode: PostConditionMode.Allow,
+        nonce,
       };
       let transaction = await makeContractCall(callTxOptions);
 
@@ -183,6 +188,7 @@ describe("principal-destruct?", () => {
         '(ok (tuple (hash-bytes 0x164247d6f2b425ac5771423ae6c80c754f7172b0) (name (some "foo")) (version 0x1a)))'
       );
       expect(tx.success).toBeTruthy();
+      nonce += 1;
     });
 
     it("works for a standard principal", async () => {
@@ -197,6 +203,7 @@ describe("principal-destruct?", () => {
         network,
         anchorMode: AnchorMode.OnChainOnly,
         postConditionMode: PostConditionMode.Allow,
+        nonce,
       };
       let transaction = await makeContractCall(callTxOptions);
 
@@ -216,6 +223,7 @@ describe("principal-destruct?", () => {
         "(ok (tuple (hash-bytes 0x164247d6f2b425ac5771423ae6c80c754f7172b0) (name none) (version 0x1a)))"
       );
       expect(tx.success).toBeTruthy();
+      nonce += 1;
     });
 
     it("works for a contract principal", async () => {
@@ -232,6 +240,7 @@ describe("principal-destruct?", () => {
         network,
         anchorMode: AnchorMode.OnChainOnly,
         postConditionMode: PostConditionMode.Allow,
+        nonce,
       };
       let transaction = await makeContractCall(callTxOptions);
 
@@ -251,6 +260,7 @@ describe("principal-destruct?", () => {
         '(ok (tuple (hash-bytes 0x164247d6f2b425ac5771423ae6c80c754f7172b0) (name (some "foo")) (version 0x1a)))'
       );
       expect(tx.success).toBeTruthy();
+      nonce += 1;
     });
 
     it("fails for an invalid principal", async () => {
@@ -267,6 +277,7 @@ describe("principal-destruct?", () => {
         network,
         anchorMode: AnchorMode.OnChainOnly,
         postConditionMode: PostConditionMode.Allow,
+        nonce,
       };
       let transaction = await makeContractCall(callTxOptions);
 
@@ -286,6 +297,7 @@ describe("principal-destruct?", () => {
         "(err (tuple (hash-bytes 0xfa6bf38ed557fe417333710d6033e9419391a320) (name none) (version 0x16)))"
       );
       expect(tx.success).toBeFalsy();
+      nonce += 1;
     });
 
     it("fails for an invalid contract principal", async () => {
@@ -302,6 +314,7 @@ describe("principal-destruct?", () => {
         network,
         anchorMode: AnchorMode.OnChainOnly,
         postConditionMode: PostConditionMode.Allow,
+        nonce,
       };
       let transaction = await makeContractCall(callTxOptions);
 

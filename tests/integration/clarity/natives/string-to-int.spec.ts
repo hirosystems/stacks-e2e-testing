@@ -53,6 +53,7 @@ describe("string-to-int?", () => {
       network,
       anchorMode: AnchorMode.OnChainOnly,
       postConditionMode: PostConditionMode.Allow,
+      nonce: 0,
     };
 
     let transaction = await makeContractDeploy(deployTxOptions);
@@ -93,6 +94,7 @@ describe("string-to-int?", () => {
         network,
         anchorMode: AnchorMode.OnChainOnly,
         postConditionMode: PostConditionMode.Allow,
+        nonce: 1,
       };
 
       let transaction = await makeContractDeploy(deployTxOptions);
@@ -124,6 +126,7 @@ describe("string-to-int?", () => {
         network,
         anchorMode: AnchorMode.OnChainOnly,
         postConditionMode: PostConditionMode.Allow,
+        nonce: 0,
       };
       let transaction = await makeContractCall(callTxOptions);
 
@@ -155,6 +158,7 @@ describe("string-to-int?", () => {
         network,
         anchorMode: AnchorMode.OnChainOnly,
         postConditionMode: PostConditionMode.Allow,
+        nonce: 1,
       };
       let transaction = await makeContractCall(callTxOptions);
 
@@ -186,6 +190,7 @@ describe("string-to-int?", () => {
         network,
         anchorMode: AnchorMode.OnChainOnly,
         postConditionMode: PostConditionMode.Allow,
+        nonce: 2,
       };
       let transaction = await makeContractCall(callTxOptions);
 

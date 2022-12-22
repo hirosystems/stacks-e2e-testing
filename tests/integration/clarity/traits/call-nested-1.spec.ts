@@ -33,22 +33,25 @@ describe("call functions with nested traits", () => {
   });
 
   it("in 2.05", async () => {
-    await load_versioned(Accounts.DEPLOYER, "empty", network, orchestrator);
+    await load_versioned(Accounts.DEPLOYER, "empty", 0, network, orchestrator);
     await load_versioned(
       Accounts.DEPLOYER,
       "empty-trait",
+      1,
       network,
       orchestrator
     );
     await load_versioned(
       Accounts.DEPLOYER,
       "math-trait",
+      2,
       network,
       orchestrator
     );
     await load_versioned(
       Accounts.DEPLOYER,
       "nested-trait-1",
+      3,
       network,
       orchestrator
     );
@@ -63,6 +66,7 @@ describe("call functions with nested traits", () => {
           contractPrincipalCV(Accounts.DEPLOYER.stxAddress, "math-trait"),
         ]),
       ],
+      0,
       network,
       orchestrator
     );
@@ -82,10 +86,17 @@ describe("call functions with nested traits", () => {
     });
 
     it("Clarity1", async () => {
-      await load_versioned(Accounts.WALLET_1, "empty", network, orchestrator);
+      await load_versioned(
+        Accounts.WALLET_1,
+        "empty",
+        1,
+        network,
+        orchestrator
+      );
       await load_versioned(
         Accounts.WALLET_1,
         "empty-trait",
+        2,
         network,
         orchestrator,
         1
@@ -93,6 +104,7 @@ describe("call functions with nested traits", () => {
       await load_versioned(
         Accounts.WALLET_1,
         "math-trait",
+        3,
         network,
         orchestrator,
         1
@@ -100,6 +112,7 @@ describe("call functions with nested traits", () => {
       await load_versioned(
         Accounts.WALLET_1,
         "nested-trait-1",
+        4,
         network,
         orchestrator,
         1
@@ -115,6 +128,7 @@ describe("call functions with nested traits", () => {
             contractPrincipalCV(Accounts.WALLET_1.stxAddress, "math-trait"),
           ]),
         ],
+        0,
         network,
         orchestrator
       );
@@ -122,10 +136,17 @@ describe("call functions with nested traits", () => {
     });
 
     it("Clarity2", async () => {
-      await load_versioned(Accounts.WALLET_2, "empty", network, orchestrator);
+      await load_versioned(
+        Accounts.WALLET_2,
+        "empty",
+        1,
+        network,
+        orchestrator
+      );
       await load_versioned(
         Accounts.WALLET_2,
         "empty-trait",
+        2,
         network,
         orchestrator,
         2
@@ -133,6 +154,7 @@ describe("call functions with nested traits", () => {
       await load_versioned(
         Accounts.WALLET_2,
         "math-trait",
+        3,
         network,
         orchestrator,
         2
@@ -140,6 +162,7 @@ describe("call functions with nested traits", () => {
       await load_versioned(
         Accounts.WALLET_2,
         "nested-trait-1",
+        4,
         network,
         orchestrator,
         2
@@ -155,6 +178,7 @@ describe("call functions with nested traits", () => {
             contractPrincipalCV(Accounts.WALLET_2.stxAddress, "math-trait"),
           ]),
         ],
+        0,
         network,
         orchestrator
       );

@@ -59,6 +59,7 @@ describe("empty trait", () => {
         network,
         anchorMode: AnchorMode.OnChainOnly,
         postConditionMode: PostConditionMode.Allow,
+        nonce: 0,
       };
 
       let transaction = await makeContractDeploy(deployTxOptions);
@@ -88,6 +89,7 @@ describe("empty trait", () => {
         network,
         anchorMode: AnchorMode.OnChainOnly,
         postConditionMode: PostConditionMode.Allow,
+        nonce: 1,
       };
 
       let transaction = await makeContractDeploy(deployTxOptions);
@@ -126,6 +128,7 @@ describe("empty trait", () => {
         network,
         anchorMode: AnchorMode.OnChainOnly,
         postConditionMode: PostConditionMode.Allow,
+        nonce: 2,
       };
 
       let transaction = await makeContractDeploy(deployTxOptions);
@@ -155,6 +158,7 @@ describe("empty trait", () => {
         network,
         anchorMode: AnchorMode.OnChainOnly,
         postConditionMode: PostConditionMode.Allow,
+        nonce: 3,
       };
 
       let transaction = await makeContractDeploy(deployTxOptions);
