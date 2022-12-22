@@ -59,7 +59,7 @@ describe("call functions with nested traits", () => {
     );
     let res = await contract_call(
       Accounts.WALLET_1,
-      transaction.txid(),
+      Accounts.DEPLOYER.stxAddress,
       "nested-trait-3",
       "foo",
       [
