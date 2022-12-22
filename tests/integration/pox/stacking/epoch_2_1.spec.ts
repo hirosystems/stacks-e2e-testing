@@ -13,7 +13,6 @@ import {
 import { Accounts } from "../../constants";
 import { StacksTestnet } from "@stacks/network";
 import { DevnetNetworkOrchestrator } from "@hirosystems/stacks-devnet-js";
-import { describe, expect, it, beforeAll, afterAll } from "vitest";
 
 describe("testing stacking under epoch 2.1", () => {
   let orchestrator: DevnetNetworkOrchestrator;

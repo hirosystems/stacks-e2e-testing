@@ -1,8 +1,10 @@
+/// <reference types="vitest" />
 import { defineConfig } from "vitest/config";
 import GithubActionsReporter from "vitest-github-actions-reporter";
 
 export default defineConfig({
   test: {
+    globals: true,
     testTimeout: 300_000,
     hookTimeout: 150_000,
     teardownTimeout: 15_000,

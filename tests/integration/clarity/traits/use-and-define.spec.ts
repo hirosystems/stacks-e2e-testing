@@ -19,7 +19,6 @@ import {
   DevnetNetworkOrchestrator,
   StacksTransactionMetadata,
 } from "@hirosystems/stacks-devnet-js";
-import { describe, expect, it, beforeAll, afterAll } from "vitest";
 
 describe("use and define trait with same name", () => {
   let orchestrator: DevnetNetworkOrchestrator;

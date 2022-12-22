@@ -17,7 +17,6 @@ import {
   getChainInfo,
 } from "../../helpers";
 import { DevnetNetworkOrchestrator } from "@hirosystems/stacks-devnet-js";
-import { describe, expect, it, beforeAll, afterAll } from "vitest";
 
 describe("empty trait", () => {
   let orchestrator: DevnetNetworkOrchestrator;

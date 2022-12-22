@@ -7,7 +7,6 @@ import {
 } from "../../helpers";
 import { DevnetNetworkOrchestrator } from "@hirosystems/stacks-devnet-js";
 import { load_versioned } from "./helper";
-import { describe, expect, it, beforeAll, afterAll } from "vitest";
 
 const STACKS_2_1_EPOCH = 112;
 

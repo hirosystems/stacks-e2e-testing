@@ -18,7 +18,6 @@ import {
 } from "../../helpers";
 import { DevnetNetworkOrchestrator } from "@hirosystems/stacks-devnet-js";
 import { stringCV } from "@stacks/transactions/dist/clarity/types/stringCV";
-import { describe, expect, it, beforeAll, afterAll } from "vitest";
 
 describe("principal-construct?", () => {
   let orchestrator: DevnetNetworkOrchestrator;

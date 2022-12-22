@@ -8,7 +8,6 @@ import {
 } from "../../helpers";
 import { DevnetNetworkOrchestrator } from "@hirosystems/stacks-devnet-js";
 import { load_versioned } from "./helper";
-import { describe, expect, it, beforeAll, afterAll } from "vitest";
 
 describe("use redefined trait from contract that redefines it", () => {
   let orchestrator: DevnetNetworkOrchestrator;

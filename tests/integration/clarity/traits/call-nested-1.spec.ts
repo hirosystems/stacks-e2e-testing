@@ -9,7 +9,6 @@ import { DevnetNetworkOrchestrator } from "@hirosystems/stacks-devnet-js";
 import { contract_call, load_versioned } from "./helper";
 import { listCV } from "@stacks/transactions";
 import { contractPrincipalCV } from "@stacks/transactions/dist/clarity/types/principalCV";
-import { describe, expect, it, beforeAll, afterAll } from "vitest";
 
 describe("call functions with nested traits", () => {
   let orchestrator: DevnetNetworkOrchestrator;

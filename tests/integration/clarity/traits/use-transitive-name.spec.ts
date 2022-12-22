@@ -14,7 +14,6 @@ import {
   getNetworkIdFromCtx,
 } from "../../helpers";
 import { DevnetNetworkOrchestrator } from "@hirosystems/stacks-devnet-js";
-import { describe, expect, it, beforeAll, afterAll } from "vitest";
 
 describe("use transitive trait name", () => {
   let orchestrator: DevnetNetworkOrchestrator;

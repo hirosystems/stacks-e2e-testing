@@ -19,7 +19,6 @@ import {
   getNetworkIdFromCtx,
   getChainInfo,
 } from "../../helpers";
-import { describe, expect, it, beforeAll, afterAll } from "vitest";
 
 describe("get-burn-block-info?", () => {
   let orchestrator: DevnetNetworkOrchestrator;

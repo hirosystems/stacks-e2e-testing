@@ -24,7 +24,6 @@ import {
   getChainInfo,
 } from "../../helpers";
 import { principalCV } from "@stacks/transactions/dist/clarity/types/principalCV";
-import { describe, expect, it, beforeAll, afterAll } from "vitest";
 
 describe("stx-account", () => {
   let orchestrator: DevnetNetworkOrchestrator;
