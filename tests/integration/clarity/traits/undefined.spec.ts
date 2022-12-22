@@ -17,7 +17,7 @@ import {
   getChainInfo,
 } from "../../helpers";
 import { DevnetNetworkOrchestrator } from "@hirosystems/stacks-devnet-js";
-import { describe, expect, it, beforeAll, afterAll } from 'vitest'
+import { describe, expect, it, beforeAll, afterAll } from "vitest";
 
 const STACKS_2_1_EPOCH = 112;
 
@@ -27,7 +27,8 @@ describe("undefined trait", () => {
 
   beforeAll(async (ctx) => {
     let networkId = getNetworkIdFromCtx(ctx.id);
-    orchestrator = buildDevnetNetworkOrchestrator(networkId,
+    orchestrator = buildDevnetNetworkOrchestrator(
+      networkId,
       {
         epoch_2_0: 100,
         epoch_2_05: 102,
@@ -53,10 +54,8 @@ describe("undefined trait", () => {
   describe("in 2.05", () => {
     afterAll(async () => {
       // Make sure this we stayed in 2.05
-    let chainInfo = await getChainInfo(network);
-    expect(chainInfo.burn_block_height).toBeLessThanOrEqual(
-      STACKS_2_1_EPOCH
-    );
+      let chainInfo = await getChainInfo(network);
+      expect(chainInfo.burn_block_height).toBeLessThanOrEqual(STACKS_2_1_EPOCH);
     });
 
     it("use an undefined trait", async () => {
@@ -92,7 +91,9 @@ describe("undefined trait", () => {
   describe("in 2.1", () => {
     beforeAll(async () => {
       // Wait for 2.1 to go live
-      await orchestrator.waitForStacksBlockAnchoredOnBitcoinBlockOfHeight(STACKS_2_1_EPOCH)
+      await orchestrator.waitForStacksBlockAnchoredOnBitcoinBlockOfHeight(
+        STACKS_2_1_EPOCH
+      );
     });
 
     it("use an undefined trait", async () => {

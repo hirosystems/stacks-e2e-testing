@@ -16,7 +16,7 @@ import {
   getChainInfo,
 } from "../../helpers";
 import { DevnetNetworkOrchestrator } from "@hirosystems/stacks-devnet-js";
-import { describe, expect, it, beforeAll, afterAll } from 'vitest'
+import { describe, expect, it, beforeAll, afterAll } from "vitest";
 
 describe("buff-to-int-le", () => {
   let orchestrator: DevnetNetworkOrchestrator;
@@ -67,7 +67,8 @@ describe("buff-to-int-le", () => {
     );
     expect(block.bitcoin_anchor_block_identifier.index).toBeLessThanOrEqual(
       Constants.DEVNET_DEFAULT_EPOCH_2_1
-    );    expect(tx.description).toBe(
+    );
+    expect(tx.description).toBe(
       `deployed: ${Accounts.DEPLOYER.stxAddress}.test-2-05`
     );
     expect(tx.success).toBeFalsy();
@@ -76,7 +77,9 @@ describe("buff-to-int-le", () => {
   describe("in 2.1", () => {
     beforeAll(async () => {
       // Wait for 2.1 to go live
-      await orchestrator.waitForStacksBlockAnchoredOnBitcoinBlockOfHeight(Constants.DEVNET_DEFAULT_EPOCH_2_1)
+      await orchestrator.waitForStacksBlockAnchoredOnBitcoinBlockOfHeight(
+        Constants.DEVNET_DEFAULT_EPOCH_2_1
+      );
     });
 
     it("is valid", async () => {

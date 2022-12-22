@@ -24,7 +24,7 @@ import {
   getChainInfo,
 } from "../../helpers";
 import { principalCV } from "@stacks/transactions/dist/clarity/types/principalCV";
-import { describe, expect, it, beforeAll, afterAll } from 'vitest'
+import { describe, expect, it, beforeAll, afterAll } from "vitest";
 
 describe("stx-account", () => {
   let orchestrator: DevnetNetworkOrchestrator;
@@ -84,7 +84,9 @@ describe("stx-account", () => {
   describe("in 2.1", () => {
     beforeAll(async () => {
       // Wait for 2.1 to go live
-      await orchestrator.waitForStacksBlockAnchoredOnBitcoinBlockOfHeight(Constants.DEVNET_DEFAULT_POX_2_ACTIVATION)
+      await orchestrator.waitForStacksBlockAnchoredOnBitcoinBlockOfHeight(
+        Constants.DEVNET_DEFAULT_POX_2_ACTIVATION
+      );
     });
 
     it("is valid", async () => {
@@ -156,7 +158,7 @@ describe("stx-account", () => {
       );
       expect(tx.success).toBeTruthy();
     });
-    
+
     it("works for a literal contract principal", async () => {
       // Build a transaction to call the contract
       let callTxOptions: SignedContractCallOptions = {
@@ -317,8 +319,11 @@ describe("stx-account", () => {
 
       // Compute the unlockHeight to avoid flakiness
       let poxInfo = await getPoxInfo(network);
-      let unlockHeight = poxInfo.first_burnchain_block_height + (1 + poxInfo.current_cycle.id) * poxInfo.reward_cycle_length + cycles * poxInfo.reward_cycle_length;
-      
+      let unlockHeight =
+        poxInfo.first_burnchain_block_height +
+        (1 + poxInfo.current_cycle.id) * poxInfo.reward_cycle_length +
+        cycles * poxInfo.reward_cycle_length;
+
       // Wait for block N+1 where N is the height of the next reward phase
       await waitForNextRewardPhase(network, orchestrator, 1);
 

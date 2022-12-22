@@ -18,7 +18,7 @@ import {
 } from "../../helpers";
 import { DevnetNetworkOrchestrator } from "@hirosystems/stacks-devnet-js";
 import { stringCV } from "@stacks/transactions/dist/clarity/types/stringCV";
-import { describe, expect, it, beforeAll, afterAll } from 'vitest'
+import { describe, expect, it, beforeAll, afterAll } from "vitest";
 
 describe("principal-construct?", () => {
   let orchestrator: DevnetNetworkOrchestrator;
@@ -81,7 +81,9 @@ describe("principal-construct?", () => {
   describe("in 2.1", () => {
     beforeAll(async () => {
       // Wait for 2.1 to go live
-      await orchestrator.waitForStacksBlockAnchoredOnBitcoinBlockOfHeight(Constants.DEVNET_DEFAULT_EPOCH_2_1)
+      await orchestrator.waitForStacksBlockAnchoredOnBitcoinBlockOfHeight(
+        Constants.DEVNET_DEFAULT_EPOCH_2_1
+      );
     });
 
     it("is valid", async () => {
