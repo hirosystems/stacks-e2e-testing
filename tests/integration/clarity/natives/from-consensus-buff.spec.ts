@@ -21,12 +21,14 @@ import { describe, expect, it, beforeAll, afterAll } from "vitest";
 describe("from-consensus-buff?", () => {
   let orchestrator: DevnetNetworkOrchestrator;
   let network: StacksNetwork;
+  let nonce: number;
 
   beforeAll(async (ctx) => {
     let networkId = getNetworkIdFromCtx(ctx.id);
     orchestrator = buildDevnetNetworkOrchestrator(networkId);
     orchestrator.start();
     network = new StacksTestnet({ url: orchestrator.getStacksNodeUrl() });
+    nonce = 0;
   });
 
   afterAll(async () => {
@@ -124,6 +126,7 @@ describe("from-consensus-buff?", () => {
         network,
         anchorMode: AnchorMode.OnChainOnly,
         postConditionMode: PostConditionMode.Allow,
+        nonce,
       };
       let transaction = await makeContractCall(callTxOptions);
 
@@ -141,6 +144,7 @@ describe("from-consensus-buff?", () => {
       );
       expect(tx.result).toBe("(ok (some 1))");
       expect(tx.success).toBeTruthy();
+      nonce += 1;
     });
 
     it("works for an invalid value", async () => {
@@ -155,6 +159,7 @@ describe("from-consensus-buff?", () => {
         network,
         anchorMode: AnchorMode.OnChainOnly,
         postConditionMode: PostConditionMode.Allow,
+        nonce,
       };
       let transaction = await makeContractCall(callTxOptions);
 
@@ -172,6 +177,7 @@ describe("from-consensus-buff?", () => {
       );
       expect(tx.result).toBe("(ok none)");
       expect(tx.success).toBeTruthy();
+      nonce += 1;
     });
 
     it("works for a tuple", async () => {
@@ -186,6 +192,7 @@ describe("from-consensus-buff?", () => {
         network,
         anchorMode: AnchorMode.OnChainOnly,
         postConditionMode: PostConditionMode.Allow,
+        nonce,
       };
       let transaction = await makeContractCall(callTxOptions);
 
@@ -203,6 +210,7 @@ describe("from-consensus-buff?", () => {
       );
       expect(tx.result).toBe("(ok (some (tuple (abc 3) (def 4))))");
       expect(tx.success).toBeTruthy();
+      nonce += 1;
     });
   });
 });

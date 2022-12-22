@@ -13,7 +13,6 @@ import { Accounts, Constants } from "../../constants";
 import { DevnetNetworkOrchestrator } from "@hirosystems/stacks-devnet-js";
 import {
   broadcastStackSTX,
-  waitForNextPreparePhase,
   waitForNextRewardPhase,
 } from "../../pox/helpers";
 import {
@@ -152,8 +151,11 @@ describe("get-burn-block-info?", () => {
   });
 
   it("returns valid pox addrs", async () => {
+    let chainUpdate =
+      await orchestrator.waitForStacksBlockAnchoredOnBitcoinBlockOfHeight(
+        Constants.DEVNET_DEFAULT_POX_2_ACTIVATION + 1
+      );
     // Wait for block N-2 where N is the height of the next prepare phase
-    let chainUpdate = await waitForNextPreparePhase(network, orchestrator, -2);
     let blockHeight = getBitcoinBlockHeight(chainUpdate);
 
     // Broadcast some STX stacking orders
