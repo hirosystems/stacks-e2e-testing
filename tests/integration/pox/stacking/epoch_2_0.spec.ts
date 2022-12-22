@@ -7,9 +7,9 @@ import { describe, expect, it, beforeAll, afterAll } from 'vitest'
 
 describe('testing stacking under epoch 2.0', () => {
     let orchestrator: DevnetNetworkOrchestrator;
+    let timeline = { epoch_2_0: 100, epoch_2_05: 105, epoch_2_1: 122, pox_2_activation: 130 };
 
     beforeAll(async (ctx) => {
-        let timeline = { epoch_2_0: 100, epoch_2_05: 105, epoch_2_1: 135, pox_2_activation: 140 };
         orchestrator = buildDevnetNetworkOrchestrator(getNetworkIdFromCtx(ctx.id), timeline);
         orchestrator.start()
     });
@@ -20,7 +20,6 @@ describe('testing stacking under epoch 2.0', () => {
 
     it('submitting stacks-stx through pox-1 contract during epoch 2.0 should succeed', async () => {
         const network = new StacksTestnet({ url: orchestrator.getStacksNodeUrl() });
-        
         // Wait for Stacks genesis block
         await orchestrator.waitForNextStacksBlock();
     
@@ -37,11 +36,10 @@ describe('testing stacking under epoch 2.0', () => {
         let wallet3 = await getAccount(network, Accounts.WALLET_3.stxAddress);
         expect(wallet3.balance).toBe(BigInt(genesisBalance));
 
-        // Wait for block N-2 where N is the height of the next prepare phase
+        // Wait for block N+2 where N is the height of the next reward phase
         let chainUpdate = await waitForNextRewardPhase(network, orchestrator, 2);
         let blockHeight = getBitcoinBlockHeight(chainUpdate);
         blockHeight += 1;
-        console.log(blockHeight);
 
         // Broadcast some STX stacking orders
         let fee = 1000;
@@ -62,16 +60,13 @@ describe('testing stacking under epoch 2.0', () => {
         expect(response.error).toBeUndefined();
 
         let poxInfo = await getPoxInfo(network);
-        console.log(JSON.stringify(poxInfo));
         await orchestrator.waitForNextStacksBlock();
 
         poxInfo = await getPoxInfo(network);
-        console.log(JSON.stringify(poxInfo));
 
         // Wait for block N+1 where N is the height of the next reward phase
         chainUpdate = await waitForNextRewardPhase(network, orchestrator, 1);
         poxInfo = await getPoxInfo(network);
-        console.log(JSON.stringify(poxInfo));
         // PoX is handled via pox 1.0, and the cycle should be active
         expect(poxInfo.contract_id).toBe('ST000000000000000000002AMW42H.pox');
         // expect(poxInfo.current_cycle.is_pox_active).toBe(true);
@@ -92,10 +87,9 @@ describe('testing stacking under epoch 2.0', () => {
         expect(wallet3.locked).toBe(BigInt(stackedByWallet3));
 
         // Wait for next PoX cycle (Bitcoin block #121)
-        await orchestrator.waitForStacksBlockAnchoredOnBitcoinBlockOfHeight(121);
+        await orchestrator.waitForStacksBlockAnchoredOnBitcoinBlockOfHeight(timeline.pox_2_activation + 1);
         poxInfo = await getPoxInfo(network);
 
-        console.log(poxInfo);
         // Proof of transfer should now be handled via pox-2 contract, and the cycle should be inactive
         expect(poxInfo.contract_id).toBe('ST000000000000000000002AMW42H.pox-2');
         expect(poxInfo.current_cycle.is_pox_active).toBe(false);

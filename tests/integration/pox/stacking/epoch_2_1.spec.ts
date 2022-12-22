@@ -7,6 +7,7 @@ import { describe, expect, it, beforeAll, afterAll } from 'vitest'
 
 describe('testing stacking under epoch 2.1', () => {
     let orchestrator: DevnetNetworkOrchestrator;
+    let timeline = { epoch_2_0: 100, epoch_2_05: 101, epoch_2_1: 103, pox_2_activation: 110 };
 
     beforeAll(async (ctx) => {
         orchestrator = buildDevnetNetworkOrchestrator(getNetworkIdFromCtx(ctx.id));
@@ -24,8 +25,8 @@ describe('testing stacking under epoch 2.1', () => {
         await orchestrator.waitForNextStacksBlock();
     
         // Wait for block N-2 where N is the height of the next prepare phase
-        let chainUpdate = await waitForRewardCycleId(network, orchestrator, 1);
-        let blockHeight = getBitcoinBlockHeight(chainUpdate);
+        let blockHeight = timeline.pox_2_activation + 1;
+        let chainUpdate = await orchestrator.waitForStacksBlockAnchoredOnBitcoinBlockOfHeight(blockHeight);
     
         // Broadcast some STX stacking orders
         let fee = 1000;
