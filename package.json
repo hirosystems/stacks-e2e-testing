@@ -3,8 +3,10 @@
   "version": "1.0.0",
   "description": "",
   "scripts": {
-    "test": "vitest tests/integration/clarity/natives/stx-account.spec.ts",
-    "test-ui": "vitest --ui"
+    "test": "vitest",
+    "test-ui": "vitest --ui",
+    "fmt:check": "./node_modules/.bin/prettier --check .",
+    "fmt:fix": "./node_modules/.bin/prettier --write ."
   },
   "dependencies": {
     "@hirosystems/stacks-devnet-js": "^1.3.0",
