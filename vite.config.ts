@@ -8,6 +8,5 @@ export default defineConfig({
     // silent: true,
     // maxConcurrency: 5,
     // slowTestThreshold: 120_000;
-
   },
 })
