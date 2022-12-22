@@ -15,6 +15,9 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: ${{ matrix.node-version }}
-      - run: yarn install --immutable --immutable-cache --check-cache
-      - run: yarn fmt:check
-      - run: yarn test
+      - name: Install dependencies
+        run: yarn install --immutable --immutable-cache --check-cache
+      - name: Check code format
+        run: yarn fmt:check
+      - name: Run test suite
+        run: yarn test
