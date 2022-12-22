@@ -74,7 +74,6 @@ describe("tx-sponsor?", () => {
     beforeAll(async () => {
       // Wait for 2.1 to go live
       await orchestrator.waitForStacksBlockAnchoredOnBitcoinBlockOfHeight(Constants.DEVNET_DEFAULT_EPOCH_2_1)
-
     });
 
     it("is valid", async () => {
@@ -169,7 +168,7 @@ describe("tx-sponsor?", () => {
       // Wait for the transaction to be processed
       let [_, tx] = await waitForStacksTransaction(
         orchestrator,
-        transaction.txid()
+        sponsoredTx.txid()
       );
       expect(tx.description).toBe(
         `invoked: ${Accounts.DEPLOYER.stxAddress}.test-2-1::test-1()`
