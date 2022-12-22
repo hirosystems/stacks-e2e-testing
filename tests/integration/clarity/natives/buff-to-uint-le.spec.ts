@@ -20,13 +20,11 @@ import { DevnetNetworkOrchestrator } from "@hirosystems/stacks-devnet-js";
 describe("buff-to-uint-le", () => {
   let orchestrator: DevnetNetworkOrchestrator;
   let network: StacksNetwork;
-  let nonce: number;
 
   beforeAll((ctx: any) => {
     orchestrator = buildDevnetNetworkOrchestrator(getNetworkIdFromCtx(ctx.id));
     orchestrator.start();
     network = new StacksTestnet({ url: orchestrator.getStacksNodeUrl() });
-    nonce = 0;
     ctx();
   });
 
@@ -54,6 +52,7 @@ describe("buff-to-uint-le", () => {
       network,
       anchorMode: AnchorMode.OnChainOnly,
       postConditionMode: PostConditionMode.Allow,
+      nonce: 0,
     };
 
     let transaction = await makeContractDeploy(deployTxOptions);
@@ -94,6 +93,7 @@ describe("buff-to-uint-le", () => {
         network,
         anchorMode: AnchorMode.OnChainOnly,
         postConditionMode: PostConditionMode.Allow,
+        nonce: 1,
       };
 
       let transaction = await makeContractDeploy(deployTxOptions);
@@ -125,7 +125,7 @@ describe("buff-to-uint-le", () => {
         network,
         anchorMode: AnchorMode.OnChainOnly,
         postConditionMode: PostConditionMode.Allow,
-        nonce,
+        nonce: 0,
       };
       let transaction = await makeContractCall(callTxOptions);
 
@@ -143,7 +143,6 @@ describe("buff-to-uint-le", () => {
       );
       expect(tx.result).toBe("(ok u1)");
       expect(tx.success).toBeTruthy();
-      nonce += 1;
     });
 
     it("works for a large int", async () => {
@@ -158,7 +157,7 @@ describe("buff-to-uint-le", () => {
         network,
         anchorMode: AnchorMode.OnChainOnly,
         postConditionMode: PostConditionMode.Allow,
-        nonce,
+        nonce: 1,
       };
       let transaction = await makeContractCall(callTxOptions);
 
@@ -176,7 +175,6 @@ describe("buff-to-uint-le", () => {
       );
       expect(tx.result).toBe("(ok u340282366920938463463374607431768211455)");
       expect(tx.success).toBeTruthy();
-      nonce += 1;
     });
 
     it("works for 0x", async () => {
@@ -191,7 +189,7 @@ describe("buff-to-uint-le", () => {
         network,
         anchorMode: AnchorMode.OnChainOnly,
         postConditionMode: PostConditionMode.Allow,
-        nonce,
+        nonce: 2,
       };
       let transaction = await makeContractCall(callTxOptions);
 

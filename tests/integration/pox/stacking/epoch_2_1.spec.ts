@@ -56,7 +56,8 @@ describe("testing stacking under epoch 2.1", () => {
       Accounts.WALLET_1,
       blockHeight,
       cycles,
-      fee
+      fee,
+      0
     );
     expect(response.error).toBeUndefined();
 
@@ -67,7 +68,8 @@ describe("testing stacking under epoch 2.1", () => {
       Accounts.WALLET_2,
       blockHeight,
       cycles,
-      fee
+      fee,
+      0
     );
     expect(response.error).toBeUndefined();
 
@@ -78,7 +80,8 @@ describe("testing stacking under epoch 2.1", () => {
       Accounts.WALLET_3,
       blockHeight,
       cycles,
-      fee
+      fee,
+      0
     );
     expect(response.error).toBeUndefined();
 

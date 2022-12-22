@@ -28,11 +28,9 @@ import { principalCV } from "@stacks/transactions/dist/clarity/types/principalCV
 describe("stx-account", () => {
   let orchestrator: DevnetNetworkOrchestrator;
   let network: StacksNetwork;
-  let nonce: number;
 
   beforeAll((ctx: any) => {
     let networkId = getNetworkIdFromCtx(ctx.id);
-    nonce = 0;
     orchestrator = buildDevnetNetworkOrchestrator(networkId);
     orchestrator.start();
     network = new StacksTestnet({ url: orchestrator.getStacksNodeUrl() });
@@ -61,6 +59,7 @@ describe("stx-account", () => {
       network,
       anchorMode: AnchorMode.OnChainOnly,
       postConditionMode: PostConditionMode.Allow,
+      nonce: 0,
     };
 
     let transaction = await makeContractDeploy(deployTxOptions);
@@ -109,6 +108,7 @@ describe("stx-account", () => {
         network,
         anchorMode: AnchorMode.OnChainOnly,
         postConditionMode: PostConditionMode.Allow,
+        nonce: 1,
       };
 
       let transaction = await makeContractDeploy(deployTxOptions);
@@ -140,7 +140,7 @@ describe("stx-account", () => {
         network,
         anchorMode: AnchorMode.OnChainOnly,
         postConditionMode: PostConditionMode.Allow,
-        nonce,
+        nonce: 0,
       };
       let transaction = await makeContractCall(callTxOptions);
 
@@ -160,7 +160,6 @@ describe("stx-account", () => {
         "(ok (tuple (locked u0) (unlock-height u0) (unlocked u0)))"
       );
       expect(tx.success).toBeTruthy();
-      nonce += 1;
     });
 
     it("works for a literal contract principal", async () => {
@@ -175,7 +174,7 @@ describe("stx-account", () => {
         network,
         anchorMode: AnchorMode.OnChainOnly,
         postConditionMode: PostConditionMode.Allow,
-        nonce,
+        nonce: 1,
       };
       let transaction = await makeContractCall(callTxOptions);
 
@@ -195,7 +194,6 @@ describe("stx-account", () => {
         "(ok (tuple (locked u0) (unlock-height u0) (unlocked u0)))"
       );
       expect(tx.success).toBeTruthy();
-      nonce += 1;
     });
 
     it("works for a standard principal", async () => {
@@ -212,7 +210,7 @@ describe("stx-account", () => {
         network,
         anchorMode: AnchorMode.OnChainOnly,
         postConditionMode: PostConditionMode.Allow,
-        nonce,
+        nonce: 2,
       };
       let transaction = await makeContractCall(callTxOptions);
 
@@ -232,7 +230,6 @@ describe("stx-account", () => {
         "(ok (tuple (locked u0) (unlock-height u0) (unlocked u0)))"
       );
       expect(tx.success).toBeTruthy();
-      nonce += 1;
     });
 
     it("works for a principal with a balance", async () => {
@@ -247,7 +244,7 @@ describe("stx-account", () => {
         network,
         anchorMode: AnchorMode.OnChainOnly,
         postConditionMode: PostConditionMode.Allow,
-        nonce,
+        nonce: 3,
       };
       let transaction = await makeContractCall(callTxOptions);
 
@@ -267,7 +264,6 @@ describe("stx-account", () => {
         "(ok (tuple (locked u0) (unlock-height u0) (unlocked u99999999992000)))"
       );
       expect(tx.success).toBeTruthy();
-      nonce += 1;
     });
 
     it("handles an invalid principal", async () => {
@@ -284,7 +280,7 @@ describe("stx-account", () => {
         network,
         anchorMode: AnchorMode.OnChainOnly,
         postConditionMode: PostConditionMode.Allow,
-        nonce,
+        nonce: 4,
       };
       let transaction = await makeContractCall(callTxOptions);
 
@@ -304,7 +300,6 @@ describe("stx-account", () => {
         "(ok (tuple (locked u0) (unlock-height u0) (unlocked u0)))"
       );
       expect(tx.success).toBeTruthy();
-      nonce += 1;
     });
 
     it("returns expected results when stacking", async () => {
@@ -325,7 +320,8 @@ describe("stx-account", () => {
         Accounts.WALLET_1,
         blockHeight,
         cycles,
-        1000
+        1000,
+        5
       );
       expect(response.error).toBeUndefined();
 
@@ -350,6 +346,7 @@ describe("stx-account", () => {
         network,
         anchorMode: AnchorMode.OnChainOnly,
         postConditionMode: PostConditionMode.Allow,
+        nonce: 6,
       };
       let transaction = await makeContractCall(callTxOptions);
 

@@ -73,6 +73,7 @@ describe("use", () => {
         network,
         anchorMode: AnchorMode.OnChainOnly,
         postConditionMode: PostConditionMode.Allow,
+        nonce: 0,
       };
 
       let transaction = await makeContractDeploy(deployTxOptions);
@@ -93,6 +94,7 @@ describe("use", () => {
         network,
         anchorMode: AnchorMode.OnChainOnly,
         postConditionMode: PostConditionMode.Allow,
+        nonce: 1,
       };
 
       transaction = await makeContractDeploy(deployTxOptions);
@@ -113,6 +115,7 @@ describe("use", () => {
         network,
         anchorMode: AnchorMode.OnChainOnly,
         postConditionMode: PostConditionMode.Allow,
+        nonce: 2,
       };
 
       transaction = await makeContractDeploy(deployTxOptions);
@@ -152,6 +155,7 @@ describe("use", () => {
         network,
         anchorMode: AnchorMode.OnChainOnly,
         postConditionMode: PostConditionMode.Allow,
+        nonce: 3,
       };
 
       let transaction = await makeContractDeploy(deployTxOptions);
@@ -182,6 +186,7 @@ describe("use", () => {
         network,
         anchorMode: AnchorMode.OnChainOnly,
         postConditionMode: PostConditionMode.Allow,
+        nonce: 4,
       };
 
       let transaction = await makeContractDeploy(deployTxOptions);

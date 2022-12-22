@@ -51,6 +51,7 @@ describe("get-burn-block-info?", () => {
       network,
       anchorMode: AnchorMode.OnChainOnly,
       postConditionMode: PostConditionMode.Allow,
+      nonce: 0,
     };
 
     let transaction = await makeContractDeploy(deployTxOptions);
@@ -96,6 +97,7 @@ describe("get-burn-block-info?", () => {
         network,
         anchorMode: AnchorMode.OnChainOnly,
         postConditionMode: PostConditionMode.Allow,
+        nonce: 1,
       };
 
       let transaction = await makeContractDeploy(deployTxOptions);
@@ -127,6 +129,7 @@ describe("get-burn-block-info?", () => {
         network,
         anchorMode: AnchorMode.OnChainOnly,
         postConditionMode: PostConditionMode.Allow,
+        nonce: 0,
       };
       let transaction = await makeContractCall(callTxOptions);
 
@@ -163,7 +166,8 @@ describe("get-burn-block-info?", () => {
       Accounts.WALLET_1,
       blockHeight,
       12,
-      1000
+      1000,
+      1
     );
     expect(response.error).toBeUndefined();
 
@@ -182,6 +186,7 @@ describe("get-burn-block-info?", () => {
       network,
       anchorMode: AnchorMode.OnChainOnly,
       postConditionMode: PostConditionMode.Allow,
+      nonce: 2,
     };
     let transaction = await makeContractCall(callTxOptions);
 

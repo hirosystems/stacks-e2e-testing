@@ -145,9 +145,9 @@ export const broadcastStackSTX = async (
   account: Account,
   blockHeight: number,
   cycles: number,
-  fee: number
+  fee: number,
+  nonce: number
 ): Promise<TxBroadcastResult> => {
-  const nonce = await getNonce(account.stxAddress, network);
   const { version, data } = decodeBtcAddress(account.btcAddress);
   const address = {
     version: bufferCV(toBytes(new Uint8Array([version.valueOf()]))),
