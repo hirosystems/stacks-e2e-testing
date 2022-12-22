@@ -30,15 +30,16 @@ describe("stx-account", () => {
   let network: StacksNetwork;
   let nonce: number;
 
-  beforeAll(async (ctx) => {
+  beforeAll((ctx: any) => {
     let networkId = getNetworkIdFromCtx(ctx.id);
     nonce = 0;
     orchestrator = buildDevnetNetworkOrchestrator(networkId);
     orchestrator.start();
     network = new StacksTestnet({ url: orchestrator.getStacksNodeUrl() });
+    ctx();
   });
 
-  afterAll(async () => {
+  afterAll(() => {
     orchestrator.terminate();
   });
 

@@ -22,14 +22,15 @@ describe("tx-sponsor?", () => {
   let orchestrator: DevnetNetworkOrchestrator;
   let network: StacksNetwork;
 
-  beforeAll(async (ctx) => {
+  beforeAll((ctx: any) => {
     let networkId = getNetworkIdFromCtx(ctx.id);
     orchestrator = buildDevnetNetworkOrchestrator(networkId);
     orchestrator.start();
     network = new StacksTestnet({ url: orchestrator.getStacksNodeUrl() });
+    ctx();
   });
 
-  afterAll(async () => {
+  afterAll(() => {
     orchestrator.terminate();
   });
 

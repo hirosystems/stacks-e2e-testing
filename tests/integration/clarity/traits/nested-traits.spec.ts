@@ -14,7 +14,7 @@ describe("use redefined trait from contract that redefines it", () => {
   let network: StacksNetwork;
   const STACKS_2_1_EPOCH = 114;
 
-  beforeAll(async (ctx) => {
+  beforeAll((ctx: any) => {
     let networkId = getNetworkIdFromCtx(ctx.id);
     orchestrator = buildDevnetNetworkOrchestrator(networkId, {
       epoch_2_0: 100,
@@ -24,9 +24,10 @@ describe("use redefined trait from contract that redefines it", () => {
     });
     orchestrator.start();
     network = new StacksTestnet({ url: orchestrator.getStacksNodeUrl() });
+    ctx();
   });
 
-  afterAll(async () => {
+  afterAll(() => {
     orchestrator.terminate();
   });
 

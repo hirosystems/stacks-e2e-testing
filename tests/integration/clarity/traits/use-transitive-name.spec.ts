@@ -20,7 +20,7 @@ describe("use transitive trait name", () => {
   let network: StacksNetwork;
   const STACKS_2_1_EPOCH = 112;
 
-  beforeAll(async (ctx) => {
+  beforeAll((ctx: any) => {
     let networkId = getNetworkIdFromCtx(ctx.id);
     orchestrator = buildDevnetNetworkOrchestrator(networkId, {
       epoch_2_0: 100,
@@ -30,9 +30,10 @@ describe("use transitive trait name", () => {
     });
     orchestrator.start();
     network = new StacksTestnet({ url: orchestrator.getStacksNodeUrl() });
+    ctx();
   });
 
-  afterAll(async () => {
+  afterAll(() => {
     orchestrator.terminate();
   });
 

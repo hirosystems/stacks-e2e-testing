@@ -8,7 +8,7 @@ import {
 } from "@hirosystems/stacks-devnet-js";
 import { Constants } from "./constants";
 import { StacksNetwork } from "@stacks/network";
-import fetch from "node-fetch";
+const fetch = require("node-fetch");
 
 interface EpochTimeline {
   epoch_2_0: number;
@@ -73,8 +73,10 @@ export const waitForStacksTransaction = async (
   ];
 };
 
-export const getNetworkIdFromCtx = (task_id: string): number => {
-  let networkId = Math.abs(parseInt(task_id)) % 500;
+export const getNetworkIdFromCtx = (taskId?: string): number => {
+  let networkId = taskId
+    ? Math.abs(parseInt(taskId)) % 500
+    : parseInt(process.env.JEST_WORKER_ID!);
   return networkId;
 };
 

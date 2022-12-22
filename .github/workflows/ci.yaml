@@ -15,14 +15,15 @@ jobs:
         with:
           access_token: ${{ github.token }}
           persist-credentials: false
-  build:
+  run:
     name: Run integration tests
     runs-on: ubuntu-latest
+    timeout-minutes: 60
     strategy:
       matrix:
         node-version: [18.x]
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: Setup Node
         uses: actions/setup-node@v3
         with:
@@ -32,4 +33,4 @@ jobs:
       - name: Check code format
         run: yarn fmt:check
       - name: Run test suite
-        run: yarn test
+        run: yarn test:ci

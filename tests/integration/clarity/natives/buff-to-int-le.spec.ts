@@ -22,14 +22,15 @@ describe("buff-to-int-le", () => {
   let network: StacksNetwork;
   let nonce: number;
 
-  beforeAll(async (ctx) => {
+  beforeAll((ctx: any) => {
     orchestrator = buildDevnetNetworkOrchestrator(getNetworkIdFromCtx(ctx.id));
     orchestrator.start();
     network = new StacksTestnet({ url: orchestrator.getStacksNodeUrl() });
     nonce = 0;
+    ctx();
   });
 
-  afterAll(async () => {
+  afterAll(() => {
     orchestrator.terminate();
   });
 

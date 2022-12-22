@@ -18,7 +18,7 @@ import {
 } from "@stacks/transactions";
 import { decodeBtcAddress } from "@stacks/stacking";
 import { toBytes } from "@stacks/common";
-import fetch from "node-fetch";
+const fetch = require("node-fetch");
 
 interface Account {
   stxAddress: string;

@@ -23,15 +23,16 @@ describe("testing stacking under epoch 2.0", () => {
     pox_2_activation: 130,
   };
 
-  beforeAll(async (ctx) => {
+  beforeAll((ctx: any) => {
     orchestrator = buildDevnetNetworkOrchestrator(
       getNetworkIdFromCtx(ctx.id),
       timeline
     );
     orchestrator.start();
+    ctx();
   });
 
-  afterAll(async () => {
+  afterAll(() => {
     orchestrator.terminate();
   });
 
