@@ -102,11 +102,12 @@ describe("transaction-fee", () => {
 
         call = callFunction(orchestrator, network);
         let tx_function_call_2 = await call("foo-test", "test", [contractPrincipalArg], 4)
-        
-        //TODO: Expect test to fail
 
-        // Although the function invocation should have failed, the fee should have been charged
-        let expectedBalanceAfterFunctionCall = balanceBeforeFunctionCall - 2000;
+        expect(tx_function_call_1.success).toBeTruthy();
+        expect(tx_function_call_2.success).toBeFalsy();
+
+        // Although the function invocation should have failed, the fee should have been charged for both functions
+        let expectedBalanceAfterFunctionCall = balanceBeforeFunctionCall - 4000; // 2000 * 2 = fee for two function invocations
         await expectAccountToBe (network, Accounts.DEPLOYER.stxAddress, expectedBalanceAfterFunctionCall, 0);
     });
 });
