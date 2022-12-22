@@ -12,6 +12,7 @@ import { Accounts, Constants } from "../../constants";
 import { DevnetNetworkOrchestrator } from "@hirosystems/stacks-devnet-js";
 import {
   broadcastStackSTX,
+  getPoxInfo,
   waitForNextPreparePhase,
   waitForNextRewardPhase,
 } from "../../pox/helpers";
@@ -302,17 +303,22 @@ describe("stx-account", () => {
       let blockHeight = getBitcoinBlockHeight(chainUpdate);
 
       // Broadcast some STX stacking orders
+      let cycles = 12;
       let response = await broadcastStackSTX(
         2,
         network,
         25_000_000_000_000,
         Accounts.WALLET_1,
         blockHeight,
-        12,
+        cycles,
         1000
       );
       expect(response.error).toBeUndefined();
 
+      // Compute the unlockHeight to avoid flakiness
+      let poxInfo = await getPoxInfo(network);
+      let unlockHeight = poxInfo.first_burnchain_block_height + (1 + poxInfo.current_cycle.id) * poxInfo.reward_cycle_length + cycles * poxInfo.reward_cycle_length;
+      
       // Wait for block N+1 where N is the height of the next reward phase
       await waitForNextRewardPhase(network, orchestrator, 1);
 
@@ -343,7 +349,7 @@ describe("stx-account", () => {
         `invoked: ${Accounts.DEPLOYER.stxAddress}.test-2-1::test(${Accounts.WALLET_1.stxAddress})`
       );
       expect(tx.result).toBe(
-        "(ok (tuple (locked u25000000000000) (unlock-height u250) (unlocked u74999999987000)))"
+        `(ok (tuple (locked u25000000000000) (unlock-height u${unlockHeight}) (unlocked u74999999987000)))`
       );
       expect(tx.success).toBeTruthy();
     });
