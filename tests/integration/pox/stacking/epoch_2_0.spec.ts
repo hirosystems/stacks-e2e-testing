@@ -19,7 +19,7 @@ describe("testing stacking under epoch 2.0", () => {
   let orchestrator: DevnetNetworkOrchestrator;
   let timeline = {
     epoch_2_0: 100,
-    epoch_2_05: 105,
+    epoch_2_05: 102,
     epoch_2_1: 122,
     pox_2_activation: 130,
   };
