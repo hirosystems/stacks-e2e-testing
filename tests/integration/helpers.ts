@@ -42,6 +42,7 @@ export function buildDevnetNetworkOrchestrator(
       pox_2_activation: timeline.pox_2_activation,
       bitcoin_controller_automining_disabled: false,
       working_dir,
+      use_docker_gateway_routing: process.env.GITHUB_ACTIONS ? true : false,
     },
   };
   let consolidatedConfig = getIsolatedNetworkConfigUsingNetworkId(
