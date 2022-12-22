@@ -28,6 +28,7 @@
   "devDependencies": {
     "@vitest/ui": "^0.25.8",
     "vite": "^4.0.1",
-    "vitest": "^0.25.8"
+    "vitest": "^0.25.8",
+    "vitest-github-actions-reporter": "^0.9.0"
   }
 }
