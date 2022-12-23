@@ -99,6 +99,9 @@ describe("use", () => {
 
       // Broadcast transaction
       result = await broadcastTransaction(transaction, network);
+      if (result.error) {
+        console.log(result);
+      }
       expect((<TxBroadcastResultOk>result).error).toBeUndefined();
 
       // Wait a block and verify that the transaction was not included.
@@ -108,7 +111,7 @@ describe("use", () => {
     });
   });
 
-  describe("in 2.1", () => {
+  describe.skip("in 2.1", () => {
     beforeAll(async () => {
       // Wait for 2.1 to go live
       await orchestrator.waitForStacksBlockAnchoredOnBitcoinBlockOfHeight(
@@ -160,6 +163,9 @@ describe("use", () => {
 
         // Broadcast transaction
         result = await broadcastTransaction(transaction, network);
+        if (result.error) {
+          console.log(result);
+        }
         expect((<TxBroadcastResultOk>result).error).toBeUndefined();
 
         // Wait for the transaction to be processed
