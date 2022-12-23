@@ -122,7 +122,7 @@ describe("empty trait", () => {
     beforeAll(async () => {
       // Wait for 2.1 to go live
       await orchestrator.waitForStacksBlockAnchoredOnBitcoinBlockOfHeight(
-        STACKS_2_1_EPOCH
+        STACKS_2_1_EPOCH + 1
       );
     });
 
