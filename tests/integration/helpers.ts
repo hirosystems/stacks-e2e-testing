@@ -27,7 +27,7 @@ const DEFAULT_EPOCH_TIMELINE = {
 export function buildDevnetNetworkOrchestrator(
   networkId: number,
   timeline: EpochTimeline = DEFAULT_EPOCH_TIMELINE,
-  logs = false
+  logs = true
 ) {
   let uuid = Date.now();
   let working_dir = `/tmp/stacks-test-${uuid}-${networkId}`;
@@ -49,7 +49,7 @@ export function buildDevnetNetworkOrchestrator(
     networkId,
     config
   );
-  let orchestrator = new DevnetNetworkOrchestrator(consolidatedConfig);
+  let orchestrator = new DevnetNetworkOrchestrator(consolidatedConfig, 2500);
   return orchestrator;
 }
 
@@ -73,10 +73,12 @@ export const waitForStacksTransaction = async (
   ];
 };
 
-export const getNetworkIdFromCtx = (taskId?: string): number => {
-  let networkId = taskId
-    ? Math.abs(parseInt(taskId)) % 500
-    : parseInt(process.env.JEST_WORKER_ID!);
+export const getNetworkIdFromEnv = (): number => {
+  let networkId = process.env.JEST_WORKER_ID
+    ? parseInt(process.env.JEST_WORKER_ID!)
+    : process.env.VITEST_WORKER_ID
+    ? parseInt(process.env.VITEST_WORKER_ID!)
+    : 1;
   return networkId;
 };
 

@@ -56,6 +56,9 @@ export const load_versioned = async (
 
   // Broadcast transaction
   let result = await broadcastTransaction(transaction, network);
+  if (result.error) {
+    console.log(result);
+  }
   if ((<TxBroadcastResultOk>result).error) {
     return { ok: false, error: Error((<TxBroadcastResultOk>result).error) };
   }
@@ -99,6 +102,9 @@ export const contract_call = async (
 
   // Broadcast transaction
   let result = await broadcastTransaction(transaction, network);
+  if (result.error) {
+    console.log(result);
+  }
   if ((<TxBroadcastResultOk>result).error) {
     return { ok: false, error: Error((<TxBroadcastResultOk>result).error) };
   }

@@ -20,7 +20,7 @@ import {
   buildDevnetNetworkOrchestrator,
   getBitcoinBlockHeight,
   waitForStacksTransaction,
-  getNetworkIdFromCtx,
+  getNetworkIdFromEnv,
   getChainInfo,
 } from "../../helpers";
 import { principalCV } from "@stacks/transactions/dist/clarity/types/principalCV";
@@ -29,12 +29,14 @@ describe("stx-account", () => {
   let orchestrator: DevnetNetworkOrchestrator;
   let network: StacksNetwork;
 
-  beforeAll((ctx: any) => {
-    let networkId = getNetworkIdFromCtx(ctx.id);
+  let networkId: number;
+
+  beforeAll(() => {
+    networkId = getNetworkIdFromEnv();
+    console.log(`network #${networkId}`);
     orchestrator = buildDevnetNetworkOrchestrator(networkId);
     orchestrator.start();
     network = new StacksTestnet({ url: orchestrator.getStacksNodeUrl() });
-    ctx();
   });
 
   afterAll(() => {
@@ -66,6 +68,9 @@ describe("stx-account", () => {
 
     // Broadcast transaction
     let result = await broadcastTransaction(transaction, network);
+    if (result.error) {
+      console.log(result);
+    }
     expect((<TxBroadcastResultOk>result).error).toBeUndefined();
 
     // Wait for the transaction to be processed
@@ -115,6 +120,9 @@ describe("stx-account", () => {
 
       // Broadcast transaction
       let result = await broadcastTransaction(transaction, network);
+      if (result.error) {
+        console.log(result);
+      }
       expect((<TxBroadcastResultOk>result).error).toBeUndefined();
 
       // Wait for the transaction to be processed
@@ -146,6 +154,9 @@ describe("stx-account", () => {
 
       // Broadcast transaction
       let result = await broadcastTransaction(transaction, network);
+      if (result.error) {
+        console.log(result);
+      }
       expect((<TxBroadcastResultOk>result).error).toBeUndefined();
 
       // Wait for the transaction to be processed
@@ -180,6 +191,9 @@ describe("stx-account", () => {
 
       // Broadcast transaction
       let result = await broadcastTransaction(transaction, network);
+      if (result.error) {
+        console.log(result);
+      }
       expect((<TxBroadcastResultOk>result).error).toBeUndefined();
 
       // Wait for the transaction to be processed
@@ -216,6 +230,9 @@ describe("stx-account", () => {
 
       // Broadcast transaction
       let result = await broadcastTransaction(transaction, network);
+      if (result.error) {
+        console.log(result);
+      }
       expect((<TxBroadcastResultOk>result).error).toBeUndefined();
 
       // Wait for the transaction to be processed
@@ -250,6 +267,9 @@ describe("stx-account", () => {
 
       // Broadcast transaction
       let result = await broadcastTransaction(transaction, network);
+      if (result.error) {
+        console.log(result);
+      }
       expect((<TxBroadcastResultOk>result).error).toBeUndefined();
 
       // Wait for the transaction to be processed
@@ -286,6 +306,9 @@ describe("stx-account", () => {
 
       // Broadcast transaction
       let result = await broadcastTransaction(transaction, network);
+      if (result.error) {
+        console.log(result);
+      }
       expect((<TxBroadcastResultOk>result).error).toBeUndefined();
 
       // Wait for the transaction to be processed
@@ -352,6 +375,9 @@ describe("stx-account", () => {
 
       // Broadcast transaction
       let result = await broadcastTransaction(transaction, network);
+      if (result.error) {
+        console.log(result);
+      }
       expect((<TxBroadcastResultOk>result).error).toBeUndefined();
 
       // Wait for the transaction to be processed

@@ -1,7 +1,7 @@
 import {
   buildDevnetNetworkOrchestrator,
   getBitcoinBlockHeight,
-  getNetworkIdFromCtx,
+  getNetworkIdFromEnv,
 } from "../../helpers";
 import {
   broadcastStackSTX,
@@ -23,13 +23,12 @@ describe("testing stacking under epoch 2.0", () => {
     pox_2_activation: 130,
   };
 
-  beforeAll((ctx: any) => {
+  beforeAll(() => {
     orchestrator = buildDevnetNetworkOrchestrator(
-      getNetworkIdFromCtx(ctx.id),
+      getNetworkIdFromEnv(),
       timeline
     );
     orchestrator.start();
-    ctx();
   });
 
   afterAll(() => {

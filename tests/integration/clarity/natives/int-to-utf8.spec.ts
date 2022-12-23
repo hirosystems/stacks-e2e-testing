@@ -12,7 +12,7 @@ import { Accounts, Constants } from "../../constants";
 import {
   buildDevnetNetworkOrchestrator,
   waitForStacksTransaction,
-  getNetworkIdFromCtx,
+  getNetworkIdFromEnv,
   getChainInfo,
 } from "../../helpers";
 import { DevnetNetworkOrchestrator } from "@hirosystems/stacks-devnet-js";
@@ -21,12 +21,14 @@ describe("int-to-utf8", () => {
   let orchestrator: DevnetNetworkOrchestrator;
   let network: StacksNetwork;
 
-  beforeAll((ctx: any) => {
-    let networkId = getNetworkIdFromCtx(ctx.id);
+  let networkId: number;
+
+  beforeAll(() => {
+    networkId = getNetworkIdFromEnv();
+    console.log(`network #${networkId}`);
     orchestrator = buildDevnetNetworkOrchestrator(networkId);
     orchestrator.start();
     network = new StacksTestnet({ url: orchestrator.getStacksNodeUrl() });
-    ctx();
   });
 
   afterAll(() => {
@@ -53,12 +55,16 @@ describe("int-to-utf8", () => {
       network,
       anchorMode: AnchorMode.OnChainOnly,
       postConditionMode: PostConditionMode.Allow,
+      nonce: 0,
     };
 
     let transaction = await makeContractDeploy(deployTxOptions);
 
     // Broadcast transaction
     let result = await broadcastTransaction(transaction, network);
+    if (result.error) {
+      console.log(result);
+    }
     expect((<TxBroadcastResultOk>result).error).toBeUndefined();
 
     // Wait for the transaction to be processed
@@ -93,12 +99,16 @@ describe("int-to-utf8", () => {
         network,
         anchorMode: AnchorMode.OnChainOnly,
         postConditionMode: PostConditionMode.Allow,
+        nonce: 1,
       };
 
       let transaction = await makeContractDeploy(deployTxOptions);
 
       // Broadcast transaction
       let result = await broadcastTransaction(transaction, network);
+      if (result.error) {
+        console.log(result);
+      }
       expect((<TxBroadcastResultOk>result).error).toBeUndefined();
 
       // Wait for the transaction to be processed
@@ -124,11 +134,15 @@ describe("int-to-utf8", () => {
         network,
         anchorMode: AnchorMode.OnChainOnly,
         postConditionMode: PostConditionMode.Allow,
+        nonce: 0,
       };
       let transaction = await makeContractCall(callTxOptions);
 
       // Broadcast transaction
       let result = await broadcastTransaction(transaction, network);
+      if (result.error) {
+        console.log(result);
+      }
       expect((<TxBroadcastResultOk>result).error).toBeUndefined();
 
       // Wait for the transaction to be processed
@@ -155,11 +169,15 @@ describe("int-to-utf8", () => {
         network,
         anchorMode: AnchorMode.OnChainOnly,
         postConditionMode: PostConditionMode.Allow,
+        nonce: 1,
       };
       let transaction = await makeContractCall(callTxOptions);
 
       // Broadcast transaction
       let result = await broadcastTransaction(transaction, network);
+      if (result.error) {
+        console.log(result);
+      }
       expect((<TxBroadcastResultOk>result).error).toBeUndefined();
 
       // Wait for the transaction to be processed
@@ -186,11 +204,15 @@ describe("int-to-utf8", () => {
         network,
         anchorMode: AnchorMode.OnChainOnly,
         postConditionMode: PostConditionMode.Allow,
+        nonce: 2,
       };
       let transaction = await makeContractCall(callTxOptions);
 
       // Broadcast transaction
       let result = await broadcastTransaction(transaction, network);
+      if (result.error) {
+        console.log(result);
+      }
       expect((<TxBroadcastResultOk>result).error).toBeUndefined();
 
       // Wait for the transaction to be processed

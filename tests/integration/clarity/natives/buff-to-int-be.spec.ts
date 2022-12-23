@@ -12,7 +12,7 @@ import { Accounts, Constants } from "../../constants";
 import {
   buildDevnetNetworkOrchestrator,
   waitForStacksTransaction,
-  getNetworkIdFromCtx,
+  getNetworkIdFromEnv,
 } from "../../helpers";
 import { DevnetNetworkOrchestrator } from "@hirosystems/stacks-devnet-js";
 
@@ -20,11 +20,10 @@ describe("buff-to-int-be", () => {
   let orchestrator: DevnetNetworkOrchestrator;
   let network: StacksNetwork;
 
-  beforeAll((ctx: any) => {
-    orchestrator = buildDevnetNetworkOrchestrator(getNetworkIdFromCtx(ctx.id));
+  beforeAll(() => {
+    orchestrator = buildDevnetNetworkOrchestrator(getNetworkIdFromEnv());
     orchestrator.start();
     network = new StacksTestnet({ url: orchestrator.getStacksNodeUrl() });
-    ctx();
   });
 
   afterAll(() => {
@@ -58,6 +57,9 @@ describe("buff-to-int-be", () => {
 
     // Broadcast transaction
     let result = await broadcastTransaction(transaction, network);
+    if (result.error) {
+      console.log(result);
+    }
     expect((<TxBroadcastResultOk>result).error).toBeUndefined();
 
     // Wait for the transaction to be processed
@@ -99,6 +101,9 @@ describe("buff-to-int-be", () => {
 
       // Broadcast transaction
       let result = await broadcastTransaction(transaction, network);
+      if (result.error) {
+        console.log(result);
+      }
       expect((<TxBroadcastResultOk>result).error).toBeUndefined();
 
       // Wait for the transaction to be processed
@@ -130,6 +135,9 @@ describe("buff-to-int-be", () => {
 
       // Broadcast transaction
       let result = await broadcastTransaction(transaction, network);
+      if (result.error) {
+        console.log(result);
+      }
       expect((<TxBroadcastResultOk>result).error).toBeUndefined();
 
       // Wait for the transaction to be processed
@@ -162,6 +170,9 @@ describe("buff-to-int-be", () => {
 
       // Broadcast transaction
       let result = await broadcastTransaction(transaction, network);
+      if (result.error) {
+        console.log(result);
+      }
       expect((<TxBroadcastResultOk>result).error).toBeUndefined();
 
       // Wait for the transaction to be processed
@@ -194,6 +205,9 @@ describe("buff-to-int-be", () => {
 
       // Broadcast transaction
       let result = await broadcastTransaction(transaction, network);
+      if (result.error) {
+        console.log(result);
+      }
       expect((<TxBroadcastResultOk>result).error).toBeUndefined();
 
       // Wait for the transaction to be processed

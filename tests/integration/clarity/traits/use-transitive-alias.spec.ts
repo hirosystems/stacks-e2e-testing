@@ -13,7 +13,7 @@ import {
   buildDevnetNetworkOrchestrator,
   getBitcoinBlockHeight,
   waitForStacksTransaction,
-  getNetworkIdFromCtx,
+  getNetworkIdFromEnv,
   getChainInfo,
 } from "../../helpers";
 import { DevnetNetworkOrchestrator } from "@hirosystems/stacks-devnet-js";
@@ -23,9 +23,11 @@ const STACKS_2_1_EPOCH = 112;
 describe("use transitive trait alias", () => {
   let orchestrator: DevnetNetworkOrchestrator;
   let network: StacksNetwork;
+  let networkId: number;
 
-  beforeAll((ctx: any) => {
-    let networkId = getNetworkIdFromCtx(ctx.id);
+  beforeAll(() => {
+    networkId = getNetworkIdFromEnv();
+    console.log(`network #${networkId}`);
     orchestrator = buildDevnetNetworkOrchestrator(networkId, {
       epoch_2_0: 100,
       epoch_2_05: 102,
@@ -34,7 +36,6 @@ describe("use transitive trait alias", () => {
     });
     orchestrator.start();
     network = new StacksTestnet({ url: orchestrator.getStacksNodeUrl() });
-    ctx();
   });
 
   afterAll(() => {
@@ -81,6 +82,9 @@ describe("use transitive trait alias", () => {
 
     // Broadcast transaction
     let result = await broadcastTransaction(transaction, network);
+    if (result.error) {
+      console.log(result);
+    }
     expect((<TxBroadcastResultOk>result).error).toBeUndefined();
 
     // Wait for the transaction to be processed
@@ -168,6 +172,9 @@ describe("use transitive trait alias", () => {
 
       // Broadcast transaction
       let result = await broadcastTransaction(transaction, network);
+      if (result.error) {
+        console.log(result);
+      }
       expect((<TxBroadcastResultOk>result).error).toBeUndefined();
 
       // Wait for the transaction to be processed
@@ -200,6 +207,9 @@ describe("use transitive trait alias", () => {
 
         // Broadcast transaction
         let result = await broadcastTransaction(transaction, network);
+        if (result.error) {
+          console.log(result);
+        }
         expect((<TxBroadcastResultOk>result).error).toBeUndefined();
 
         // Wait for the transaction to be processed
@@ -231,6 +241,9 @@ describe("use transitive trait alias", () => {
 
         // Broadcast transaction
         let result = await broadcastTransaction(transaction, network);
+        if (result.error) {
+          console.log(result);
+        }
         expect((<TxBroadcastResultOk>result).error).toBeUndefined();
 
         // Wait for the transaction to be processed

@@ -13,7 +13,7 @@ import {
   buildDevnetNetworkOrchestrator,
   getBitcoinBlockHeight,
   waitForStacksTransaction,
-  getNetworkIdFromCtx,
+  getNetworkIdFromEnv,
   getChainInfo,
 } from "../../helpers";
 import { DevnetNetworkOrchestrator } from "@hirosystems/stacks-devnet-js";
@@ -23,8 +23,11 @@ describe("define a trait with duplicate identical methods", () => {
   let network: StacksNetwork;
   const STACKS_2_1_EPOCH = 112;
 
-  beforeAll((ctx: any) => {
-    let networkId = getNetworkIdFromCtx(ctx.id);
+  let networkId: number;
+
+  beforeAll(() => {
+    networkId = getNetworkIdFromEnv();
+    console.log(`network #${networkId}`);
     orchestrator = buildDevnetNetworkOrchestrator(networkId, {
       epoch_2_0: 100,
       epoch_2_05: 102,
@@ -33,7 +36,6 @@ describe("define a trait with duplicate identical methods", () => {
     });
     orchestrator.start();
     network = new StacksTestnet({ url: orchestrator.getStacksNodeUrl() });
-    ctx();
   });
 
   afterAll(() => {
@@ -61,6 +63,9 @@ describe("define a trait with duplicate identical methods", () => {
 
     // Broadcast transaction
     let result = await broadcastTransaction(transaction, network);
+    if (result.error) {
+      console.log(result);
+    }
     expect((<TxBroadcastResultOk>result).error).toBeUndefined();
 
     // Wait for the transaction to be processed
@@ -106,6 +111,9 @@ describe("define a trait with duplicate identical methods", () => {
 
       // Broadcast transaction
       let result = await broadcastTransaction(transaction, network);
+      if (result.error) {
+        console.log(result);
+      }
       expect((<TxBroadcastResultOk>result).error).toBeUndefined();
 
       // Wait for the transaction to be processed
@@ -137,6 +145,9 @@ describe("define a trait with duplicate identical methods", () => {
 
       // Broadcast transaction
       let result = await broadcastTransaction(transaction, network);
+      if (result.error) {
+        console.log(result);
+      }
       expect((<TxBroadcastResultOk>result).error).toBeUndefined();
 
       // Wait for the transaction to be processed

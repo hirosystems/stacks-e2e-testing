@@ -2,7 +2,7 @@ import { StacksNetwork, StacksTestnet } from "@stacks/network";
 import { Accounts, Constants } from "../../constants";
 import {
   buildDevnetNetworkOrchestrator,
-  getNetworkIdFromCtx,
+  getNetworkIdFromEnv,
   getChainInfo,
 } from "../../helpers";
 import { DevnetNetworkOrchestrator } from "@hirosystems/stacks-devnet-js";
@@ -14,8 +14,11 @@ describe("use trait from contract that redefines it", () => {
   let orchestrator: DevnetNetworkOrchestrator;
   let network: StacksNetwork;
 
-  beforeAll((ctx: any) => {
-    let networkId = getNetworkIdFromCtx(ctx.id);
+  let networkId: number;
+
+  beforeAll(() => {
+    networkId = getNetworkIdFromEnv();
+    console.log(`network #${networkId}`);
     orchestrator = buildDevnetNetworkOrchestrator(networkId, {
       epoch_2_0: 100,
       epoch_2_05: 102,
@@ -24,7 +27,6 @@ describe("use trait from contract that redefines it", () => {
     });
     orchestrator.start();
     network = new StacksTestnet({ url: orchestrator.getStacksNodeUrl() });
-    ctx();
   });
 
   afterAll(() => {
