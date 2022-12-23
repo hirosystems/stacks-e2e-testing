@@ -139,9 +139,9 @@ describe("use and define trait with same name", () => {
 
       // Broadcast transaction
       let result = await broadcastTransaction(tx, network);
-    if (result.error) {
-      console.log(result);
-    }
+      if (result.error) {
+        console.log(result);
+      }
       expect((<TxBroadcastResultOk>result).error).toBeUndefined();
 
       // Wait for the transaction to be processed
@@ -173,9 +173,9 @@ describe("use and define trait with same name", () => {
 
         // Broadcast transaction
         let result = await broadcastTransaction(tx, network);
-    if (result.error) {
-      console.log(result);
-    }
+        if (result.error) {
+          console.log(result);
+        }
         expect((<TxBroadcastResultOk>result).error).toBeUndefined();
 
         // Wait for the transaction to be processed
@@ -206,9 +206,9 @@ describe("use and define trait with same name", () => {
 
         // Broadcast transaction
         let result = await broadcastTransaction(tx, network);
-    if (result.error) {
-      console.log(result);
-    }
+        if (result.error) {
+          console.log(result);
+        }
         expect((<TxBroadcastResultOk>result).error).toBeUndefined();
 
         // Wait for the transaction to be processed
