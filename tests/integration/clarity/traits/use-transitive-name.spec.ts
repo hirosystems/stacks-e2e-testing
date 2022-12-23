@@ -143,7 +143,7 @@ describe("use transitive trait name", () => {
     );
   });
 
-  describe.skip("in 2.1", () => {
+  describe("in 2.1", () => {
     beforeAll(async () => {
       // Wait for 2.1 to go live
       await orchestrator.waitForStacksBlockAnchoredOnBitcoinBlockOfHeight(

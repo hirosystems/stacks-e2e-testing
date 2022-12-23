@@ -113,7 +113,7 @@ describe("use and define trait with same name", () => {
     expect(getBitcoinBlockHeight(chainUpdate)).toBeLessThan(STACKS_2_1_EPOCH);
   });
 
-  describe.skip("in 2.1", () => {
+  describe("in 2.1", () => {
     beforeAll(async () => {
       // Wait for 2.1 to go live
       await orchestrator.waitForStacksBlockAnchoredOnBitcoinBlockOfHeight(
