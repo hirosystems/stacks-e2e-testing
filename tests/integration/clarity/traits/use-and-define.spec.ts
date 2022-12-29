@@ -12,34 +12,35 @@ import { Accounts, Constants } from "../../constants";
 import {
   buildDevnetNetworkOrchestrator,
   getBitcoinBlockHeight,
-  getNetworkIdFromCtx,
+  getNetworkIdFromEnv,
   getChainInfo,
 } from "../../helpers";
-import { DevnetNetworkOrchestrator, StacksTransactionMetadata } from "@hirosystems/stacks-devnet-js";
-import { describe, expect, it, beforeAll, afterAll } from 'vitest'
+import {
+  DevnetNetworkOrchestrator,
+  StacksTransactionMetadata,
+} from "@hirosystems/stacks-devnet-js";
 
 describe("use and define trait with same name", () => {
   let orchestrator: DevnetNetworkOrchestrator;
   let network: StacksNetwork;
   const STACKS_2_1_EPOCH = 112;
 
-  beforeAll(async (ctx) => {
-    let networkId = getNetworkIdFromCtx(ctx.id);
-    orchestrator = buildDevnetNetworkOrchestrator(networkId,
-      {
-        epoch_2_0: 100,
-        epoch_2_05: 102,
-        epoch_2_1: STACKS_2_1_EPOCH,
-        pox_2_activation: 120,
-      },
-      false
-    );
+  let networkId: number;
+
+  beforeAll(() => {
+    networkId = getNetworkIdFromEnv();
+    console.log(`network #${networkId}`);
+    orchestrator = buildDevnetNetworkOrchestrator(networkId, {
+      epoch_2_0: 100,
+      epoch_2_05: 102,
+      epoch_2_1: STACKS_2_1_EPOCH,
+      pox_2_activation: 120,
+    });
     orchestrator.start();
     network = new StacksTestnet({ url: orchestrator.getStacksNodeUrl() });
-
   });
 
-  afterAll(async () => {
+  afterAll(() => {
     orchestrator.terminate();
   });
 
@@ -66,12 +67,16 @@ describe("use and define trait with same name", () => {
       network,
       anchorMode: AnchorMode.OnChainOnly,
       postConditionMode: PostConditionMode.Allow,
+      nonce: 0,
     };
 
     let tx = await makeContractDeploy(deployTxOptions);
 
     // Broadcast transaction
     let result = await broadcastTransaction(tx, network);
+    if (result.error) {
+      console.log(result);
+    }
     expect((<TxBroadcastResultOk>result).error).toBeUndefined();
 
     // Wait for the transaction to be processed
@@ -86,6 +91,7 @@ describe("use and define trait with same name", () => {
       network,
       anchorMode: AnchorMode.OnChainOnly,
       postConditionMode: PostConditionMode.Allow,
+      nonce: 1,
     };
 
     tx = await makeContractDeploy(deployTxOptions);
@@ -95,23 +101,24 @@ describe("use and define trait with same name", () => {
     expect((<TxBroadcastResultOk>result).error).toBeUndefined();
 
     // Wait for the transaction to be processed
-    let { chainUpdate, transaction } = await orchestrator.waitForStacksBlockIncludingTransaction(tx.txid());
-    let metadata = (<StacksTransactionMetadata>transaction.metadata);
+    let { chainUpdate, transaction } =
+      await orchestrator.waitForStacksBlockIncludingTransaction(tx.txid());
+    let metadata = <StacksTransactionMetadata>transaction.metadata;
     expect(metadata.description).toBe(
       `deployed: ${Accounts.DEPLOYER.stxAddress}.use-original-and-define-a-trait`
     );
     expect(metadata.success).toBeFalsy();
 
     // Make sure we stayed in 2.05
-    expect(getBitcoinBlockHeight(chainUpdate)).toBeLessThan(
-      STACKS_2_1_EPOCH
-    );
+    expect(getBitcoinBlockHeight(chainUpdate)).toBeLessThan(STACKS_2_1_EPOCH);
   });
 
   describe("in 2.1", () => {
     beforeAll(async () => {
       // Wait for 2.1 to go live
-      await orchestrator.waitForStacksBlockAnchoredOnBitcoinBlockOfHeight(STACKS_2_1_EPOCH)
+      await orchestrator.waitForStacksBlockAnchoredOnBitcoinBlockOfHeight(
+        STACKS_2_1_EPOCH + 1
+      );
     });
 
     it("Clarity1", async () => {
@@ -125,17 +132,23 @@ describe("use and define trait with same name", () => {
         network,
         anchorMode: AnchorMode.OnChainOnly,
         postConditionMode: PostConditionMode.Allow,
+        nonce: 2,
       };
 
       let tx = await makeContractDeploy(deployTxOptions);
 
       // Broadcast transaction
       let result = await broadcastTransaction(tx, network);
+      // todo(brice): fails with 'Versioned smart contract transactions are not supported in this epoch'
+      if (result.error) {
+        console.log(result);
+      }
       expect((<TxBroadcastResultOk>result).error).toBeUndefined();
 
       // Wait for the transaction to be processed
-      let { transaction } = await orchestrator.waitForStacksBlockIncludingTransaction(tx.txid());
-    let metadata = (<StacksTransactionMetadata>transaction.metadata);
+      let { transaction } =
+        await orchestrator.waitForStacksBlockIncludingTransaction(tx.txid());
+      let metadata = <StacksTransactionMetadata>transaction.metadata;
       expect(metadata.description).toBe(
         `deployed: ${Accounts.DEPLOYER.stxAddress}.use-original-and-define-a-trait-c1`
       );
@@ -154,17 +167,22 @@ describe("use and define trait with same name", () => {
           network,
           anchorMode: AnchorMode.OnChainOnly,
           postConditionMode: PostConditionMode.Allow,
+          nonce: 3,
         };
 
         let tx = await makeContractDeploy(deployTxOptions);
 
         // Broadcast transaction
         let result = await broadcastTransaction(tx, network);
+        if (result.error) {
+          console.log(result);
+        }
         expect((<TxBroadcastResultOk>result).error).toBeUndefined();
 
         // Wait for the transaction to be processed
-        let { transaction } = await orchestrator.waitForStacksBlockIncludingTransaction(tx.txid());
-        let metadata = (<StacksTransactionMetadata>transaction.metadata);
+        let { transaction } =
+          await orchestrator.waitForStacksBlockIncludingTransaction(tx.txid());
+        let metadata = <StacksTransactionMetadata>transaction.metadata;
         expect(metadata.description).toBe(
           `deployed: ${Accounts.DEPLOYER.stxAddress}.use-original-and-define-a-trait-c2`
         );
@@ -182,17 +200,20 @@ describe("use and define trait with same name", () => {
           network,
           anchorMode: AnchorMode.OnChainOnly,
           postConditionMode: PostConditionMode.Allow,
+          nonce: 0,
         };
 
         let tx = await makeContractDeploy(deployTxOptions);
 
         // Broadcast transaction
         let result = await broadcastTransaction(tx, network);
+        if (result.error) {
+          console.log(result);
+        }
         expect((<TxBroadcastResultOk>result).error).toBeUndefined();
 
         // Wait for the transaction to be processed
         await orchestrator.waitForStacksBlockIncludingTransaction(tx.txid());
-
 
         // Build the transaction to deploy the contract
         deployTxOptions = {
@@ -204,6 +225,7 @@ describe("use and define trait with same name", () => {
           network,
           anchorMode: AnchorMode.OnChainOnly,
           postConditionMode: PostConditionMode.Allow,
+          nonce: 1,
         };
 
         tx = await makeContractDeploy(deployTxOptions);
@@ -213,8 +235,9 @@ describe("use and define trait with same name", () => {
         expect((<TxBroadcastResultOk>result).error).toBeUndefined();
 
         // Wait for the transaction to be processed
-        let { transaction } = await orchestrator.waitForStacksBlockIncludingTransaction(tx.txid());
-        let metadata = (<StacksTransactionMetadata>transaction.metadata);
+        let { transaction } =
+          await orchestrator.waitForStacksBlockIncludingTransaction(tx.txid());
+        let metadata = <StacksTransactionMetadata>transaction.metadata;
         expect(metadata.description).toBe(
           `deployed: ${Accounts.WALLET_1.stxAddress}.use-original-and-define-a-trait`
         );

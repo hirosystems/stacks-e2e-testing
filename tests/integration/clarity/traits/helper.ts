@@ -28,6 +28,7 @@ export type Result<T, E = Error> =
 export const load_versioned = async (
   sender: Sender,
   contractName: string,
+  nonce: number,
   network: StacksNetwork,
   orchestrator: DevnetNetworkOrchestrator,
   version?: number,
@@ -48,18 +49,25 @@ export const load_versioned = async (
     network,
     anchorMode: AnchorMode.OnChainOnly,
     postConditionMode: PostConditionMode.Allow,
+    nonce,
   };
 
   let transaction = await makeContractDeploy(deployTxOptions);
 
   // Broadcast transaction
   let result = await broadcastTransaction(transaction, network);
+  if (result.error) {
+    console.log(result);
+  }
   if ((<TxBroadcastResultOk>result).error) {
     return { ok: false, error: Error((<TxBroadcastResultOk>result).error) };
   }
 
   // Wait for the transaction to be processed
-  let [_, tx] = await waitForStacksTransaction(orchestrator, transaction.txid());
+  let [_, tx] = await waitForStacksTransaction(
+    orchestrator,
+    transaction.txid()
+  );
   if (!tx.success) {
     return { ok: false, error: Error(tx.description) };
   } else {
@@ -73,6 +81,7 @@ export const contract_call = async (
   contractName: string,
   functionName: string,
   functionArgs: ClarityValue[],
+  nonce: number,
   network: StacksNetwork,
   orchestrator: DevnetNetworkOrchestrator
 ): Promise<Result<StacksTransactionMetadata>> => {
@@ -87,17 +96,24 @@ export const contract_call = async (
     network,
     anchorMode: AnchorMode.OnChainOnly,
     postConditionMode: PostConditionMode.Allow,
+    nonce,
   };
   let transaction = await makeContractCall(callTxOptions);
 
   // Broadcast transaction
   let result = await broadcastTransaction(transaction, network);
+  if (result.error) {
+    console.log(result);
+  }
   if ((<TxBroadcastResultOk>result).error) {
     return { ok: false, error: Error((<TxBroadcastResultOk>result).error) };
   }
 
   // Wait for the transaction to be processed
-  let [_, tx] = await waitForStacksTransaction(orchestrator, transaction.txid());
+  let [_, tx] = await waitForStacksTransaction(
+    orchestrator,
+    transaction.txid()
+  );
   if (!tx.success) {
     return { ok: false, error: Error(tx.description) };
   } else {

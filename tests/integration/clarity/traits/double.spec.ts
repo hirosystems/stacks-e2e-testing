@@ -12,34 +12,32 @@ import { Accounts, Constants } from "../../constants";
 import {
   buildDevnetNetworkOrchestrator,
   waitForStacksTransaction,
-  getNetworkIdFromCtx,
+  getNetworkIdFromEnv,
   getChainInfo,
 } from "../../helpers";
 import { DevnetNetworkOrchestrator } from "@hirosystems/stacks-devnet-js";
-import { describe, expect, it, beforeAll, afterAll } from 'vitest'
-
 
 describe("use", () => {
   let orchestrator: DevnetNetworkOrchestrator;
   let network: StacksNetwork;
   const STACKS_2_1_EPOCH = 112;
 
-  beforeAll(async (ctx) => {
-    let networkId = getNetworkIdFromCtx(ctx.id);
-    orchestrator = buildDevnetNetworkOrchestrator(networkId,
-      {
-        epoch_2_0: 100,
-        epoch_2_05: 102,
-        epoch_2_1: STACKS_2_1_EPOCH,
-        pox_2_activation: 120,
-      },
-      false
-    );
+  let networkId: number;
+
+  beforeAll(() => {
+    networkId = getNetworkIdFromEnv();
+    console.log(`network #${networkId}`);
+    orchestrator = buildDevnetNetworkOrchestrator(networkId, {
+      epoch_2_0: 100,
+      epoch_2_05: 102,
+      epoch_2_1: STACKS_2_1_EPOCH,
+      pox_2_activation: 120,
+    });
     orchestrator.start();
     network = new StacksTestnet({ url: orchestrator.getStacksNodeUrl() });
   });
 
-  afterAll(async () => {
+  afterAll(() => {
     orchestrator.terminate();
   });
 
@@ -52,9 +50,7 @@ describe("use", () => {
     afterAll(async () => {
       // Make sure this we stayed in 2.05
       let chainInfo = await getChainInfo(network);
-      expect(chainInfo.burn_block_height).toBeLessThanOrEqual(
-        STACKS_2_1_EPOCH
-      );
+      expect(chainInfo.burn_block_height).toBeLessThanOrEqual(STACKS_2_1_EPOCH);
     });
 
     it("define a trait with duplicate method names", async () => {
@@ -67,12 +63,16 @@ describe("use", () => {
         network,
         anchorMode: AnchorMode.OnChainOnly,
         postConditionMode: PostConditionMode.Allow,
+        nonce: 0,
       };
 
       let transaction = await makeContractDeploy(deployTxOptions);
 
       // Broadcast transaction
       let result = await broadcastTransaction(transaction, network);
+      if (result.error) {
+        console.log(result);
+      }
       expect((<TxBroadcastResultOk>result).error).toBeUndefined();
 
       // Wait for the transaction to be processed
@@ -90,7 +90,9 @@ describe("use", () => {
   describe("in 2.1", () => {
     beforeAll(async () => {
       // Wait for 2.1 to go live
-      await orchestrator.waitForStacksBlockAnchoredOnBitcoinBlockOfHeight(STACKS_2_1_EPOCH)
+      await orchestrator.waitForStacksBlockAnchoredOnBitcoinBlockOfHeight(
+        STACKS_2_1_EPOCH + 1
+      );
     });
 
     describe("define a trait with duplicate method names", () => {
@@ -105,12 +107,16 @@ describe("use", () => {
           network,
           anchorMode: AnchorMode.OnChainOnly,
           postConditionMode: PostConditionMode.Allow,
+          nonce: 1,
         };
 
         let transaction = await makeContractDeploy(deployTxOptions);
 
         // Broadcast transaction
         let result = await broadcastTransaction(transaction, network);
+        if (result.error) {
+          console.log(result);
+        }
         expect((<TxBroadcastResultOk>result).error).toBeUndefined();
 
         // Wait for the transaction to be processed
@@ -135,12 +141,16 @@ describe("use", () => {
           network,
           anchorMode: AnchorMode.OnChainOnly,
           postConditionMode: PostConditionMode.Allow,
+          nonce: 2,
         };
 
         let transaction = await makeContractDeploy(deployTxOptions);
 
         // Broadcast transaction
         let result = await broadcastTransaction(transaction, network);
+        if (result.error) {
+          console.log(result);
+        }
         expect((<TxBroadcastResultOk>result).error).toBeUndefined();
 
         // Wait for the transaction to be processed

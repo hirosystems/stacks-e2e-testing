@@ -12,24 +12,26 @@ import { Accounts, Constants } from "../../constants";
 import {
   buildDevnetNetworkOrchestrator,
   waitForStacksTransaction,
-  getNetworkIdFromCtx,
+  getNetworkIdFromEnv,
   getChainInfo,
 } from "../../helpers";
 import { DevnetNetworkOrchestrator } from "@hirosystems/stacks-devnet-js";
-import { describe, expect, it, beforeAll, afterAll } from 'vitest'
 
 describe("int-to-ascii", () => {
   let orchestrator: DevnetNetworkOrchestrator;
   let network: StacksNetwork;
 
-  beforeAll(async (ctx) => {
-    let networkId = getNetworkIdFromCtx(ctx.id);
+  let networkId: number;
+
+  beforeAll(() => {
+    networkId = getNetworkIdFromEnv();
+    console.log(`network #${networkId}`);
     orchestrator = buildDevnetNetworkOrchestrator(networkId);
     orchestrator.start();
     network = new StacksTestnet({ url: orchestrator.getStacksNodeUrl() });
   });
 
-  afterAll(async () => {
+  afterAll(() => {
     orchestrator.terminate();
   });
 
@@ -53,12 +55,16 @@ describe("int-to-ascii", () => {
       network,
       anchorMode: AnchorMode.OnChainOnly,
       postConditionMode: PostConditionMode.Allow,
+      nonce: 0,
     };
 
     let transaction = await makeContractDeploy(deployTxOptions);
 
     // Broadcast transaction
     let result = await broadcastTransaction(transaction, network);
+    if (result.error) {
+      console.log(result);
+    }
     expect((<TxBroadcastResultOk>result).error).toBeUndefined();
 
     // Wait for the transaction to be processed
@@ -68,7 +74,8 @@ describe("int-to-ascii", () => {
     );
     expect(block.bitcoin_anchor_block_identifier.index).toBeLessThanOrEqual(
       Constants.DEVNET_DEFAULT_EPOCH_2_1
-    );    expect(tx.description).toBe(
+    );
+    expect(tx.description).toBe(
       `deployed: ${Accounts.DEPLOYER.stxAddress}.test-2-05`
     );
     expect(tx.success).toBeFalsy();
@@ -77,8 +84,9 @@ describe("int-to-ascii", () => {
   describe("in 2.1", () => {
     beforeAll(async () => {
       // Wait for 2.1 to go live
-      await orchestrator.waitForStacksBlockAnchoredOnBitcoinBlockOfHeight(Constants.DEVNET_DEFAULT_EPOCH_2_1)
-
+      await orchestrator.waitForStacksBlockAnchoredOnBitcoinBlockOfHeight(
+        Constants.DEVNET_DEFAULT_EPOCH_2_1 + 1
+      );
     });
 
     it("is valid", async () => {
@@ -91,12 +99,16 @@ describe("int-to-ascii", () => {
         network,
         anchorMode: AnchorMode.OnChainOnly,
         postConditionMode: PostConditionMode.Allow,
+        nonce: 1,
       };
 
       let transaction = await makeContractDeploy(deployTxOptions);
 
       // Broadcast transaction
       let result = await broadcastTransaction(transaction, network);
+      if (result.error) {
+        console.log(result);
+      }
       expect((<TxBroadcastResultOk>result).error).toBeUndefined();
 
       // Wait for the transaction to be processed
@@ -122,11 +134,15 @@ describe("int-to-ascii", () => {
         network,
         anchorMode: AnchorMode.OnChainOnly,
         postConditionMode: PostConditionMode.Allow,
+        nonce: 0,
       };
       let transaction = await makeContractCall(callTxOptions);
 
       // Broadcast transaction
       let result = await broadcastTransaction(transaction, network);
+      if (result.error) {
+        console.log(result);
+      }
       expect((<TxBroadcastResultOk>result).error).toBeUndefined();
 
       // Wait for the transaction to be processed
@@ -137,7 +153,7 @@ describe("int-to-ascii", () => {
       expect(tx.description).toBe(
         `invoked: ${Accounts.DEPLOYER.stxAddress}.test-2-1::test-1()`
       );
-      expect(tx.result).toBe("(ok \"1\")");
+      expect(tx.result).toBe('(ok "1")');
       expect(tx.success).toBeTruthy();
     });
 
@@ -153,11 +169,15 @@ describe("int-to-ascii", () => {
         network,
         anchorMode: AnchorMode.OnChainOnly,
         postConditionMode: PostConditionMode.Allow,
+        nonce: 1,
       };
       let transaction = await makeContractCall(callTxOptions);
 
       // Broadcast transaction
       let result = await broadcastTransaction(transaction, network);
+      if (result.error) {
+        console.log(result);
+      }
       expect((<TxBroadcastResultOk>result).error).toBeUndefined();
 
       // Wait for the transaction to be processed
@@ -168,7 +188,7 @@ describe("int-to-ascii", () => {
       expect(tx.description).toBe(
         `invoked: ${Accounts.DEPLOYER.stxAddress}.test-2-1::test-2()`
       );
-      expect(tx.result).toBe("(ok \"1\")");
+      expect(tx.result).toBe('(ok "1")');
       expect(tx.success).toBeTruthy();
     });
 
@@ -184,11 +204,15 @@ describe("int-to-ascii", () => {
         network,
         anchorMode: AnchorMode.OnChainOnly,
         postConditionMode: PostConditionMode.Allow,
+        nonce: 2,
       };
       let transaction = await makeContractCall(callTxOptions);
 
       // Broadcast transaction
       let result = await broadcastTransaction(transaction, network);
+      if (result.error) {
+        console.log(result);
+      }
       expect((<TxBroadcastResultOk>result).error).toBeUndefined();
 
       // Wait for the transaction to be processed
@@ -199,7 +223,7 @@ describe("int-to-ascii", () => {
       expect(tx.description).toBe(
         `invoked: ${Accounts.DEPLOYER.stxAddress}.test-2-1::test-3()`
       );
-      expect(tx.result).toBe("(ok \"-1\")");
+      expect(tx.result).toBe('(ok "-1")');
       expect(tx.success).toBeTruthy();
     });
   });

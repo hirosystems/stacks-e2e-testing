@@ -2,18 +2,35 @@ name: Stacks 2.1 CI
 
 on: [push]
 
+env:
+  CI: 1
+
 jobs:
-  build:
+  pre_run:
+    name: Cancel previous runs
+    runs-on: ubuntu-latest
+    steps:
+      - name: Cancel Previous Runs
+        uses: styfle/cancel-workflow-action@ad6cb1b847ffb509a69b745b6ee2f1d14dfe14b8
+        with:
+          access_token: ${{ github.token }}
+          persist-credentials: false
+  run:
     name: Run integration tests
     runs-on: ubuntu-latest
+    timeout-minutes: 90
     strategy:
       matrix:
-        node-version: [16.x]
+        node-version: [18.x]
     steps:
-    - uses: actions/checkout@v2
-    - name: Setup Node
-      uses: actions/setup-node@v1
-      with:
-        node-version: ${{ matrix.node-version }}
-    - run: yarn install
-    - run: yarn test
+      - uses: actions/checkout@v3
+      - name: Setup Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node-version }}
+      - name: Install dependencies
+        run: yarn install --immutable --immutable-cache --check-cache
+      - name: Check code format
+        run: yarn fmt:check
+      - name: Run test suite
+        run: yarn test:ci

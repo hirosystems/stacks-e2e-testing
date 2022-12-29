@@ -11,32 +11,30 @@ import {
 import { StacksNetwork, StacksTestnet } from "@stacks/network";
 import { Accounts, Constants } from "../../constants";
 import { DevnetNetworkOrchestrator } from "@hirosystems/stacks-devnet-js";
-import {
-  broadcastStackSTX,
-  waitForNextPreparePhase,
-  waitForNextRewardPhase,
-} from "../../pox/helpers";
+import { broadcastStackSTX, waitForNextRewardPhase } from "../../pox/helpers";
 import {
   buildDevnetNetworkOrchestrator,
   getBitcoinBlockHeight,
   waitForStacksTransaction,
-  getNetworkIdFromCtx,
+  getNetworkIdFromEnv,
   getChainInfo,
 } from "../../helpers";
-import { describe, expect, it, beforeAll, afterAll } from 'vitest'
 
 describe("get-burn-block-info?", () => {
   let orchestrator: DevnetNetworkOrchestrator;
   let network: StacksNetwork;
 
-  beforeAll(async (ctx) => {
-    let networkId = getNetworkIdFromCtx(ctx.id);
+  let networkId: number;
+
+  beforeAll(() => {
+    networkId = getNetworkIdFromEnv();
+    console.log(`network #${networkId}`);
     orchestrator = buildDevnetNetworkOrchestrator(networkId);
     orchestrator.start();
     network = new StacksTestnet({ url: orchestrator.getStacksNodeUrl() });
   });
 
-  afterAll(async () => {
+  afterAll(() => {
     orchestrator.terminate();
   });
 
@@ -55,12 +53,16 @@ describe("get-burn-block-info?", () => {
       network,
       anchorMode: AnchorMode.OnChainOnly,
       postConditionMode: PostConditionMode.Allow,
+      nonce: 0,
     };
 
     let transaction = await makeContractDeploy(deployTxOptions);
 
     // Broadcast transaction
     let result = await broadcastTransaction(transaction, network);
+    if (result.error) {
+      console.log(result);
+    }
     expect((<TxBroadcastResultOk>result).error).toBeUndefined();
 
     // Wait for the transaction to be processed
@@ -81,7 +83,7 @@ describe("get-burn-block-info?", () => {
     beforeAll(async () => {
       // Wait for 2.1 to go live
       await orchestrator.waitForStacksBlockAnchoredOnBitcoinBlockOfHeight(
-        Constants.DEVNET_DEFAULT_EPOCH_2_1
+        Constants.DEVNET_DEFAULT_EPOCH_2_1 + 1
       );
     });
 
@@ -100,12 +102,16 @@ describe("get-burn-block-info?", () => {
         network,
         anchorMode: AnchorMode.OnChainOnly,
         postConditionMode: PostConditionMode.Allow,
+        nonce: 1,
       };
 
       let transaction = await makeContractDeploy(deployTxOptions);
 
       // Broadcast transaction
       let result = await broadcastTransaction(transaction, network);
+      if (result.error) {
+        console.log(result);
+      }
       expect((<TxBroadcastResultOk>result).error).toBeUndefined();
 
       // Wait for the transaction to be processed
@@ -131,11 +137,15 @@ describe("get-burn-block-info?", () => {
         network,
         anchorMode: AnchorMode.OnChainOnly,
         postConditionMode: PostConditionMode.Allow,
+        nonce: 0,
       };
       let transaction = await makeContractCall(callTxOptions);
 
       // Broadcast transaction
       let result = await broadcastTransaction(transaction, network);
+      if (result.error) {
+        console.log(result);
+      }
       expect((<TxBroadcastResultOk>result).error).toBeUndefined();
 
       // Wait for the transaction to be processed
@@ -152,8 +162,11 @@ describe("get-burn-block-info?", () => {
   });
 
   it("returns valid pox addrs", async () => {
+    let chainUpdate =
+      await orchestrator.waitForStacksBlockAnchoredOnBitcoinBlockOfHeight(
+        Constants.DEVNET_DEFAULT_POX_2_ACTIVATION + 1
+      );
     // Wait for block N-2 where N is the height of the next prepare phase
-    let chainUpdate = await waitForNextPreparePhase(network, orchestrator, -2);
     let blockHeight = getBitcoinBlockHeight(chainUpdate);
 
     // Broadcast some STX stacking orders
@@ -164,7 +177,8 @@ describe("get-burn-block-info?", () => {
       Accounts.WALLET_1,
       blockHeight,
       12,
-      1000
+      1000,
+      1
     );
     expect(response.error).toBeUndefined();
 
@@ -183,11 +197,15 @@ describe("get-burn-block-info?", () => {
       network,
       anchorMode: AnchorMode.OnChainOnly,
       postConditionMode: PostConditionMode.Allow,
+      nonce: 2,
     };
     let transaction = await makeContractCall(callTxOptions);
 
     // Broadcast transaction
     let result = await broadcastTransaction(transaction, network);
+    if (result.error) {
+      console.log(result);
+    }
     expect((<TxBroadcastResultOk>result).error).toBeUndefined();
 
     // Wait for the transaction to be processed

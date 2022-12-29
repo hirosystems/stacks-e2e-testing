@@ -12,6 +12,7 @@ import { Accounts, Constants } from "../../constants";
 import { DevnetNetworkOrchestrator } from "@hirosystems/stacks-devnet-js";
 import {
   broadcastStackSTX,
+  getPoxInfo,
   waitForNextPreparePhase,
   waitForNextRewardPhase,
 } from "../../pox/helpers";
@@ -19,24 +20,26 @@ import {
   buildDevnetNetworkOrchestrator,
   getBitcoinBlockHeight,
   waitForStacksTransaction,
-  getNetworkIdFromCtx,
+  getNetworkIdFromEnv,
   getChainInfo,
 } from "../../helpers";
 import { principalCV } from "@stacks/transactions/dist/clarity/types/principalCV";
-import { describe, expect, it, beforeAll, afterAll } from 'vitest'
 
 describe("stx-account", () => {
   let orchestrator: DevnetNetworkOrchestrator;
   let network: StacksNetwork;
 
-  beforeAll(async (ctx) => {
-    let networkId = getNetworkIdFromCtx(ctx.id);
+  let networkId: number;
+
+  beforeAll(() => {
+    networkId = getNetworkIdFromEnv();
+    console.log(`network #${networkId}`);
     orchestrator = buildDevnetNetworkOrchestrator(networkId);
     orchestrator.start();
     network = new StacksTestnet({ url: orchestrator.getStacksNodeUrl() });
   });
 
-  afterAll(async () => {
+  afterAll(() => {
     orchestrator.terminate();
   });
 
@@ -58,12 +61,16 @@ describe("stx-account", () => {
       network,
       anchorMode: AnchorMode.OnChainOnly,
       postConditionMode: PostConditionMode.Allow,
+      nonce: 0,
     };
 
     let transaction = await makeContractDeploy(deployTxOptions);
 
     // Broadcast transaction
     let result = await broadcastTransaction(transaction, network);
+    if (result.error) {
+      console.log(result);
+    }
     expect((<TxBroadcastResultOk>result).error).toBeUndefined();
 
     // Wait for the transaction to be processed
@@ -83,7 +90,9 @@ describe("stx-account", () => {
   describe("in 2.1", () => {
     beforeAll(async () => {
       // Wait for 2.1 to go live
-      await orchestrator.waitForStacksBlockAnchoredOnBitcoinBlockOfHeight(Constants.DEVNET_DEFAULT_POX_2_ACTIVATION)
+      await orchestrator.waitForStacksBlockAnchoredOnBitcoinBlockOfHeight(
+        Constants.DEVNET_DEFAULT_POX_2_ACTIVATION
+      );
     });
 
     it("is valid", async () => {
@@ -104,12 +113,16 @@ describe("stx-account", () => {
         network,
         anchorMode: AnchorMode.OnChainOnly,
         postConditionMode: PostConditionMode.Allow,
+        nonce: 1,
       };
 
       let transaction = await makeContractDeploy(deployTxOptions);
 
       // Broadcast transaction
       let result = await broadcastTransaction(transaction, network);
+      if (result.error) {
+        console.log(result);
+      }
       expect((<TxBroadcastResultOk>result).error).toBeUndefined();
 
       // Wait for the transaction to be processed
@@ -135,11 +148,15 @@ describe("stx-account", () => {
         network,
         anchorMode: AnchorMode.OnChainOnly,
         postConditionMode: PostConditionMode.Allow,
+        nonce: 0,
       };
       let transaction = await makeContractCall(callTxOptions);
 
       // Broadcast transaction
       let result = await broadcastTransaction(transaction, network);
+      if (result.error) {
+        console.log(result);
+      }
       expect((<TxBroadcastResultOk>result).error).toBeUndefined();
 
       // Wait for the transaction to be processed
@@ -155,7 +172,7 @@ describe("stx-account", () => {
       );
       expect(tx.success).toBeTruthy();
     });
-    
+
     it("works for a literal contract principal", async () => {
       // Build a transaction to call the contract
       let callTxOptions: SignedContractCallOptions = {
@@ -168,11 +185,15 @@ describe("stx-account", () => {
         network,
         anchorMode: AnchorMode.OnChainOnly,
         postConditionMode: PostConditionMode.Allow,
+        nonce: 1,
       };
       let transaction = await makeContractCall(callTxOptions);
 
       // Broadcast transaction
       let result = await broadcastTransaction(transaction, network);
+      if (result.error) {
+        console.log(result);
+      }
       expect((<TxBroadcastResultOk>result).error).toBeUndefined();
 
       // Wait for the transaction to be processed
@@ -203,11 +224,15 @@ describe("stx-account", () => {
         network,
         anchorMode: AnchorMode.OnChainOnly,
         postConditionMode: PostConditionMode.Allow,
+        nonce: 2,
       };
       let transaction = await makeContractCall(callTxOptions);
 
       // Broadcast transaction
       let result = await broadcastTransaction(transaction, network);
+      if (result.error) {
+        console.log(result);
+      }
       expect((<TxBroadcastResultOk>result).error).toBeUndefined();
 
       // Wait for the transaction to be processed
@@ -236,11 +261,15 @@ describe("stx-account", () => {
         network,
         anchorMode: AnchorMode.OnChainOnly,
         postConditionMode: PostConditionMode.Allow,
+        nonce: 3,
       };
       let transaction = await makeContractCall(callTxOptions);
 
       // Broadcast transaction
       let result = await broadcastTransaction(transaction, network);
+      if (result.error) {
+        console.log(result);
+      }
       expect((<TxBroadcastResultOk>result).error).toBeUndefined();
 
       // Wait for the transaction to be processed
@@ -271,11 +300,15 @@ describe("stx-account", () => {
         network,
         anchorMode: AnchorMode.OnChainOnly,
         postConditionMode: PostConditionMode.Allow,
+        nonce: 4,
       };
       let transaction = await makeContractCall(callTxOptions);
 
       // Broadcast transaction
       let result = await broadcastTransaction(transaction, network);
+      if (result.error) {
+        console.log(result);
+      }
       expect((<TxBroadcastResultOk>result).error).toBeUndefined();
 
       // Wait for the transaction to be processed
@@ -302,16 +335,25 @@ describe("stx-account", () => {
       let blockHeight = getBitcoinBlockHeight(chainUpdate);
 
       // Broadcast some STX stacking orders
+      let cycles = 12;
       let response = await broadcastStackSTX(
         2,
         network,
         25_000_000_000_000,
         Accounts.WALLET_1,
         blockHeight,
-        12,
-        1000
+        cycles,
+        1000,
+        5
       );
       expect(response.error).toBeUndefined();
+
+      // Compute the unlockHeight to avoid flakiness
+      let poxInfo = await getPoxInfo(network);
+      let unlockHeight =
+        poxInfo.first_burnchain_block_height +
+        (1 + poxInfo.current_cycle.id) * poxInfo.reward_cycle_length +
+        cycles * poxInfo.reward_cycle_length;
 
       // Wait for block N+1 where N is the height of the next reward phase
       await waitForNextRewardPhase(network, orchestrator, 1);
@@ -327,11 +369,15 @@ describe("stx-account", () => {
         network,
         anchorMode: AnchorMode.OnChainOnly,
         postConditionMode: PostConditionMode.Allow,
+        nonce: 6,
       };
       let transaction = await makeContractCall(callTxOptions);
 
       // Broadcast transaction
       let result = await broadcastTransaction(transaction, network);
+      if (result.error) {
+        console.log(result);
+      }
       expect((<TxBroadcastResultOk>result).error).toBeUndefined();
 
       // Wait for the transaction to be processed
@@ -343,7 +389,7 @@ describe("stx-account", () => {
         `invoked: ${Accounts.DEPLOYER.stxAddress}.test-2-1::test(${Accounts.WALLET_1.stxAddress})`
       );
       expect(tx.result).toBe(
-        "(ok (tuple (locked u25000000000000) (unlock-height u250) (unlocked u74999999987000)))"
+        `(ok (tuple (locked u25000000000000) (unlock-height u${unlockHeight}) (unlocked u74999999987000)))`
       );
       expect(tx.success).toBeTruthy();
     });
