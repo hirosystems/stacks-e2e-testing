@@ -42,4 +42,10 @@ export namespace Accounts {
     secretKey:
       "d655b2523bcd65e34889725c73064feb17ceb796831c0e111ba1a552b0f31b3901",
   };
+  export const FAUCET = {
+    stxAddress: "STNHKEPYEPJ8ET55ZZ0M5A34J0R3N5FM2CMMMAZ6",
+    btcAddress: "mjSrB3wS4xab3kYqFktwBzfTdPg367ZJ2d",
+    secretKey:
+      "de433bdfa14ec43aa1098d5be594c8ffb20a31485ff9de2923b2689471c401b801",
+  };
 }
