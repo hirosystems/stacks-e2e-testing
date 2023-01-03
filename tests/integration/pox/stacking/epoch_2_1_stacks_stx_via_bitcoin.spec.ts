@@ -48,7 +48,7 @@ describe("testing stacking under epoch 2.1", () => {
       "devnet",
       "devnet",
       Accounts.FAUCET,
-      25_000_000_000_000,
+      90_000_000_000_000,
       6
     );
 
