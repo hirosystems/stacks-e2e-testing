@@ -88,9 +88,7 @@ describe("transaction-fee", () => {
         );
         expect(tx_foo_test.success).toBeTruthy();
 
-        //TODO: Get balance of current user. Call foo-test. Verify test failure, check balance after execution.
         let {balance: balanceBeforeFunctionCall} = await getAccount (network, Accounts.DEPLOYER.stxAddress);
-        // await expectAccountToBe (network, Accounts.DEPLOYER.stxAddress, balanceBeforeFunctionCall, 0);
 
         let contractPrincipalArg = contractPrincipalCV(
           Accounts.DEPLOYER.stxAddress,
@@ -107,7 +105,7 @@ describe("transaction-fee", () => {
         expect(tx_function_call_2.success).toBeFalsy();
 
         // Although the function invocation should have failed, the fee should have been charged for both functions
-        let expectedBalanceAfterFunctionCall = balanceBeforeFunctionCall - 4000; // 2000 * 2 = fee for two function invocations
+        let expectedBalanceAfterFunctionCall = Number(balanceBeforeFunctionCall) - 4000; // 2000 * 2 = fee for two function invocations
         await expectAccountToBe (network, Accounts.DEPLOYER.stxAddress, expectedBalanceAfterFunctionCall, 0);
     });
 });
