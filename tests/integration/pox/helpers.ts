@@ -17,9 +17,9 @@ import {
   uintCV,
 } from "@stacks/transactions";
 
-import { decodeBtcAddress } from '@stacks/stacking';
-import { toBytes } from '@stacks/common';
-import { expect } from 'vitest'
+import { decodeBtcAddress } from "@stacks/stacking";
+import { toBytes } from "@stacks/common";
+import { expect } from "vitest";
 const fetch = require("node-fetch");
 
 interface Account {
