@@ -7,7 +7,8 @@ import {
 } from "../../helpers";
 import {
   getPoxInfo,
-  waitForNextRewardPhase
+  waitForNextRewardPhase,
+  waitForRewardCycleId
 } from "../helpers";
 import {
   broadcastStackIncrease,
@@ -18,9 +19,9 @@ describe("testing stacking under epoch 2.1", () => {
   let orchestrator: DevnetNetworkOrchestrator;
   let timeline = {
     epoch_2_0: 100,
-    epoch_2_05: 101,
-    epoch_2_1: 103,
-    pox_2_activation: 110,
+    epoch_2_05: 102,
+    epoch_2_1: 106,
+    pox_2_activation: 109,
   };
 
   beforeAll(() => {
@@ -78,7 +79,7 @@ describe("testing stacking under epoch 2.1", () => {
     expect(response.error).toBeUndefined();
 
     await orchestrator.waitForNextStacksBlock();
-    const poxInfo = await getPoxInfo(network);
+    let poxInfo = await getPoxInfo(network);
 
     // Asserts about pox info for better knowledge sharing
     expect(poxInfo.contract_id).toBe("ST000000000000000000002AMW42H.pox-2");
@@ -88,14 +89,15 @@ describe("testing stacking under epoch 2.1", () => {
 
     // Assert that the next cycle has 100m STX locked
     expect(poxInfo.current_cycle.stacked_ustx).toBe(0);
-    expect(poxInfo.next_cycle.stacked_ustx).toBe(100_000_000_000_000);
     expect(poxInfo.current_cycle.is_pox_active).toBe(false);
+    expect(poxInfo.next_cycle.stacked_ustx).toBe(100_000_000_000_000);
 
     // move on to the nexte cycle
-    await waitForNextRewardPhase(network, orchestrator, 1);
-
+    await waitForRewardCycleId(network, orchestrator, 2, 1);
+    
+    poxInfo = await getPoxInfo(network);
     // Assert that the current cycle has 100m STX locked and earning
-    expect(poxInfo.current_cycle.id).toBe(1);
+    expect(poxInfo.current_cycle.id).toBe(2);
     expect(poxInfo.current_cycle.stacked_ustx).toBe(100_000_000_000_000);
     expect(poxInfo.current_cycle.is_pox_active).toBe(true);
 
