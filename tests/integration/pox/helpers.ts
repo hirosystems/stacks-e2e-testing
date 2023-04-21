@@ -3,6 +3,7 @@ import {
   StacksChainUpdate
 } from "@hirosystems/stacks-devnet-js";
 import { StacksNetwork } from "@stacks/network";
+import { TxBroadcastResult } from "@stacks/transactions";
 
 import { expect } from "vitest";
 const fetch = require("node-fetch");
@@ -124,3 +125,14 @@ export const expectAccountToBe = async (
   expect(wallet.balance).toBe(BigInt(account));
   expect(wallet.locked).toBe(BigInt(locked));
 };
+
+export const expectNoError = (response: TxBroadcastResult) => {
+  expect(
+    response.error,
+    response.error +
+      " " +
+      response.reason +
+      " " +
+      JSON.stringify(response.reason_data)
+  ).toBeUndefined();
+}

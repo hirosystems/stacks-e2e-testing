@@ -26,7 +26,7 @@ export const broadcastDelegateSTX = async (
   fee: number,
   nonce: number,
   amount: number,
-  poolAddress: string,
+  poolAddress: Account,
   poolRewardAccount?: Account,
   untilBurnHeight?: number
 ): Promise<TxBroadcastResult> => {
@@ -52,7 +52,7 @@ export const broadcastDelegateSTX = async (
     functionName: "delegate-stx",
     functionArgs: [
       uintCV(amount),
-      principalCV(poolAddress),
+      principalCV(poolAddress.stxAddress),
       untilBurnHeightCV,
       poxAddressCV,
     ],
@@ -104,26 +104,182 @@ export const broadcastDelegateStackSTX = async (
   amount: number,
   poolRewardAccount: Account,
   startBurnHeight: number,
-  lockingPeriodCycles: number
+  lockPeriodCycles: number
 ): Promise<TxBroadcastResult> => {
   const { version, data } = decodeBtcAddress(poolRewardAccount.btcAddress);
   const poxAddress = {
     version: bufferCV(toBytes(new Uint8Array([version.valueOf()]))),
     hashbytes: bufferCV(data),
   };
-  const poxAddressCV = someCV(tupleCV(poxAddress));
 
   const txOptions = {
     contractAddress: Contracts.POX_1.address,
     contractName: poxVersion == 1 ? Contracts.POX_1.name : Contracts.POX_2.name,
-    functionName: "delegate-stacks-stx",
+    functionName: "delegate-stack-stx",
     functionArgs: [
-      principalCV(stacker),
+      principalCV(stacker.stxAddress),
       uintCV(amount),
-      poxAddressCV,
+      tupleCV(poxAddress),
       uintCV(startBurnHeight),
-      uintCV(lockingPeriodCycles)
+      uintCV(lockPeriodCycles),
     ],
+    fee,
+    nonce,
+    network,
+    anchorMode: AnchorMode.OnChainOnly,
+    postConditionMode: PostConditionMode.Allow,
+    senderKey: account.secretKey,
+  };
+  const tx = await makeContractCall(txOptions);
+  // Broadcast transaction to our Devnet stacks node
+  const result = await broadcastTransaction(tx, network);
+  return result;
+};
+
+export const broadcastDelegateStackExtend = async (
+  poxVersion: number,
+  network: StacksNetwork,
+  account: Account,
+  fee: number,
+  nonce: number,
+  stacker: Account,
+  poolRewardAccount: Account,
+  extendByCount: number
+): Promise<TxBroadcastResult> => {
+  const { version, data } = decodeBtcAddress(poolRewardAccount.btcAddress);
+  const poxAddress = {
+    version: bufferCV(toBytes(new Uint8Array([version.valueOf()]))),
+    hashbytes: bufferCV(data),
+  };
+
+  const txOptions = {
+    contractAddress: Contracts.POX_1.address,
+    contractName: poxVersion == 1 ? Contracts.POX_1.name : Contracts.POX_2.name,
+    functionName: "delegate-stack-extend",
+    functionArgs: [
+      principalCV(stacker.stxAddress),
+      tupleCV(poxAddress),
+      uintCV(extendByCount),
+    ],
+    fee,
+    nonce,
+    network,
+    anchorMode: AnchorMode.OnChainOnly,
+    postConditionMode: PostConditionMode.Allow,
+    senderKey: account.secretKey,
+  };
+  const tx = await makeContractCall(txOptions);
+  // Broadcast transaction to our Devnet stacks node
+  const result = await broadcastTransaction(tx, network);
+  return result;
+};
+
+export const broadcastDelegateStackIncrease = async (
+  poxVersion: number,
+  network: StacksNetwork,
+  account: Account,
+  fee: number,
+  nonce: number,
+  stacker: Account,
+  poolRewardAccount: Account,
+  increaseByAmountUstx: number
+): Promise<TxBroadcastResult> => {
+  const { version, data } = decodeBtcAddress(poolRewardAccount.btcAddress);
+  const poxAddress = {
+    version: bufferCV(toBytes(new Uint8Array([version.valueOf()]))),
+    hashbytes: bufferCV(data),
+  };
+
+  const txOptions = {
+    contractAddress: Contracts.POX_1.address,
+    contractName: poxVersion == 1 ? Contracts.POX_1.name : Contracts.POX_2.name,
+    functionName: "delegate-stack-increase",
+    functionArgs: [
+      principalCV(stacker.stxAddress),
+      tupleCV(poxAddress),
+      uintCV(increaseByAmountUstx),
+    ],
+    fee,
+    nonce,
+    network,
+    anchorMode: AnchorMode.OnChainOnly,
+    postConditionMode: PostConditionMode.Allow,
+    senderKey: account.secretKey,
+  };
+  const tx = await makeContractCall(txOptions);
+  // Broadcast transaction to our Devnet stacks node
+  const result = await broadcastTransaction(tx, network);
+  return result;
+};
+
+/**
+ * Broadcasts a transaction for stack-aggregation-commit-indexed (poxVersion 2) or
+ * stack-aggregation-commit (poxVersion 1)
+ * @param poxVersion
+ * @param network
+ * @param account
+ * @param fee
+ * @param nonce
+ * @param poolRewardAccount
+ * @param cycleId
+ * @returns
+ */
+export const broadcastStackAggregationCommitIndexed = async (
+  poxVersion: number,
+  network: StacksNetwork,
+  account: Account,
+  fee: number,
+  nonce: number,
+  poolRewardAccount: Account,
+  cycleId: number
+): Promise<TxBroadcastResult> => {
+  const { version, data } = decodeBtcAddress(poolRewardAccount.btcAddress);
+  const poxAddress = {
+    version: bufferCV(toBytes(new Uint8Array([version.valueOf()]))),
+    hashbytes: bufferCV(data),
+  };
+
+  const txOptions = {
+    contractAddress: Contracts.POX_1.address,
+    contractName: poxVersion == 1 ? Contracts.POX_1.name : Contracts.POX_2.name,
+    functionName:
+      poxVersion == 1
+        ? "stack-aggregation-commit"
+        : "stack-aggregation-commit-indexed",
+    functionArgs: [tupleCV(poxAddress), uintCV(cycleId)],
+    fee,
+    nonce,
+    network,
+    anchorMode: AnchorMode.OnChainOnly,
+    postConditionMode: PostConditionMode.Allow,
+    senderKey: account.secretKey,
+  };
+  const tx = await makeContractCall(txOptions);
+  // Broadcast transaction to our Devnet stacks node
+  const result = await broadcastTransaction(tx, network);
+  return result;
+};
+
+export const broadcastStackAggregationIncrease = async (
+  network: StacksNetwork,
+  account: Account,
+  fee: number,
+  nonce: number,
+  poolRewardAccount: Account,
+  cycleId: number,
+  rewardIndex: number
+): Promise<TxBroadcastResult> => {
+  const { version, data } = decodeBtcAddress(poolRewardAccount.btcAddress);
+  const poxAddress = {
+    version: bufferCV(toBytes(new Uint8Array([version.valueOf()]))),
+    hashbytes: bufferCV(data),
+  };
+
+  const txOptions = {
+    contractAddress: Contracts.POX_2.address,
+    contractName: Contracts.POX_2.name,
+    functionName: "stack-aggregation-increase",
+    functionArgs: [tupleCV(poxAddress), uintCV(cycleId), uintCV(rewardIndex)],
     fee,
     nonce,
     network,
