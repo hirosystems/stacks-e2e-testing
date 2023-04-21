@@ -3,17 +3,19 @@ import { StacksTestnet } from "@stacks/network";
 import { Accounts } from "../../constants";
 import {
   buildDevnetNetworkOrchestrator,
-  getNetworkIdFromEnv
+  getNetworkIdFromEnv,
 } from "../../helpers";
 import {
   getPoxInfo,
   waitForNextRewardPhase,
-  waitForRewardCycleId
+  waitForRewardCycleId,
+  readRewardCyclePoxAddressList,
 } from "../helpers";
 import {
   broadcastStackIncrease,
-  broadcastStackSTX
+  broadcastStackSTX,
 } from "../helpers-direct-stacking";
+import { cvToString, hexToCV } from "@stacks/transactions";
 
 describe("testing stacking under epoch 2.1", () => {
   let orchestrator: DevnetNetworkOrchestrator;
@@ -94,12 +96,22 @@ describe("testing stacking under epoch 2.1", () => {
 
     // move on to the nexte cycle
     await waitForRewardCycleId(network, orchestrator, 2, 1);
-    
+
     poxInfo = await getPoxInfo(network);
     // Assert that the current cycle has 100m STX locked and earning
     expect(poxInfo.current_cycle.id).toBe(2);
     expect(poxInfo.current_cycle.stacked_ustx).toBe(100_000_000_000_000);
     expect(poxInfo.current_cycle.is_pox_active).toBe(true);
+
+    const poxAddrInfo0 = await readRewardCyclePoxAddressList(network, 2, 0);
+    const poxAddrInfoStr0 = cvToString(hexToCV(poxAddrInfo0.data));
+    // HERE'S THE BUG: THIS SHOULD BE `u80000000000000`
+    // expect(poxAddrInfoStr0).toContain("(total-ustx u80000000000000)");
+    expect(poxAddrInfoStr0).toContain("(total-ustx u100000000000000)");
+
+    const poxAddrInfo1 = await readRewardCyclePoxAddressList(network, 2, 1);
+    const poxAddrInfoStr1 = cvToString(hexToCV(poxAddrInfo1.data));
+    expect(poxAddrInfoStr1).toContain("(total-ustx u50000000000000)");
 
     // move on to the nexte cycle
     await waitForNextRewardPhase(network, orchestrator, 1);

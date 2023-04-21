@@ -1,9 +1,14 @@
 import {
   DevnetNetworkOrchestrator,
-  StacksChainUpdate
+  StacksChainUpdate,
 } from "@hirosystems/stacks-devnet-js";
 import { StacksNetwork } from "@stacks/network";
-import { TxBroadcastResult } from "@stacks/transactions";
+import {
+  tupleCV,
+  uintCV,
+  cvToHex,
+  TxBroadcastResult,
+} from "@stacks/transactions";
 
 import { expect } from "vitest";
 const fetch = require("node-fetch");
@@ -135,4 +140,36 @@ export const expectNoError = (response: TxBroadcastResult) => {
       " " +
       JSON.stringify(response.reason_data)
   ).toBeUndefined();
-}
+};
+
+export const readRewardCyclePoxAddressList = async (
+  network: StacksNetwork,
+  cycleId: number,
+  index: number
+) => {
+  const url = network.getMapEntryUrl(
+    "ST000000000000000000002AMW42H",
+    "pox-2",
+    "reward-cycle-pox-address-list"
+  );
+  const cycleIdValue = uintCV(cycleId);
+  const indexValue = uintCV(index);
+  const keyValue = tupleCV({
+    "reward-cycle": cycleIdValue,
+    index: indexValue,
+  });
+  const response = await network.fetchFn(url, {
+    method: "POST",
+    body: JSON.stringify(cvToHex(keyValue)),
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+  if (!response.ok) {
+    const msg = await response.text().catch(() => "");
+    throw new Error(
+      `Error calling read-only function. Response ${response.status}: ${response.statusText}. Attempted to fetch ${url} and failed with the message: "${msg}"`
+    );
+  }
+  return response.json();
+};
