@@ -9,12 +9,10 @@ import {
   getPoxInfo,
   waitForRewardCycleId,
 } from "../helpers";
-import {
-  broadcastStackSTX,
-} from "../helpers-direct-stacking";
 import { Accounts } from "../../constants";
 import { StacksTestnet } from "@stacks/network";
 import { DevnetNetworkOrchestrator } from "@hirosystems/stacks-devnet-js";
+import { broadcastStackIncrease, broadcastStackSTX, broadcastStackExtend } from "../helpers-direct-stacking";
 import { expectAccountToBe } from "../helpers.ts";
 
 describe("testing stacking under epoch 2.1", () => {
@@ -35,65 +33,68 @@ describe("testing stacking under epoch 2.1", () => {
     orchestrator.terminate();
   });
 
-  it("submitting stacks-stx through pox-2 contract during epoch 2.0 should succeed", async () => {
+  it("using stacks-increase in the same cycle should result in increased rewards", async () => {
     const network = new StacksTestnet({ url: orchestrator.getStacksNodeUrl() });
 
     // Wait for Stacks genesis block
     await orchestrator.waitForNextStacksBlock();
+    // Wait for block N+1 where N is the height of the next reward phase
+    await waitForNextRewardPhase(network, orchestrator, 1);
 
-    // Wait for block N-2 where N is the height of the next prepare phase
-    let blockHeight = timeline.pox_2_activation + 1;
-    let chainUpdate =
-      await orchestrator.waitForStacksBlockAnchoredOnBitcoinBlockOfHeight(
-        blockHeight
-      );
+    const blockHeight = timeline.pox_2_activation + 1;
+    const fee = 1000;
+    const cycles = 1;
 
-    // Broadcast some STX stacking orders
-    let fee = 1000;
-    let cycles = 1;
     let response = await broadcastStackSTX(
       2,
       network,
-      25_000_000_000_000,
+      150_000_000_000_000,
       Accounts.WALLET_1,
       blockHeight,
       cycles,
       fee,
       0
-    );
+    )
     expect(response.error).toBeUndefined();
 
     response = await broadcastStackSTX(
       2,
       network,
-      50_000_000_000_000,
+      30_000_000_000_000,
       Accounts.WALLET_2,
       blockHeight,
       cycles,
       fee,
       0
-    );
+    )
     expect(response.error).toBeUndefined();
 
-    response = await broadcastStackSTX(
-      2,
+    response = await broadcastStackIncrease(
       network,
-      75_000_000_000_000,
-      Accounts.WALLET_3,
-      blockHeight,
-      cycles,
+      20_000_000_000_000,
+      Accounts.WALLET_2,
       fee,
-      0
-    );
+      1
+    )
     expect(response.error).toBeUndefined();
 
-    // Wait for block N+1 where N is the height of the next reward phase
-    chainUpdate = await waitForNextRewardPhase(network, orchestrator, 1);
-    let poxInfo = await getPoxInfo(network);
+    await orchestrator.waitForNextStacksBlock()
+    const poxInfo = await getPoxInfo(network);
 
     // Assert
     expect(poxInfo.contract_id).toBe("ST000000000000000000002AMW42H.pox-2");
+    expect(poxInfo.pox_activation_threshold_ustx).toBe(50_000_000_000_000);
+    expect(poxInfo.current_cycle.id).toBe(1);
+    expect(poxInfo.current_cycle.min_threshold_ustx).toBe(20_960_000_000_000);
+    expect(poxInfo.current_cycle.stacked_ustx).toBe(150_000_000_000_000);
     expect(poxInfo.current_cycle.is_pox_active).toBe(true);
-    expect(poxInfo.total)
+
+    await waitForNextRewardPhase(network, orchestrator, 1);
+
+        // Assert
+        expect(poxInfo.contract_id).toBe("ST000000000000000000002AMW42H.pox-2");
+        expect(poxInfo.current_cycle.total_stacked).toBe(150_000_000_000_000);
+        expect(poxInfo.current_cycle.is_pox_active).toBe(true);
+    
   });
 });

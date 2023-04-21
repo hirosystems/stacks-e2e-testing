@@ -1,28 +1,13 @@
-import { Contracts } from "../constants";
 import {
-  StacksChainUpdate,
   DevnetNetworkOrchestrator,
-  StacksTransactionMetadata,
+  StacksChainUpdate
 } from "@hirosystems/stacks-devnet-js";
 import { StacksNetwork } from "@stacks/network";
-import {
-  AnchorMode,
-  broadcastTransaction,
-  bufferCV,
-  getNonce,
-  makeContractCall,
-  PostConditionMode,
-  tupleCV,
-  TxBroadcastResult,
-  uintCV,
-} from "@stacks/transactions";
 
-import { decodeBtcAddress } from "@stacks/stacking";
-import { toBytes } from "@stacks/common";
 import { expect } from "vitest";
 const fetch = require("node-fetch");
 
-interface Account {
+export interface Account {
   stxAddress: string;
   btcAddress: string;
   secretKey: string;
@@ -135,46 +120,7 @@ export const expectAccountToBe = async (
   account: number,
   locked: number
 ) => {
-  let wallet = await getAccount(network, address);
+  const wallet = await getAccount(network, address);
   expect(wallet.balance).toBe(BigInt(account));
   expect(wallet.locked).toBe(BigInt(locked));
-};
-
-export const broadcastStackSTX = async (
-  poxVersion: number,
-  network: StacksNetwork,
-  amount: number,
-  account: Account,
-  blockHeight: number,
-  cycles: number,
-  fee: number,
-  nonce: number
-): Promise<TxBroadcastResult> => {
-  const { version, data } = decodeBtcAddress(account.btcAddress);
-  const address = {
-    version: bufferCV(toBytes(new Uint8Array([version.valueOf()]))),
-    hashbytes: bufferCV(data),
-  };
-
-  const txOptions = {
-    contractAddress: Contracts.POX_1.address,
-    contractName: poxVersion == 1 ? Contracts.POX_1.name : Contracts.POX_2.name,
-    functionName: "stack-stx",
-    functionArgs: [
-      uintCV(amount),
-      tupleCV(address),
-      uintCV(blockHeight),
-      uintCV(cycles),
-    ],
-    fee,
-    nonce,
-    network,
-    anchorMode: AnchorMode.OnChainOnly,
-    postConditionMode: PostConditionMode.Allow,
-    senderKey: account.secretKey,
-  };
-  const tx = await makeContractCall(txOptions);
-  // Broadcast transaction to our Devnet stacks node
-  const result = await broadcastTransaction(tx, network);
-  return result;
 };
