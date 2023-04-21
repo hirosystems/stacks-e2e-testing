@@ -106,6 +106,7 @@ describe("testing stacking under epoch 2.1", () => {
     const poxAddrInfo0 = await readRewardCyclePoxAddressList(network, 2, 0);
     const poxAddrInfoStr0 = cvToString(hexToCV(poxAddrInfo0.data));
     // HERE'S THE BUG: THIS SHOULD BE `u80000000000000`
+    // expect(poxAddrInfoStr0).toContain("(total-ustx u80000000000000)");
     expect(poxAddrInfoStr0).toContain("(total-ustx u100000000000000)");
 
     const poxAddrInfo1 = await readRewardCyclePoxAddressList(network, 2, 1);
