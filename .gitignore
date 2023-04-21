@@ -3,6 +3,7 @@
 **/settings/Testnet.toml
 .cache/**
 history.txt
+deployments/default.devnet-plan.yaml
 
 ### Node ###
 # Logs
