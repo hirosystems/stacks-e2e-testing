@@ -4,15 +4,18 @@ import {
   getNetworkIdFromEnv,
 } from "../../helpers";
 import {
-  broadcastStackSTX,
   waitForNextPreparePhase,
   waitForNextRewardPhase,
   getPoxInfo,
   waitForRewardCycleId,
 } from "../helpers";
+import {
+  broadcastStackSTX,
+} from "../helpers-direct-stacking";
 import { Accounts } from "../../constants";
 import { StacksTestnet } from "@stacks/network";
 import { DevnetNetworkOrchestrator } from "@hirosystems/stacks-devnet-js";
+import { expectAccountToBe } from "../helpers.ts";
 
 describe("testing stacking under epoch 2.1", () => {
   let orchestrator: DevnetNetworkOrchestrator;
@@ -32,7 +35,7 @@ describe("testing stacking under epoch 2.1", () => {
     orchestrator.terminate();
   });
 
-  it("submitting stacks-stx through pox-1 contract during epoch 2.0 should succeed", async () => {
+  it("submitting stacks-stx through pox-2 contract during epoch 2.0 should succeed", async () => {
     const network = new StacksTestnet({ url: orchestrator.getStacksNodeUrl() });
 
     // Wait for Stacks genesis block
@@ -91,5 +94,6 @@ describe("testing stacking under epoch 2.1", () => {
     // Assert
     expect(poxInfo.contract_id).toBe("ST000000000000000000002AMW42H.pox-2");
     expect(poxInfo.current_cycle.is_pox_active).toBe(true);
+    expect(poxInfo.total)
   });
 });
