@@ -78,7 +78,7 @@ describe("testing stacking under epoch 2.1", () => {
     );
     expect(response.error).toBeUndefined();
 
-    await orchestrator.waitForNextStacksBlock();
+    await orchestrator.waitForStacksBlockIncludingTransaction(response.txid);
     let poxInfo = await getPoxInfo(network);
 
     // Asserts about pox info for better knowledge sharing
