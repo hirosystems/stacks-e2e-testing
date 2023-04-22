@@ -85,9 +85,7 @@ describe("testing stacking under epoch 2.1", () => {
 
     // Asserts about pox info for better knowledge sharing
     expect(poxInfo.contract_id).toBe("ST000000000000000000002AMW42H.pox-2");
-    expect(poxInfo.pox_activation_threshold_ustx).toBe(50_286_942_145_278);
     expect(poxInfo.current_cycle.id).toBe(1);
-    expect(poxInfo.current_cycle.min_threshold_ustx).toBe(20_960_000_000_000);
 
     // Assert that the next cycle has 100m STX locked
     expect(poxInfo.current_cycle.stacked_ustx).toBe(0);

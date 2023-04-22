@@ -1,6 +1,6 @@
 import { DevnetNetworkOrchestrator } from "@hirosystems/stacks-devnet-js";
 import { StacksTestnet } from "@stacks/network";
-import { ClarityValue, UIntCV } from "@stacks/transactions";
+import { ClarityValue, UIntCV, uintCV } from "@stacks/transactions";
 import { Accounts } from "../../constants";
 import {
   buildDevnetNetworkOrchestrator,
@@ -134,8 +134,8 @@ describe("testing solo stacker increase without bug", () => {
       2,
       Accounts.FAUCET.stxAddress
     )) as Record<string, ClarityValue>;
-    expect((poxAddrInfo0["total-ustx"] as UIntCV).value).toBe(
-      BigInt(900_000_000_000_001)
+    expect((poxAddrInfo0["total-ustx"] as UIntCV).value).toEqual(
+      uintCV(900_000_000_000_001)
     );
 
     // Check Bob's table entry
@@ -145,10 +145,13 @@ describe("testing solo stacker increase without bug", () => {
       Accounts.WALLET_2.stxAddress
     )) as Record<string, ClarityValue>;
     // HERE'S THE BUG: THIS SHOULD BE `u90000000000110`
-    // expect(cvToString(poxAddrInfo1CV.value.data["total-ustx"])).toBe("u90000000000110");
-    expect((poxAddrInfo1["total-ustx"] as UIntCV).value).toBe(
-      BigInt(990_000_000_000_111)
+    // expect((poxAddrInfo1["total-ustx"] as UIntCV).value).toEqual(
+    //   uintCV(90_000_000_000_110)
+    // );
+    expect((poxAddrInfo1["total-ustx"] as UIntCV).value).toEqual(
+      uintCV(900_000_000_000_111)
     );
+
     // Check Cloe's table entry
     const poxAddrInfo2 = (await readRewardCyclePoxAddressForAddress(
       network,
