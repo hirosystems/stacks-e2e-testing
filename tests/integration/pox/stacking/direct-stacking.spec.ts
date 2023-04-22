@@ -15,7 +15,7 @@ import {
   broadcastStackIncrease,
   broadcastStackSTX,
 } from "../helpers-direct-stacking";
-import { ClarityValue, UIntCV } from "@stacks/transactions";
+import { ClarityValue, uintCV } from "@stacks/transactions";
 
 describe("testing stacking under epoch 2.1", () => {
   let orchestrator: DevnetNetworkOrchestrator;
@@ -107,20 +107,16 @@ describe("testing stacking under epoch 2.1", () => {
       Accounts.WALLET_2.stxAddress
     )) as Record<string, ClarityValue>;
     // HERE'S THE BUG: THIS SHOULD BE `u80000000000000`
-    // expect((poxAddrInfo0["total-ustx"] as UIntCV).value).toBe(
-    //   BigInt(80_000_000_000_000)
+    // expect(poxAddrInfo0["total-ustx"]).toEqual(
+    //   uintCV(80_000_000_000_000)
     // );
-    expect((poxAddrInfo0["total-ustx"] as UIntCV).value).toBe(
-      BigInt(100_000_000_000_000)
-    );
+    expect(poxAddrInfo0["total-ustx"]).toEqual(uintCV(100_000_000_000_000));
 
     const poxAddrInfo1 = (await readRewardCyclePoxAddressForAddress(
       network,
       2,
       Accounts.WALLET_1.stxAddress
     )) as Record<string, ClarityValue>;
-    expect((poxAddrInfo1["total-ustx"] as UIntCV).value).toBe(
-      BigInt(50_000_000_000_000)
-    );
+    expect(poxAddrInfo1["total-ustx"]).toEqual(uintCV(50_000_000_000_000));
   });
 });

@@ -1,6 +1,6 @@
 import { DevnetNetworkOrchestrator } from "@hirosystems/stacks-devnet-js";
 import { StacksTestnet } from "@stacks/network";
-import { ClarityValue, UIntCV, uintCV } from "@stacks/transactions";
+import { ClarityValue, uintCV } from "@stacks/transactions";
 import { Accounts } from "../../constants";
 import {
   buildDevnetNetworkOrchestrator,
@@ -134,9 +134,7 @@ describe("testing solo stacker increase without bug", () => {
       2,
       Accounts.FAUCET.stxAddress
     )) as Record<string, ClarityValue>;
-    expect((poxAddrInfo0["total-ustx"] as UIntCV).value).toEqual(
-      uintCV(900_000_000_000_001)
-    );
+    expect(poxAddrInfo0["total-ustx"]).toEqual(uintCV(900_000_000_000_001));
 
     // Check Bob's table entry
     const poxAddrInfo1 = (await readRewardCyclePoxAddressForAddress(
@@ -145,12 +143,10 @@ describe("testing solo stacker increase without bug", () => {
       Accounts.WALLET_2.stxAddress
     )) as Record<string, ClarityValue>;
     // HERE'S THE BUG: THIS SHOULD BE `u90000000000110`
-    // expect((poxAddrInfo1["total-ustx"] as UIntCV).value).toEqual(
+    // expect(poxAddrInfo1["total-ustx"]).toEqual(
     //   uintCV(90_000_000_000_110)
     // );
-    expect((poxAddrInfo1["total-ustx"] as UIntCV).value).toEqual(
-      uintCV(900_000_000_000_111)
-    );
+    expect(poxAddrInfo1["total-ustx"]).toEqual(uintCV(990_000_000_000_111));
 
     // Check Cloe's table entry
     const poxAddrInfo2 = (await readRewardCyclePoxAddressForAddress(
@@ -159,10 +155,8 @@ describe("testing solo stacker increase without bug", () => {
       Accounts.WALLET_3.stxAddress
     )) as Record<string, ClarityValue>;
     // HERE'S THE BUG: THIS SHOULD BE `u90000000011000`
-    // expect(cvToString(poxAddrInfo1CV.value.data["total-ustx"])).toBe("u90000000011000");
-    expect((poxAddrInfo2["total-ustx"] as UIntCV).value).toBe(
-      BigInt(1080_000_000_011_111)
-    );
+    // expect(poxAddrInfo2["total-ustx"]).toEqual(uintCV(90_000_000_011_000));
+    expect(poxAddrInfo2["total-ustx"]).toEqual(uintCV(1080_000_000_011_111));
 
     // advance to block 120, the last one before chain halt
     let coreInfo = await getCoreInfo(network);
