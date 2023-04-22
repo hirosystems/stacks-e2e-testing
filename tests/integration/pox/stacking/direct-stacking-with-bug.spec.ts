@@ -4,8 +4,7 @@ import {
   SomeCV,
   TupleCV,
   UIntCV,
-  cvToString,
-  hexToCV,
+  hexToCV
 } from "@stacks/transactions";
 import { Accounts } from "../../constants";
 import {
@@ -18,8 +17,7 @@ import {
   getPoxInfo,
   mineBtcBlock as mineBitcoinBlockAndHopeForStacksBlock,
   readRewardCyclePoxAddressList,
-  waitForNextPreparePhase,
-  waitForNextRewardPhase,
+  waitForNextRewardPhase
 } from "../helpers";
 import {
   broadcastStackIncrease,

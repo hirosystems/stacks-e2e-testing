@@ -4,7 +4,6 @@ import {
   getNetworkIdFromEnv,
 } from "../../helpers";
 import {
-  broadcastStackSTX,
   waitForNextPreparePhase,
   waitForNextRewardPhase,
   getPoxInfo,
@@ -13,6 +12,7 @@ import {
 import { Accounts } from "../../constants";
 import { StacksTestnet } from "@stacks/network";
 import { DevnetNetworkOrchestrator } from "@hirosystems/stacks-devnet-js";
+import { broadcastStackSTX } from "../helpers-direct-stacking";
 
 describe("testing stacking under epoch 2.0", () => {
   let orchestrator: DevnetNetworkOrchestrator;
