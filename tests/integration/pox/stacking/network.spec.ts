@@ -1,10 +1,10 @@
+import { DevnetNetworkOrchestrator } from "@hirosystems/stacks-devnet-js";
 import { StacksTestnet } from "@stacks/network";
-import { getPoxInfo, waitForNextRewardPhase } from "../helpers";
 import {
   buildDevnetNetworkOrchestrator,
   getNetworkIdFromEnv,
 } from "../../helpers";
-import { DevnetNetworkOrchestrator } from "@hirosystems/stacks-devnet-js";
+import { getPoxInfo, waitForNextRewardPhase } from "../helpers";
 
 describe("testing devnet settings", () => {
   let orchestrator: DevnetNetworkOrchestrator;
@@ -20,11 +20,10 @@ describe("testing devnet settings", () => {
 
   it("testing pox info data after 2.1 activation (cycle #1)", async () => {
     const network = new StacksTestnet({ url: orchestrator.getStacksNodeUrl() });
-
     // Wait for Stacks genesis block
     await orchestrator.waitForNextStacksBlock();
-    // Wait for block N+1 where N is the height of the next reward phase
-    await waitForNextRewardPhase(network, orchestrator, 1);
+    // Wait for block N+2 where N is the height of the next reward phase
+    await waitForNextRewardPhase(network, orchestrator, 2);
 
     let poxInfo = await getPoxInfo(network);
 

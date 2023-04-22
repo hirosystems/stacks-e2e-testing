@@ -10,11 +10,13 @@ yarn test:dev
 ```
 
 To run tests from one file, use:
+
 ```
 yarn vitest --run direct-stacking-with-bug
 ```
 
 Or to run a specific test, use the `-t` flag to specify the complete name:
+
 ```
 yarn test:dev run -t "using stacks-increase in the same cycle should result in increased rewards"
 ```

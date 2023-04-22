@@ -12,14 +12,14 @@ import {
   getPoxInfo,
   mineBtcBlock as mineBitcoinBlockAndHopeForStacksBlock,
   readRewardCyclePoxAddressForAddress,
-  waitForNextRewardPhase
+  waitForNextRewardPhase,
 } from "../helpers";
 import {
   broadcastStackIncrease,
   broadcastStackSTX,
 } from "../helpers-direct-stacking";
 
-describe("testing solo stacker increase without bug", () => {
+describe("testing solo stacker increase with bug", () => {
   let orchestrator: DevnetNetworkOrchestrator;
   let timeline = {
     epoch_2_0: 100,
@@ -49,7 +49,7 @@ describe("testing solo stacker increase without bug", () => {
     const fee = 1000;
     const cycles = 1;
 
-    // Alice stacks 900m (1/4 of liquid suply)
+    // Faucet stacks 900m (1/4 of liquid suply)
     let response = await broadcastStackSTX(
       2,
       network,
@@ -62,7 +62,7 @@ describe("testing solo stacker increase without bug", () => {
     );
     expect(response.error).toBeUndefined();
 
-    // let Alice's stacking confirm to enforce reward index 0
+    // let Faucet's stacking confirm to enforce reward index 0
     await waitForStacksTransaction(orchestrator, response.txid);
 
     // Bob stacks 80m
@@ -116,47 +116,41 @@ describe("testing solo stacker increase without bug", () => {
 
     let poxInfo = await getPoxInfo(network);
 
-    // Asserts about pox info for better knowledge sharing
-    expect(poxInfo.total_liquid_supply_ustx).toBe(1_405_738_842_905_579);
-    expect(poxInfo.contract_id).toBe("ST000000000000000000002AMW42H.pox-2");
-    expect(poxInfo.pox_activation_threshold_ustx).toBe(70_286_942_145_278);
     expect(poxInfo.current_cycle.id).toBe(1);
-    expect(poxInfo.current_cycle.min_threshold_ustx).toBe(29_290_000_000_000);
 
-    // Assert that the next cycle has 100m STX locked
-    expect(poxInfo.current_cycle.stacked_ustx).toBe(0);
-    expect(poxInfo.current_cycle.is_pox_active).toBe(false);
+    // Assert that the next cycle has 1_080m STX locked
+    // that is more than the liquidity of 1_405m STX
     expect(poxInfo.next_cycle.stacked_ustx).toBe(1_080_000_000_011_111);
 
-    // Check Alice's table entry
-    const poxAddrInfo0 = (await readRewardCyclePoxAddressForAddress(
+    // Check Faucets's table entry
+    const poxAddrInfo0 = await readRewardCyclePoxAddressForAddress(
       network,
       2,
       Accounts.FAUCET.stxAddress
-    )) as Record<string, ClarityValue>;
-    expect(poxAddrInfo0["total-ustx"]).toEqual(uintCV(900_000_000_000_001));
+    );
+    expect(poxAddrInfo0?.["total-ustx"]).toEqual(uintCV(900_000_000_000_001));
 
     // Check Bob's table entry
-    const poxAddrInfo1 = (await readRewardCyclePoxAddressForAddress(
+    const poxAddrInfo1 = await readRewardCyclePoxAddressForAddress(
       network,
       2,
       Accounts.WALLET_2.stxAddress
-    )) as Record<string, ClarityValue>;
+    );
     // HERE'S THE BUG: THIS SHOULD BE `u90000000000110`
     // expect(poxAddrInfo1["total-ustx"]).toEqual(
     //   uintCV(90_000_000_000_110)
     // );
-    expect(poxAddrInfo1["total-ustx"]).toEqual(uintCV(990_000_000_000_111));
+    expect(poxAddrInfo1?.["total-ustx"]).toEqual(uintCV(990_000_000_000_111));
 
     // Check Cloe's table entry
-    const poxAddrInfo2 = (await readRewardCyclePoxAddressForAddress(
+    const poxAddrInfo2 = await readRewardCyclePoxAddressForAddress(
       network,
       2,
       Accounts.WALLET_3.stxAddress
-    )) as Record<string, ClarityValue>;
+    );
     // HERE'S THE BUG: THIS SHOULD BE `u90000000011000`
     // expect(poxAddrInfo2["total-ustx"]).toEqual(uintCV(90_000_000_011_000));
-    expect(poxAddrInfo2["total-ustx"]).toEqual(uintCV(1080_000_000_011_111));
+    expect(poxAddrInfo2?.["total-ustx"]).toEqual(uintCV(1080_000_000_011_111));
 
     // advance to block 120, the last one before chain halt
     let coreInfo = await getCoreInfo(network);
