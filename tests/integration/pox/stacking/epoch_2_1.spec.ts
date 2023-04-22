@@ -1,19 +1,12 @@
+import { DevnetNetworkOrchestrator } from "@hirosystems/stacks-devnet-js";
+import { StacksTestnet } from "@stacks/network";
+import { Accounts } from "../../constants";
 import {
   buildDevnetNetworkOrchestrator,
-  getBitcoinBlockHeight,
   getNetworkIdFromEnv,
 } from "../../helpers";
-import {
-  waitForNextPreparePhase,
-  waitForNextRewardPhase,
-  getPoxInfo,
-  waitForRewardCycleId,
-} from "../helpers";
+import { getPoxInfo, waitForNextRewardPhase } from "../helpers";
 import { broadcastStackSTX } from "../helpers-direct-stacking";
-import { Accounts } from "../../constants";
-import { StacksTestnet } from "@stacks/network";
-import { DevnetNetworkOrchestrator } from "@hirosystems/stacks-devnet-js";
-import { expectAccountToBe } from "../helpers.ts";
 
 describe("testing stacking under epoch 2.1", () => {
   let orchestrator: DevnetNetworkOrchestrator;

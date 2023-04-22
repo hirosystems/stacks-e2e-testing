@@ -7,23 +7,14 @@ import {
   waitForStacksTransaction,
 } from "../../helpers";
 import {
+  expectAccountToBe,
   getPoxInfo,
   waitForNextRewardPhase,
-  waitForRewardCycleId,
-  readRewardCyclePoxAddressList,
-  expectAccountToBe,
 } from "../helpers";
 import {
   broadcastStackIncrease,
   broadcastStackSTX,
 } from "../helpers-direct-stacking";
-import {
-  OptionalCV,
-  SomeCV,
-  TupleCV,
-  cvToString,
-  hexToCV,
-} from "@stacks/transactions";
 
 describe("testing solo stacker increase without bug", () => {
   let orchestrator: DevnetNetworkOrchestrator;
@@ -92,7 +83,7 @@ describe("testing solo stacker increase without bug", () => {
     await waitForStacksTransaction(orchestrator, response.txid);
 
     let poxInfo = await getPoxInfo(network);
-    // Assert that the next cycle has 100m STX locked
+    // Assert that the next cycle has 55m STX locked
     expect(poxInfo.current_cycle.id).toBe(1);
     expect(poxInfo.next_cycle.stacked_ustx).toBe(55_000_000_001_110);
     await expectAccountToBe(
