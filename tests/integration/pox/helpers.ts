@@ -21,6 +21,7 @@ import {
   someCV,
   principalCV,
   noneCV,
+  OptionalCV,
 } from "@stacks/transactions";
 
 import { expect } from "vitest";
@@ -214,7 +215,10 @@ export const readRewardCyclePoxAddressList = async (
     );
   }
   let lengthJson = await response.json();
-  let lengthSome = hexToCV(lengthJson.data) as SomeCV<TupleCV>;
+  let lengthSome = hexToCV(lengthJson.data) as OptionalCV<TupleCV>;
+  if (lengthSome.type === ClarityType.OptionalNone) {
+    return null;
+  }
   let lengthUint = lengthSome.value.data["len"] as UIntCV;
   let length = Number(lengthUint.value);
 
@@ -261,19 +265,22 @@ export const readRewardCyclePoxAddressForAddress = async (
     );
   }
   let lengthJson = await response.json();
-  let lengthSome = hexToCV(lengthJson.data) as SomeCV<TupleCV>;
+  let lengthSome = hexToCV(lengthJson.data) as OptionalCV<TupleCV>;
+  if (lengthSome.type === ClarityType.OptionalNone) {
+    return null;
+  }
   let lengthUint = lengthSome.value.data["len"] as UIntCV;
   let length = Number(lengthUint.value);
 
   for (let i = 0; i < length; i++) {
-    let poxAddressInfo = (await readRewardCyclePoxAddressListAtIndex(
+    let poxAddressInfo = await readRewardCyclePoxAddressListAtIndex(
       network,
       cycleId,
       i
-    )) as Record<string, ClarityValue>;
-    if (poxAddressInfo["stacker"].type === ClarityType.OptionalNone) {
+    );
+    if (poxAddressInfo?.["stacker"]?.type === ClarityType.OptionalNone) {
       continue;
-    } else {
+    } else if (poxAddressInfo?.["stacker"]?.type === ClarityType.OptionalSome) {
       let stackerSome = poxAddressInfo["stacker"] as SomeCV<PrincipalCV>;
       if (cvToString(stackerSome.value) === address) {
         return poxAddressInfo;
@@ -284,11 +291,16 @@ export const readRewardCyclePoxAddressForAddress = async (
   return null;
 };
 
+export type RewardCyclePoxAddressMapEntry = {
+  "total-ustx": UIntCV;
+  stacker: OptionalCV<PrincipalCV>;
+};
+
 export const readRewardCyclePoxAddressListAtIndex = async (
   network: StacksNetwork,
   cycleId: number,
   index: number
-) => {
+): Promise<RewardCyclePoxAddressMapEntry | null | undefined> => {
   const url = network.getMapEntryUrl(
     "ST000000000000000000002AMW42H",
     "pox-2",
@@ -317,7 +329,7 @@ export const readRewardCyclePoxAddressListAtIndex = async (
   let cv = hexToCV(poxAddrInfoJson.data);
   if (cv.type === ClarityType.OptionalSome) {
     let someCV = cv as SomeCV<TupleCV>;
-    const tupleData: Record<string, ClarityValue> = someCV.value.data;
+    const tupleData = someCV.value.data as RewardCyclePoxAddressMapEntry;
     return tupleData;
   } else if (cv.type === ClarityType.OptionalNone) {
     return null;

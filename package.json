@@ -4,7 +4,7 @@
   "description": "",
   "scripts": {
     "build": "tsc --build",
-    "test:dev": "vitest --run direct-stacking-with-bug",
+    "test:dev": "vitest",
     "test:ci": "jest --bail=1 --silent=false",
     "fmt:check": "./node_modules/.bin/prettier --check .",
     "fmt": "./node_modules/.bin/prettier --write ."
