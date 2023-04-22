@@ -9,13 +9,13 @@ import {
   getPoxInfo,
   waitForNextRewardPhase,
   waitForRewardCycleId,
-  readRewardCyclePoxAddressList,
+  readRewardCyclePoxAddressForAddress,
 } from "../helpers";
 import {
   broadcastStackIncrease,
   broadcastStackSTX,
 } from "../helpers-direct-stacking";
-import { cvToString, hexToCV } from "@stacks/transactions";
+import { ClarityValue, UIntCV } from "@stacks/transactions";
 
 describe("testing stacking under epoch 2.1", () => {
   let orchestrator: DevnetNetworkOrchestrator;
@@ -103,20 +103,26 @@ describe("testing stacking under epoch 2.1", () => {
     expect(poxInfo.current_cycle.stacked_ustx).toBe(100_000_000_000_000);
     expect(poxInfo.current_cycle.is_pox_active).toBe(true);
 
-    const poxAddrInfo0 = await readRewardCyclePoxAddressList(network, 2, 0);
-    const poxAddrInfoStr0 = cvToString(hexToCV(poxAddrInfo0.data));
+    const poxAddrInfo0 = (await readRewardCyclePoxAddressForAddress(
+      network,
+      2,
+      Accounts.WALLET_2.stxAddress
+    )) as Record<string, ClarityValue>;
     // HERE'S THE BUG: THIS SHOULD BE `u80000000000000`
-    // expect(poxAddrInfoStr0).toContain("(total-ustx u80000000000000)");
-    expect(poxAddrInfoStr0).toContain("(total-ustx u100000000000000)");
+    // expect((poxAddrInfo0["total-ustx"] as UIntCV).value).toBe(
+    //   BigInt(80_000_000_000_000)
+    // );
+    expect((poxAddrInfo0["total-ustx"] as UIntCV).value).toBe(
+      BigInt(100_000_000_000_000)
+    );
 
-    const poxAddrInfo1 = await readRewardCyclePoxAddressList(network, 2, 1);
-    const poxAddrInfoStr1 = cvToString(hexToCV(poxAddrInfo1.data));
-    expect(poxAddrInfoStr1).toContain("(total-ustx u50000000000000)");
-
-    // move on to the nexte cycle
-    await waitForNextRewardPhase(network, orchestrator, 1);
-
-    // Assert reward slots
-    // TODO
+    const poxAddrInfo1 = (await readRewardCyclePoxAddressForAddress(
+      network,
+      2,
+      Accounts.WALLET_1.stxAddress
+    )) as Record<string, ClarityValue>;
+    expect((poxAddrInfo1["total-ustx"] as UIntCV).value).toBe(
+      BigInt(50_000_000_000_000)
+    );
   });
 });
