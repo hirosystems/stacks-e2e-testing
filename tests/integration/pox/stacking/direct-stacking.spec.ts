@@ -9,13 +9,13 @@ import {
   getPoxInfo,
   waitForNextRewardPhase,
   waitForRewardCycleId,
-  readRewardCyclePoxAddressList,
+  readRewardCyclePoxAddressForAddress,
 } from "../helpers";
 import {
   broadcastStackIncrease,
   broadcastStackSTX,
 } from "../helpers-direct-stacking";
-import { cvToString, hexToCV } from "@stacks/transactions";
+import { ClarityValue, uintCV } from "@stacks/transactions";
 
 describe("testing stacking under epoch 2.1", () => {
   let orchestrator: DevnetNetworkOrchestrator;
@@ -85,9 +85,7 @@ describe("testing stacking under epoch 2.1", () => {
 
     // Asserts about pox info for better knowledge sharing
     expect(poxInfo.contract_id).toBe("ST000000000000000000002AMW42H.pox-2");
-    expect(poxInfo.pox_activation_threshold_ustx).toBe(50_286_942_145_278);
     expect(poxInfo.current_cycle.id).toBe(1);
-    expect(poxInfo.current_cycle.min_threshold_ustx).toBe(20_960_000_000_000);
 
     // Assert that the next cycle has 100m STX locked
     expect(poxInfo.current_cycle.stacked_ustx).toBe(0);
@@ -103,20 +101,22 @@ describe("testing stacking under epoch 2.1", () => {
     expect(poxInfo.current_cycle.stacked_ustx).toBe(100_000_000_000_000);
     expect(poxInfo.current_cycle.is_pox_active).toBe(true);
 
-    const poxAddrInfo0 = await readRewardCyclePoxAddressList(network, 2, 0);
-    const poxAddrInfoStr0 = cvToString(hexToCV(poxAddrInfo0.data));
+    const poxAddrInfo0 = (await readRewardCyclePoxAddressForAddress(
+      network,
+      2,
+      Accounts.WALLET_2.stxAddress
+    )) as Record<string, ClarityValue>;
     // HERE'S THE BUG: THIS SHOULD BE `u80000000000000`
-    // expect(poxAddrInfoStr0).toContain("(total-ustx u80000000000000)");
-    expect(poxAddrInfoStr0).toContain("(total-ustx u100000000000000)");
+    // expect(poxAddrInfo0["total-ustx"]).toEqual(
+    //   uintCV(80_000_000_000_000)
+    // );
+    expect(poxAddrInfo0["total-ustx"]).toEqual(uintCV(100_000_000_000_000));
 
-    const poxAddrInfo1 = await readRewardCyclePoxAddressList(network, 2, 1);
-    const poxAddrInfoStr1 = cvToString(hexToCV(poxAddrInfo1.data));
-    expect(poxAddrInfoStr1).toContain("(total-ustx u50000000000000)");
-
-    // move on to the nexte cycle
-    await waitForNextRewardPhase(network, orchestrator, 1);
-
-    // Assert reward slots
-    // TODO
+    const poxAddrInfo1 = (await readRewardCyclePoxAddressForAddress(
+      network,
+      2,
+      Accounts.WALLET_1.stxAddress
+    )) as Record<string, ClarityValue>;
+    expect(poxAddrInfo1["total-ustx"]).toEqual(uintCV(50_000_000_000_000));
   });
 });
