@@ -4,20 +4,20 @@ import { Accounts } from "../../constants";
 import {
   buildDevnetNetworkOrchestrator,
   getNetworkIdFromEnv,
-  waitForStacksTransaction,
 } from "../../helpers";
 import {
   getPoxInfo,
   waitForNextRewardPhase,
+  waitForRewardCycleId,
   readRewardCyclePoxAddressForAddress,
 } from "../helpers";
 import {
   broadcastStackIncrease,
   broadcastStackSTX,
 } from "../helpers-direct-stacking";
-import { ClarityValue, cvToString, uintCV } from "@stacks/transactions";
+import { ClarityValue, uintCV } from "@stacks/transactions";
 
-describe("testing solo stacker increase without bug", () => {
+describe("testing stacking under epoch 2.1", () => {
   let orchestrator: DevnetNetworkOrchestrator;
   let timeline = {
     epoch_2_0: 100,
@@ -47,42 +47,36 @@ describe("testing solo stacker increase without bug", () => {
     const fee = 1000;
     const cycles = 1;
 
-    // Bob stacks 30m
     let response = await broadcastStackSTX(
       2,
       network,
-      30_000_000_000_010,
-      Accounts.WALLET_2,
-      blockHeight,
-      cycles,
-      fee,
-      0
-    );
-    expect(response.error).toBeUndefined();
-
-    // Bob increases by 20m
-    response = await broadcastStackIncrease(
-      network,
-      20_000_000_000_100,
-      Accounts.WALLET_2,
-      fee,
-      1
-    );
-    expect(response.error).toBeUndefined();
-
-    // let Bob's stacking confirm to enforce reward index 0
-    await waitForStacksTransaction(orchestrator, response.txid);
-
-    // Alice stacks 50m
-    response = await broadcastStackSTX(
-      2,
-      network,
-      50_000_000_000_001,
+      50_000_000_000_000,
       Accounts.WALLET_1,
       blockHeight,
       cycles,
       fee,
       0
+    );
+    expect(response.error).toBeUndefined();
+
+    response = await broadcastStackSTX(
+      2,
+      network,
+      30_000_000_000_000,
+      Accounts.WALLET_2,
+      blockHeight,
+      cycles,
+      fee,
+      0
+    );
+    expect(response.error).toBeUndefined();
+
+    response = await broadcastStackIncrease(
+      network,
+      20_000_000_000_000,
+      Accounts.WALLET_2,
+      fee,
+      1
     );
     expect(response.error).toBeUndefined();
 
@@ -96,24 +90,33 @@ describe("testing solo stacker increase without bug", () => {
     // Assert that the next cycle has 100m STX locked
     expect(poxInfo.current_cycle.stacked_ustx).toBe(0);
     expect(poxInfo.current_cycle.is_pox_active).toBe(false);
-    expect(poxInfo.next_cycle.stacked_ustx).toBe(100_000_000_000_111);
+    expect(poxInfo.next_cycle.stacked_ustx).toBe(100_000_000_000_000);
+
+    // move on to the nexte cycle
+    await waitForRewardCycleId(network, orchestrator, 2, 1);
+
+    poxInfo = await getPoxInfo(network);
+    // Assert that the current cycle has 100m STX locked and earning
+    expect(poxInfo.current_cycle.id).toBe(2);
+    expect(poxInfo.current_cycle.stacked_ustx).toBe(100_000_000_000_000);
+    expect(poxInfo.current_cycle.is_pox_active).toBe(true);
 
     const poxAddrInfo0 = (await readRewardCyclePoxAddressForAddress(
       network,
       2,
       Accounts.WALLET_2.stxAddress
     )) as Record<string, ClarityValue>;
-    // There is no bug here because total stack was equal to Bob's stacked amount when Bob called stack-increase.
-    expect(cvToString(poxAddrInfo0["total-ustx"])).toBe("u50000000000110");
-
-    // There is no bug here because total stack was 0 when stack-increase was called.
-    expect(poxAddrInfo0["total-ustx"]).toEqual(uintCV(50000000000110));
+    // HERE'S THE BUG: THIS SHOULD BE `u80000000000000`
+    // expect(poxAddrInfo0["total-ustx"]).toEqual(
+    //   uintCV(80_000_000_000_000)
+    // );
+    expect(poxAddrInfo0["total-ustx"]).toEqual(uintCV(100_000_000_000_000));
 
     const poxAddrInfo1 = (await readRewardCyclePoxAddressForAddress(
       network,
       2,
       Accounts.WALLET_1.stxAddress
     )) as Record<string, ClarityValue>;
-    expect(poxAddrInfo1["total-ustx"]).toEqual(uintCV(50000000000001));
+    expect(poxAddrInfo1["total-ustx"]).toEqual(uintCV(50_000_000_000_000));
   });
 });

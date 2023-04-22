@@ -1,11 +1,5 @@
 import { DevnetNetworkOrchestrator } from "@hirosystems/stacks-devnet-js";
 import { StacksTestnet } from "@stacks/network";
-import {
-  SomeCV,
-  TupleCV,
-  UIntCV,
-  hexToCV
-} from "@stacks/transactions";
 import { Accounts } from "../../constants";
 import {
   buildDevnetNetworkOrchestrator,
@@ -16,7 +10,6 @@ import {
   getCoreInfo,
   getPoxInfo,
   mineBtcBlock as mineBitcoinBlockAndHopeForStacksBlock,
-  readRewardCyclePoxAddressList,
   waitForNextRewardPhase
 } from "../helpers";
 import {
@@ -134,28 +127,34 @@ describe("testing solo stacker increase without bug", () => {
     expect(poxInfo.next_cycle.stacked_ustx).toBe(1_080_000_000_011_111);
 
     // Check Alice's table entry
-    const poxAddrInfo0 = await readRewardCyclePoxAddressList(network, 2, 0);
-    const poxAddrInfo0CV = hexToCV(poxAddrInfo0.data) as SomeCV<TupleCV>;
-    expect((poxAddrInfo0CV.value.data["total-ustx"] as UIntCV).value).toBe(
-      BigInt(900_000_000_000_001)
-    );
+    const poxAddrInfo0 = (await readRewardCyclePoxAddressForAddress(
+      network,
+      2,
+      Accounts.FAUCET.stxAddress
+    )) as Record<string, ClarityValue>;
+    expect(poxAddrInfo0["total-ustx"]).toEqual(uintCV(900_000_000_000_001));
 
     // Check Bob's table entry
-    const poxAddrInfo1 = await readRewardCyclePoxAddressList(network, 2, 1);
-    const poxAddrInfo1CV = hexToCV(poxAddrInfo1.data) as SomeCV<TupleCV>;
+    const poxAddrInfo1 = (await readRewardCyclePoxAddressForAddress(
+      network,
+      2,
+      Accounts.WALLET_2.stxAddress
+    )) as Record<string, ClarityValue>;
     // HERE'S THE BUG: THIS SHOULD BE `u90000000000110`
-    // expect(cvToString(poxAddrInfo1CV.value.data["total-ustx"])).toBe("u90000000000110");
-    expect((poxAddrInfo1CV.value.data["total-ustx"] as UIntCV).value).toBe(
-      BigInt(990_000_000_000_111)
-    );
+    // expect(poxAddrInfo1["total-ustx"]).toEqual(
+    //   uintCV(90_000_000_000_110)
+    // );
+    expect(poxAddrInfo1["total-ustx"]).toEqual(uintCV(990_000_000_000_111));
+
     // Check Cloe's table entry
-    const poxAddrInfo2 = await readRewardCyclePoxAddressList(network, 2, 2);
-    const poxAddrInfo2CV = hexToCV(poxAddrInfo2.data) as SomeCV<TupleCV>;
+    const poxAddrInfo2 = (await readRewardCyclePoxAddressForAddress(
+      network,
+      2,
+      Accounts.WALLET_3.stxAddress
+    )) as Record<string, ClarityValue>;
     // HERE'S THE BUG: THIS SHOULD BE `u90000000011000`
-    // expect(cvToString(poxAddrInfo1CV.value.data["total-ustx"])).toBe("u90000000011000");
-    expect((poxAddrInfo2CV.value.data["total-ustx"] as UIntCV).value).toBe(
-      BigInt(1080_000_000_011_111)
-    );
+    // expect(poxAddrInfo2["total-ustx"]).toEqual(uintCV(90_000_000_011_000));
+    expect(poxAddrInfo2["total-ustx"]).toEqual(uintCV(1080_000_000_011_111));
 
     // advance to block 120, the last one before chain halt
     let coreInfo = await getCoreInfo(network);
