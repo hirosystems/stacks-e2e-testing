@@ -9,9 +9,7 @@ import {
   getPoxInfo,
   waitForRewardCycleId,
 } from "../helpers";
-import {
-  broadcastStackSTX,
-} from "../helpers-direct-stacking";
+import { broadcastStackSTX } from "../helpers-direct-stacking";
 import { Accounts } from "../../constants";
 import { StacksTestnet } from "@stacks/network";
 import { DevnetNetworkOrchestrator } from "@hirosystems/stacks-devnet-js";
@@ -94,6 +92,6 @@ describe("testing stacking under epoch 2.1", () => {
     // Assert
     expect(poxInfo.contract_id).toBe("ST000000000000000000002AMW42H.pox-2");
     expect(poxInfo.current_cycle.is_pox_active).toBe(true);
-    expect(poxInfo.total)
+    expect(poxInfo.total);
   });
 });

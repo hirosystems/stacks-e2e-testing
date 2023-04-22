@@ -38,7 +38,7 @@ describe("testing pooled stacking under epoch 2.1", () => {
   afterAll(() => {
     orchestrator.terminate();
   });
-  
+
   it("pool operators can lock user's locked stx for longer", async () => {
     const network = new StacksTestnet({ url: orchestrator.getStacksNodeUrl() });
 

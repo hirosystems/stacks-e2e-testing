@@ -110,7 +110,7 @@ describe("testing solo stacker increase without bug", () => {
     const poxAddrInfo0 = await readRewardCyclePoxAddressList(network, 2, 0);
     const poxAddrInfo0CV = hexToCV(poxAddrInfo0.data) as SomeCV<TupleCV>;
     const poxAddrInfoStr0 = cvToString(hexToCV(poxAddrInfo0.data));
-    // There is no bug here because total stack was 0 when stack-increase was called.
+    // There is no bug here because total stack was equal to Bob's stacked amount when Bob called stack-increase.
     expect(cvToString(poxAddrInfo0CV.value.data["total-ustx"])).toBe(
       "u50000000000110"
     );

@@ -14,8 +14,11 @@ import {
   waitForStacksTransaction,
 } from "../../helpers";
 import {
+  getCoreInfo,
   getPoxInfo,
+  mineBtcBlock as mineBitcoinBlockAndHopeForStacksBlock,
   readRewardCyclePoxAddressList,
+  waitForNextPreparePhase,
   waitForNextRewardPhase,
 } from "../helpers";
 import {
@@ -117,7 +120,7 @@ describe("testing solo stacker increase without bug", () => {
     );
     expect(response.error).toBeUndefined();
     await orchestrator.waitForStacksBlockIncludingTransaction(response.txid);
-   
+
     let poxInfo = await getPoxInfo(network);
 
     // Asserts about pox info for better knowledge sharing
@@ -156,7 +159,28 @@ describe("testing solo stacker increase without bug", () => {
       BigInt(1080_000_000_011_111)
     );
 
-    const update = await waitForNextRewardPhase(network, orchestrator, 5);
-    console.log(update)
+    // advance to block 120, the last one before chain halt
+    let coreInfo = await getCoreInfo(network);
+    const mineUntilHalt = 120 - coreInfo.burn_block_height;
+    let lastIndices;
+    for (let i = 0; i < mineUntilHalt; i++) {
+      lastIndices = await mineBitcoinBlockAndHopeForStacksBlock(orchestrator);
+    }
+    expect(lastIndices).toStrictEqual({
+      btcIndex: 120,
+      stxIndex: coreInfo.stacks_tip_height + mineUntilHalt,
+    });
+
+    // try two bitcoin blocks and assert that no more stacks blocks are mined
+    lastIndices = await mineBitcoinBlockAndHopeForStacksBlock(orchestrator);
+    expect(lastIndices).toStrictEqual({
+      stxIndex: undefined,
+      btcIndex: undefined,
+    });
+    lastIndices = await mineBitcoinBlockAndHopeForStacksBlock(orchestrator);
+    expect(lastIndices).toStrictEqual({
+      stxIndex: undefined,
+      btcIndex: undefined,
+    });
   });
 });

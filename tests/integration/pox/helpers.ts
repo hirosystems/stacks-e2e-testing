@@ -3,6 +3,7 @@ import {
   StacksChainUpdate,
 } from "@hirosystems/stacks-devnet-js";
 import { StacksNetwork } from "@stacks/network";
+import { CoreInfo } from "@stacks/stacking";
 import {
   tupleCV,
   uintCV,
@@ -20,6 +21,28 @@ export interface Account {
 }
 
 const delay = () => new Promise((resolve) => setTimeout(resolve, 3000));
+
+export const getCoreInfo = async (
+  network: StacksNetwork,
+  retry?: number
+): Promise<
+  CoreInfo & {
+    stacks_tip_height: number;
+  }
+> => {
+  let retryCountdown = retry ? retry : 20;
+  if (retryCountdown == 0) return Promise.reject();
+  try {
+    let response = await fetch(network.getInfoUrl(), {});
+    let coreInfo = (await response.json()) as CoreInfo & {
+      stacks_tip_height: number;
+    };
+    return coreInfo;
+  } catch (e) {
+    await delay();
+    return await getCoreInfo(network, retryCountdown - 1);
+  }
+};
 
 export const getPoxInfo = async (
   network: StacksNetwork,
@@ -119,6 +142,16 @@ export const waitForNextRewardPhase = async (
     height
   );
 };
+
+export async function mineBtcBlock(orchestrator: DevnetNetworkOrchestrator) {
+  const update = await orchestrator.mineBitcoinBlockAndHopeForStacksBlock();
+  const firstNewBlock = update?.new_blocks?.[0];
+  return {
+    stxIndex: firstNewBlock?.block?.block_identifier.index,
+    btcIndex: (firstNewBlock?.block?.metadata as any)
+      ?.bitcoin_anchor_block_identifier?.index,
+  };
+}
 
 export const expectAccountToBe = async (
   network: StacksNetwork,

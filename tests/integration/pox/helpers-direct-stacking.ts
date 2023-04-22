@@ -7,7 +7,7 @@ import {
   bufferCV,
   makeContractCall,
   tupleCV,
-  uintCV
+  uintCV,
 } from "@stacks/transactions";
 import { Contracts } from "../constants";
 
@@ -62,14 +62,11 @@ export const broadcastStackIncrease = async (
   fee: number,
   nonce: number
 ): Promise<TxBroadcastResult> => {
-
   const txOptions = {
     contractAddress: Contracts.POX_2.address,
     contractName: Contracts.POX_2.name,
     functionName: "stack-increase",
-    functionArgs: [
-      uintCV(amount),
-    ],
+    functionArgs: [uintCV(amount)],
     fee,
     nonce,
     network,
@@ -100,10 +97,7 @@ export const broadcastStackExtend = async (
     contractAddress: Contracts.POX_2.address,
     contractName: Contracts.POX_2.name,
     functionName: "stack-extend",
-    functionArgs: [
-      tupleCV(address),
-      uintCV(cycles),
-    ],
+    functionArgs: [tupleCV(address), uintCV(cycles)],
     fee,
     nonce,
     network,
