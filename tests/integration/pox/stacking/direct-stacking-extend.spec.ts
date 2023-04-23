@@ -96,8 +96,6 @@ describe("testing stack-extend functionality", () => {
       )) as Record<string, ClarityValue>;
       expect(poxAddrInfo?.["total-ustx"]).toEqual(uintCV(80_000_000_000_000));
 
-      // Wait for Stacks genesis block
-      await orchestrator.waitForNextStacksBlock();
       // Wait for 1 reward cycle
       await waitForNextRewardPhase(network, orchestrator, 1);
     }
