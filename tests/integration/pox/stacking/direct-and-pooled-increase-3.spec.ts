@@ -51,7 +51,7 @@ describe("testing direct stacker as pool operator with auto-unlock under epoch 2
     const blockHeight = timeline.pox_2_activation + 1;
     const cycles = 1;
 
-    // Alice stacks 90m STX
+    // Alice stacks 80m STX
     let response = await broadcastStackSTX(
       2,
       network,
@@ -142,12 +142,16 @@ describe("testing direct stacker as pool operator with auto-unlock under epoch 2
       80_000_000_000_000
     );
 
-    // Wait for block N+1 where N is the height of the next reward phase
+    // Wait until unlock happens that is block N+5 where N is the height of the next reward phase
     await waitForNextRewardPhase(network, orchestrator, 5);
 
     poxInfo = await getPoxInfo(network);
     expect(poxInfo.current_cycle.id).toBe(2);
-    // Assert that the next cycle has 980m STX locked
+    expect(poxInfo.current_cycle.min_threshold_ustx).toBe(89_920_000_000_000);
+    // Assert that the next cycle has 10790m STX locked
+    // Alice amount was not unlocked because the same
+    // pox address was used as pool address
+    // thereby, the total locked of 1079m was above the minimum of 81m.
     expect(poxInfo.current_cycle.stacked_ustx).toBe(1_079_000_000_000_000);
 
     // Check Alice's table entry
