@@ -13,7 +13,7 @@ import {
   broadcastDelegateStackIncrease,
 } from "../helpers-pooled-stacking";
 
-describe("testing stacker who is also a pool under epoch 2.1", () => {
+describe("testing stacker who is a bad pool operator under epoch 2.1", () => {
   let orchestrator: DevnetNetworkOrchestrator;
   let timeline = {
     epoch_2_0: 100,
