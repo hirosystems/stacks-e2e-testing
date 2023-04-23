@@ -1,6 +1,5 @@
 import { DevnetNetworkOrchestrator } from "@hirosystems/stacks-devnet-js";
 import { StacksTestnet } from "@stacks/network";
-import { callReadOnlyFunction } from "@stacks/transactions";
 import { Accounts } from "../../constants";
 import {
   buildDevnetNetworkOrchestrator,
