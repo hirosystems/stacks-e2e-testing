@@ -46,11 +46,11 @@ describe("testing stack-extend functionality", () => {
     const blockHeight = timeline.pox_2_activation + 1;
     const fee = 1000;
 
-    // Alice stacks 50m STX for 1 cycle
+    // Alice stacks 80m STX for 1 cycle
     let response = await broadcastStackSTX(
       2,
       network,
-      50_000_000_000_000,
+      80_000_000_000_000,
       Accounts.WALLET_1,
       blockHeight,
       1,
@@ -58,7 +58,13 @@ describe("testing stack-extend functionality", () => {
       0
     );
     expect(response.error).toBeUndefined();
-
+    // Wait for Alice's stacking transaction to confirm
+    let [block, tx] = await waitForStacksTransaction(
+      orchestrator,
+      response.txid
+    );
+    expect(tx.success).toBeTruthy();
+    
     // Alice extends stacking for another 2 cycles
     response = await broadcastStackExtend(
       network,
@@ -68,15 +74,17 @@ describe("testing stack-extend functionality", () => {
       1
     );
     expect(response.error).toBeUndefined();
-
     // Wait for Alice's stacking extension transaction to confirm
-    await waitForStacksTransaction(orchestrator, response.txid);
+    [block, tx] = await waitForStacksTransaction(
+      orchestrator,
+      response.txid
+    );
+    expect(tx.success).toBeTruthy();
 
     // Check rewards for 3 cycles
     for (let cycle = 1; cycle <= 3; cycle++) {
 
       let poxInfo = await getPoxInfo(network);
-
       // Asserts about pox info for better knowledge sharing
       expect(poxInfo.contract_id).toBe("ST000000000000000000002AMW42H.pox-2");
       expect(poxInfo.current_cycle.id).toBe(cycle);
@@ -86,14 +94,12 @@ describe("testing stack-extend functionality", () => {
         cycle+1, // cycle + 1 because we are checking the next cycle, including rewards
         Accounts.WALLET_1.stxAddress
       )) as Record<string, ClarityValue>;
-      // IS THIS A BUG? SHOULD BE > 50mm for any of the 3 cycles (increasingly so)
-      expect(poxAddrInfo?.["total-ustx"]).toEqual(uintCV(50_000_000_000_000));
+      expect(poxAddrInfo?.["total-ustx"]).toEqual(uintCV(80_000_000_000_000));
 
-      // Wait for a Stacks block
+      // Wait for Stacks genesis block
       await orchestrator.waitForNextStacksBlock();
       // Wait for 1 reward cycle
       await waitForNextRewardPhase(network, orchestrator, 1);
-
     }
   });
 });
