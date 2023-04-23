@@ -73,7 +73,7 @@ describe("testing stacker who is also a pool under epoch 2.1", () => {
     );
     expect(tx.success).toBeTruthy();
 
-    // Alice increase delegation by 80m
+    // Alice tries to increase Bob's delegation by 80m
     response = await broadcastDelegateStackIncrease(
       2,
       network,
@@ -87,7 +87,11 @@ describe("testing stacker who is also a pool under epoch 2.1", () => {
     expect(response.error).toBeUndefined();
     [block, tx] = await waitForStacksTransaction(orchestrator, response.txid);
     // throws ArithmeticUnderflow
+    // because Bob does not have any stacking yet
+    // therefore no increase possible.
+    // pox-2 does not handle this user error gracefully
+    // because it assume stx-account.unlock-height to be > first-burnchain-block-height
     expect(tx.result).toBe("(err none)");
-    expect(tx.success).toBeTruthy();
+    expect(tx.success).toBeFalsy();
   });
 });
