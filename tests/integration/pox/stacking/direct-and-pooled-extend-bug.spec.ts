@@ -244,7 +244,6 @@ describe("testing mixed direct and pooled stacking with extend under epoch 2.1",
     let poxInfo = await getPoxInfo(network);
     expect(poxInfo.current_cycle.id).toBe(2);
     expect(poxInfo.next_cycle.stacked_ustx).toBe(155_000_000_000_000);
-
   });
 
   it("unlocked amount should be still unlocked, but STX are earning (BUG) (cycle #3)", async () => {
