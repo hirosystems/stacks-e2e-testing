@@ -151,7 +151,7 @@ describe("testing direct stacker as pool operator with auto-unlock under epoch 2
     // Assert that the next cycle has 10790m STX locked
     // Alice amount was not unlocked because the same
     // pox address was used as pool address
-    // thereby, the total locked of 1079m was above the minimum of 81m.
+    // thereby, the total locked of 1079m was above the minimum of 89m.
     expect(poxInfo.current_cycle.stacked_ustx).toBe(1_079_000_000_000_000);
 
     // Check Alice's table entry
