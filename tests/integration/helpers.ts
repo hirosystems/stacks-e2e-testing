@@ -14,6 +14,7 @@ interface EpochTimeline {
   epoch_2_05: number;
   epoch_2_1: number;
   pox_2_activation: number;
+  epoch_2_2: number;
 }
 
 export const DEFAULT_EPOCH_TIMELINE = {
@@ -21,12 +22,14 @@ export const DEFAULT_EPOCH_TIMELINE = {
   epoch_2_05: Constants.DEVNET_DEFAULT_EPOCH_2_05,
   epoch_2_1: Constants.DEVNET_DEFAULT_EPOCH_2_1,
   pox_2_activation: Constants.DEVNET_DEFAULT_POX_2_ACTIVATION,
+  epoch_2_2: Constants.DEVNET_DEFAULT_EPOCH_2_2,
 };
 
 export function buildDevnetNetworkOrchestrator(
   networkId: number,
   timeline: EpochTimeline = DEFAULT_EPOCH_TIMELINE,
-  logs = false
+  logs = false,
+  stacks_node_image_url?: string
 ) {
   let uuid = Date.now();
   let working_dir = `/tmp/stacks-test-${uuid}-${networkId}`;
@@ -39,9 +42,11 @@ export function buildDevnetNetworkOrchestrator(
       epoch_2_05: timeline.epoch_2_05,
       epoch_2_1: timeline.epoch_2_1,
       pox_2_activation: timeline.pox_2_activation,
+      epoch_2_2: timeline.epoch_2_2,
       bitcoin_controller_automining_disabled: false,
       working_dir,
       use_docker_gateway_routing: process.env.GITHUB_ACTIONS ? true : false,
+      ...(typeof stacks_node_image_url !== 'undefined' && { stacks_node_image_url }),
     },
   };
   let consolidatedConfig = getIsolatedNetworkConfigUsingNetworkId(
