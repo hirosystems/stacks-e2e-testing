@@ -1,6 +1,6 @@
 import { DevnetNetworkOrchestrator } from "@hirosystems/stacks-devnet-js";
 import { StacksTestnet } from "@stacks/network";
-import { Accounts } from "../../constants";
+import { Accounts, Constants } from "../../constants";
 import {
   buildDevnetNetworkOrchestrator,
   getNetworkIdFromEnv,
@@ -15,12 +15,6 @@ import {
 
 describe("testing stacker who is a bad pool operator under epoch 2.1", () => {
   let orchestrator: DevnetNetworkOrchestrator;
-  let timeline = {
-    epoch_2_0: 100,
-    epoch_2_05: 102,
-    epoch_2_1: 106,
-    pox_2_activation: 109,
-  };
   const fee = 1000;
 
   beforeAll(() => {
@@ -40,7 +34,7 @@ describe("testing stacker who is a bad pool operator under epoch 2.1", () => {
     // Wait for block N+1 where N is the height of the next reward phase
     await waitForNextRewardPhase(network, orchestrator, 1);
 
-    const blockHeight = timeline.pox_2_activation + 1;
+    const blockHeight = Constants.DEVNET_DEFAULT_POX_2_ACTIVATION + 1;
     const cycles = 1;
 
     // Alice stacks 90m STX

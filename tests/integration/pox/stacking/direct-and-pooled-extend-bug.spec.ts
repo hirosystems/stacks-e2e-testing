@@ -1,7 +1,7 @@
 import { DevnetNetworkOrchestrator } from "@hirosystems/stacks-devnet-js";
 import { StacksTestnet } from "@stacks/network";
 import { SomeCV, cvToString, uintCV } from "@stacks/transactions";
-import { Accounts } from "../../constants";
+import { Accounts, Constants } from "../../constants";
 import {
   asyncExpectStacksTransactionSuccess,
   buildDevnetNetworkOrchestrator,
@@ -23,12 +23,6 @@ import {
 
 describe("testing mixed direct and pooled stacking with extend under epoch 2.1", () => {
   let orchestrator: DevnetNetworkOrchestrator;
-  let timeline = {
-    epoch_2_0: 100,
-    epoch_2_05: 102,
-    epoch_2_1: 106,
-    pox_2_activation: 109,
-  };
   const fee = 1000;
 
   beforeAll(() => {
@@ -48,7 +42,7 @@ describe("testing mixed direct and pooled stacking with extend under epoch 2.1",
     // Wait for block N+1 where N is the height of the next reward phase
     await waitForNextRewardPhase(network, orchestrator, 1);
 
-    const blockHeight = timeline.pox_2_activation + 1;
+    const blockHeight = Constants.DEVNET_DEFAULT_POX_2_ACTIVATION + 1;
     const cycles = 1;
 
     // Alice stacks 75m STX
@@ -122,7 +116,7 @@ describe("testing mixed direct and pooled stacking with extend under epoch 2.1",
   it("stacking more should increase the slot price (cycle #1)", async () => {
     const network = new StacksTestnet({ url: orchestrator.getStacksNodeUrl() });
 
-    const blockHeight = timeline.pox_2_activation + 1;
+    const blockHeight = Constants.DEVNET_DEFAULT_POX_2_ACTIVATION + 1;
     const cycles = 1;
 
     // Faucet stacks 900m (1/4 of liquid suply)
@@ -198,7 +192,7 @@ describe("testing mixed direct and pooled stacking with extend under epoch 2.1",
 
   it("stacking by other user should activate pox for cycle #3 (cycle #2)", async () => {
     const network = new StacksTestnet({ url: orchestrator.getStacksNodeUrl() });
-    const blockHeight = timeline.pox_2_activation + 11;
+    const blockHeight = Constants.DEVNET_DEFAULT_POX_2_ACTIVATION + 11;
     const cycles = 1;
 
     // Cloe stacks 80m

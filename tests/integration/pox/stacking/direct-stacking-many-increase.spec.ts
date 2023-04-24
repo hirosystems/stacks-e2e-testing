@@ -1,29 +1,23 @@
 import { DevnetNetworkOrchestrator } from "@hirosystems/stacks-devnet-js";
 import { StacksTestnet } from "@stacks/network";
-import { Accounts } from "../../constants";
+import { cvToString } from "@stacks/transactions";
+import { Accounts, Constants } from "../../constants";
 import {
   buildDevnetNetworkOrchestrator,
   getNetworkIdFromEnv,
   waitForStacksTransaction,
 } from "../../helpers";
 import {
-  waitForNextRewardPhase,
   readRewardCyclePoxAddressForAddress,
+  waitForNextRewardPhase,
 } from "../helpers";
 import {
   broadcastStackIncrease,
   broadcastStackSTX,
 } from "../helpers-direct-stacking";
-import { cvToString } from "@stacks/transactions";
 
 describe("testing multiple stack-stx and stack-increase calls in the same block", () => {
   let orchestrator: DevnetNetworkOrchestrator;
-  let timeline = {
-    epoch_2_0: 100,
-    epoch_2_05: 102,
-    epoch_2_1: 106,
-    pox_2_activation: 109,
-  };
 
   beforeAll(() => {
     orchestrator = buildDevnetNetworkOrchestrator(getNetworkIdFromEnv());
@@ -42,7 +36,7 @@ describe("testing multiple stack-stx and stack-increase calls in the same block"
     // Wait for block N+1 where N is the height of the next reward phase
     await waitForNextRewardPhase(network, orchestrator, 1);
 
-    const blockHeight = timeline.pox_2_activation + 1;
+    const blockHeight = Constants.DEVNET_DEFAULT_POX_2_ACTIVATION + 1;
     const fee = 1000;
 
     // Alice stacks 80m STX

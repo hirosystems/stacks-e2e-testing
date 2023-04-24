@@ -1,7 +1,7 @@
 import { DevnetNetworkOrchestrator } from "@hirosystems/stacks-devnet-js";
 import { StacksTestnet } from "@stacks/network";
-import { ClarityValue, uintCV } from "@stacks/transactions";
-import { Accounts } from "../../constants";
+import { uintCV } from "@stacks/transactions";
+import { Accounts, Constants } from "../../constants";
 import {
   buildDevnetNetworkOrchestrator,
   getNetworkIdFromEnv,
@@ -21,12 +21,6 @@ import {
 
 describe("testing solo stacker increase with bug", () => {
   let orchestrator: DevnetNetworkOrchestrator;
-  let timeline = {
-    epoch_2_0: 100,
-    epoch_2_05: 102,
-    epoch_2_1: 106,
-    pox_2_activation: 109,
-  };
 
   beforeAll(() => {
     orchestrator = buildDevnetNetworkOrchestrator(getNetworkIdFromEnv());
@@ -45,7 +39,7 @@ describe("testing solo stacker increase with bug", () => {
     // Wait for block N+1 where N is the height of the next reward phase
     await waitForNextRewardPhase(network, orchestrator, 1);
 
-    const blockHeight = timeline.pox_2_activation + 1;
+    const blockHeight = Constants.DEVNET_DEFAULT_POX_2_ACTIVATION + 1;
     const fee = 1000;
     const cycles = 1;
 
