@@ -64,7 +64,7 @@ describe("testing stack-extend functionality", () => {
       response.txid
     );
     expect(tx.success).toBeTruthy();
-    
+
     // Alice extends stacking for another 2 cycles
     response = await broadcastStackExtend(
       network,
@@ -75,15 +75,11 @@ describe("testing stack-extend functionality", () => {
     );
     expect(response.error).toBeUndefined();
     // Wait for Alice's stacking extension transaction to confirm
-    [block, tx] = await waitForStacksTransaction(
-      orchestrator,
-      response.txid
-    );
+    [block, tx] = await waitForStacksTransaction(orchestrator, response.txid);
     expect(tx.success).toBeTruthy();
 
     // Check rewards for 3 cycles
     for (let cycle = 1; cycle <= 3; cycle++) {
-
       let poxInfo = await getPoxInfo(network);
       // Asserts about pox info for better knowledge sharing
       expect(poxInfo.contract_id).toBe("ST000000000000000000002AMW42H.pox-2");
@@ -91,7 +87,7 @@ describe("testing stack-extend functionality", () => {
 
       const poxAddrInfo = (await readRewardCyclePoxAddressForAddress(
         network,
-        cycle+1, // cycle + 1 because we are checking the next cycle, including rewards
+        cycle + 1, // cycle + 1 because we are checking the next cycle, including rewards
         Accounts.WALLET_1.stxAddress
       )) as Record<string, ClarityValue>;
       expect(poxAddrInfo?.["total-ustx"]).toEqual(uintCV(80_000_000_000_000));
