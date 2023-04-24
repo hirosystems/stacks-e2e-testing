@@ -1,13 +1,12 @@
 import {
+  DevnetNetworkOrchestrator,
   StacksBlockMetadata,
   StacksChainUpdate,
-  DevnetNetworkOrchestrator,
   StacksTransactionMetadata,
   getIsolatedNetworkConfigUsingNetworkId,
-  Transaction,
 } from "@hirosystems/stacks-devnet-js";
-import { Constants } from "./constants";
 import { StacksNetwork } from "@stacks/network";
+import { Constants } from "./constants";
 const fetch = require("node-fetch");
 
 interface EpochTimeline {
