@@ -56,12 +56,10 @@ describe("testing solo stacker increase without bug", () => {
 
     // Bob increases by 20m
     response = await broadcastStackIncrease(
-      network,
-      20_000_000_000_100,
-      Accounts.WALLET_2,
-      fee,
-      1
+      { network, account: Accounts.WALLET_2, fee, nonce: 1 },
+      { amount: 20000000000100 }
     );
+
     expect(response.error).toBeUndefined();
 
     // let Bob's stacking confirm to enforce reward index 0

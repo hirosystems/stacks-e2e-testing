@@ -59,13 +59,8 @@ describe("testing mixed direct and pooled stacking under epoch 2.1", () => {
 
     // Faucet delegates 1_100m to Bob
     response = await broadcastDelegateSTX(
-      2,
-      network,
-      Accounts.FAUCET,
-      fee,
-      1,
-      1_100_000_000_000_000,
-      Accounts.WALLET_2
+      { poxVersion: 2, network, account: Accounts.FAUCET, fee, nonce: 1 },
+      { amount: 1_100_000_000_000_000, poolAddress: Accounts.WALLET_2 }
     );
     expect(response.error).toBeUndefined();
     let [block, tx] = await waitForStacksTransaction(
@@ -76,14 +71,12 @@ describe("testing mixed direct and pooled stacking under epoch 2.1", () => {
 
     // Bob increase delegation by 920m
     response = await broadcastDelegateStackIncrease(
-      2,
-      network,
-      Accounts.WALLET_2,
-      fee,
-      0,
-      Accounts.FAUCET,
-      Accounts.WALLET_2,
-      920_000_000_000_000
+      { poxVersion: 2, network, account: Accounts.WALLET_2, fee, nonce: 0 },
+      {
+        stacker: Accounts.FAUCET,
+        poolRewardAccount: Accounts.WALLET_2,
+        increaseByAmountUstx: 920_000_000_000_000,
+      }
     );
     expect(response.error).toBeUndefined();
 
@@ -92,13 +85,8 @@ describe("testing mixed direct and pooled stacking under epoch 2.1", () => {
 
     // Bob commits 920m
     response = await broadcastStackAggregationCommitIndexed(
-      2,
-      network,
-      Accounts.WALLET_2,
-      fee,
-      1,
-      Accounts.WALLET_2,
-      2
+      { poxVersion: 2, network, account: Accounts.WALLET_2, fee, nonce: 1 },
+      { poolRewardAccount: Accounts.WALLET_2, cycleId: 2 }
     );
     expect(response.error).toBeUndefined();
 

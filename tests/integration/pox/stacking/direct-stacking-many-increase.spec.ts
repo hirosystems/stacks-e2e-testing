@@ -47,14 +47,12 @@ describe("testing multiple stack-stx and stack-increase calls in the same block"
 
     // Alice stacks 80m STX
     let response = await broadcastStackSTX(
-      2,
-      network,
-      80_000_000_000_000,
-      Accounts.WALLET_1,
-      blockHeight,
-      1,
-      fee,
-      0
+      { poxVersion: 2, network, account: Accounts.WALLET_1, fee, nonce: 0 },
+      {
+        amount: 80_000_000_000_000,
+        blockHeight,
+        cycles: 1,
+      }
     );
     expect(response.error).toBeUndefined();
 
@@ -67,14 +65,12 @@ describe("testing multiple stack-stx and stack-increase calls in the same block"
 
     // Bob stacks 80m STX
     response = await broadcastStackSTX(
-      2,
-      network,
-      80_000_000_000_000,
-      Accounts.WALLET_2,
-      blockHeight,
-      1,
-      fee,
-      0
+      { poxVersion: 2, network, account: Accounts.WALLET_2, fee, nonce: 0 },
+      {
+        amount: 80_000_000_000_000,
+        blockHeight,
+        cycles: 1,
+      }
     );
     expect(response.error).toBeUndefined();
 
@@ -85,19 +81,18 @@ describe("testing multiple stack-stx and stack-increase calls in the same block"
     // Alice and Bob both increase their stacks by 10m STX in the same block
     const increaseAmount = 10_000_000_000_000;
     const aliceIncrease = broadcastStackIncrease(
-      network,
-      increaseAmount,
-      Accounts.WALLET_1,
-      fee,
-      1
+      { network, account: Accounts.WALLET_1, fee, nonce: 1 },
+      { amount: increaseAmount }
     );
 
     const bobIncrease = broadcastStackIncrease(
-      network,
-      increaseAmount,
-      Accounts.WALLET_2,
-      fee,
-      1
+      {
+        network,
+        account: Accounts.WALLET_2,
+        fee,
+        nonce: 1,
+      },
+      { amount: increaseAmount }
     );
 
     // Wait for both stack-increase transactions to confirm

@@ -59,13 +59,8 @@ describe("testing direct stacker as pool operator without auto-unlock under epoc
 
     // Faucet delegates 999m to Alice address
     response = await broadcastDelegateSTX(
-      2,
-      network,
-      Accounts.FAUCET,
-      fee,
-      0,
-      999_000_000_000_000,
-      Accounts.WALLET_1
+      { poxVersion: 2, network, account: Accounts.FAUCET, fee, nonce: 0 },
+      { amount: 999000000000000, poolAddress: Accounts.WALLET_1 }
     );
     expect(response.error).toBeUndefined();
     let [block, tx] = await waitForStacksTransaction(
@@ -76,16 +71,14 @@ describe("testing direct stacker as pool operator without auto-unlock under epoc
 
     // Alice locks 999m as pool operator
     response = await broadcastDelegateStackSTX(
-      2,
-      network,
-      Accounts.WALLET_1,
-      fee,
-      1,
-      Accounts.FAUCET,
-      999_000_000_000_000,
-      Accounts.WALLET_1,
-      blockHeight,
-      1
+      { poxVersion: 2, network, account: Accounts.WALLET_1, fee, nonce: 1 },
+      {
+        stacker: Accounts.FAUCET,
+        amount: 999000000000000,
+        poolRewardAccount: Accounts.WALLET_1,
+        startBurnHeight: blockHeight,
+        lockPeriodCycles: 1,
+      }
     );
     expect(response.error).toBeUndefined();
     [block, tx] = await waitForStacksTransaction(orchestrator, response.txid);
@@ -93,13 +86,8 @@ describe("testing direct stacker as pool operator without auto-unlock under epoc
 
     // Alice commits 999m
     response = await broadcastStackAggregationCommitIndexed(
-      2,
-      network,
-      Accounts.WALLET_1,
-      fee,
-      2,
-      Accounts.WALLET_1,
-      2
+      { poxVersion: 2, network, account: Accounts.WALLET_1, fee, nonce: 2 },
+      { poolRewardAccount: Accounts.WALLET_1, cycleId: 2 }
     );
     expect(response.error).toBeUndefined();
 

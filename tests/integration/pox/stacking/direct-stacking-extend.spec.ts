@@ -48,14 +48,12 @@ describe("testing stack-extend functionality", () => {
 
     // Alice stacks 80m STX for 1 cycle
     let response = await broadcastStackSTX(
-      2,
-      network,
-      80_000_000_000_000,
-      Accounts.WALLET_1,
-      blockHeight,
-      1,
-      fee,
-      0
+      { poxVersion: 2, network, account: Accounts.WALLET_1, fee, nonce: 0 },
+      {
+        amount: 80_000_000_000_000,
+        blockHeight,
+        cycles: 1,
+      }
     );
     expect(response.error).toBeUndefined();
     // Wait for Alice's stacking transaction to confirm
@@ -67,11 +65,8 @@ describe("testing stack-extend functionality", () => {
 
     // Alice extends stacking for another 2 cycles
     response = await broadcastStackExtend(
-      network,
-      Accounts.WALLET_1,
-      2,
-      fee,
-      1
+      { network, account: Accounts.WALLET_1, fee, nonce: 1 },
+      { cycles: 2 }
     );
     expect(response.error).toBeUndefined();
     // Wait for Alice's stacking extension transaction to confirm

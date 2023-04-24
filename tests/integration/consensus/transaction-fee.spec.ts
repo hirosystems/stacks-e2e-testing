@@ -1,27 +1,24 @@
+import { DevnetNetworkOrchestrator } from "@hirosystems/stacks-devnet-js";
+import { StacksNetwork, StacksTestnet } from "@stacks/network";
 import {
-  makeContractDeploy,
-  broadcastTransaction,
   AnchorMode,
+  ClarityValue,
+  ClarityVersion,
   PostConditionMode,
   TxBroadcastResultOk,
-  makeContractCall,
-  SignedContractCallOptions,
-  ClarityVersion,
-  ClarityValue,
-  createLPString,
+  broadcastTransaction,
   contractPrincipalCV,
+  makeContractCall,
+  makeContractDeploy,
 } from "@stacks/transactions";
-import { StacksNetwork, StacksTestnet } from "@stacks/network";
+import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { Accounts, Constants } from "../constants";
-import { getAccount, expectAccountToBe } from "../pox/helpers";
-import { principalCV } from "@stacks/transactions/dist/clarity/types/principalCV";
 import {
   buildDevnetNetworkOrchestrator,
-  getNetworkIdFromCtx,
+  getNetworkIdFromEnv,
   waitForStacksTransaction,
 } from "../helpers";
-import { DevnetNetworkOrchestrator } from "@hirosystems/stacks-devnet-js";
-import { describe, expect, it, test, beforeAll, afterAll } from "vitest";
+import { expectAccountToBe, getAccount } from "../pox/helpers";
 
 const CONTRACT_TRAIT = `
 (define-trait foo
@@ -52,7 +49,7 @@ describe("transaction-fee", () => {
   let orchestrator: DevnetNetworkOrchestrator;
 
   beforeAll(async (ctx) => {
-    orchestrator = buildDevnetNetworkOrchestrator(getNetworkIdFromCtx(ctx.id));
+    orchestrator = buildDevnetNetworkOrchestrator(getNetworkIdFromEnv());
     orchestrator.start();
   });
 

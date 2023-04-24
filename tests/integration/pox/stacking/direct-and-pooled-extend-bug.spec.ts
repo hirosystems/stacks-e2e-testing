@@ -1,6 +1,6 @@
 import { DevnetNetworkOrchestrator } from "@hirosystems/stacks-devnet-js";
 import { StacksTestnet } from "@stacks/network";
-import { ClarityType, SomeCV, cvToString, uintCV } from "@stacks/transactions";
+import { SomeCV, cvToString, uintCV } from "@stacks/transactions";
 import { Accounts } from "../../constants";
 import {
   asyncExpectStacksTransactionSuccess,
@@ -18,10 +18,8 @@ import { broadcastStackSTX } from "../helpers-direct-stacking";
 import {
   broadcastDelegateSTX,
   broadcastDelegateStackExtend,
-  broadcastDelegateStackIncrease,
   broadcastStackAggregationCommitIndexed,
 } from "../helpers-pooled-stacking";
-import { poxAddressToBtcAddress } from "@stacks/stacking";
 
 describe("testing mixed direct and pooled stacking with extend under epoch 2.1", () => {
   let orchestrator: DevnetNetworkOrchestrator;
@@ -62,13 +60,8 @@ describe("testing mixed direct and pooled stacking with extend under epoch 2.1",
 
     // Alice delegates 100m to Bob
     response = await broadcastDelegateSTX(
-      2,
-      network,
-      Accounts.WALLET_1,
-      fee,
-      1,
-      100_000_000_000_000,
-      Accounts.WALLET_2
+      { poxVersion: 2, network, account: Accounts.WALLET_1, fee, nonce: 1 },
+      { amount: 100_000_000_000_000, poolAddress: Accounts.WALLET_2 }
     );
     expect(response.error).toBeUndefined();
     let [block, tx] = await waitForStacksTransaction(
@@ -79,14 +72,12 @@ describe("testing mixed direct and pooled stacking with extend under epoch 2.1",
 
     // Bob extends delegation by 1 cycle
     response = await broadcastDelegateStackExtend(
-      2,
-      network,
-      Accounts.WALLET_2,
-      fee,
-      0,
-      Accounts.WALLET_1,
-      Accounts.WALLET_2,
-      1
+      { poxVersion: 2, network, account: Accounts.WALLET_2, fee, nonce: 0 },
+      {
+        stacker: Accounts.WALLET_1,
+        poolRewardAccount: Accounts.WALLET_2,
+        extendByCount: 1,
+      }
     );
     expect(response.error).toBeUndefined();
 
@@ -96,13 +87,8 @@ describe("testing mixed direct and pooled stacking with extend under epoch 2.1",
     // Bob commits 75m for cycle #3
     // delegate-stack-extend only locks for the cycles after the current stacking
     response = await broadcastStackAggregationCommitIndexed(
-      2,
-      network,
-      Accounts.WALLET_2,
-      fee,
-      1,
-      Accounts.WALLET_2,
-      3
+      { poxVersion: 2, network, account: Accounts.WALLET_2, fee, nonce: 1 },
+      { poolRewardAccount: Accounts.WALLET_2, cycleId: 3 }
     );
     expect(response.error).toBeUndefined();
 

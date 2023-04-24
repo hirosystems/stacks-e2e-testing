@@ -1,5 +1,6 @@
 import { DevnetNetworkOrchestrator } from "@hirosystems/stacks-devnet-js";
-import { StacksNetwork, StacksTestnet } from "@stacks/network";
+import { StacksTestnet } from "@stacks/network";
+import { uintCV } from "@stacks/transactions";
 import { Accounts } from "../../constants";
 import {
   buildDevnetNetworkOrchestrator,
@@ -12,11 +13,7 @@ import {
   readRewardCyclePoxAddressForAddress,
   waitForNextRewardPhase,
 } from "../helpers";
-import {
-  broadcastStackIncrease,
-  broadcastStackSTX,
-} from "../helpers-direct-stacking";
-import { uintCV } from "@stacks/transactions";
+import { broadcastStackSTX } from "../helpers-direct-stacking";
 
 describe("testing solo stacker below minimum", () => {
   let orchestrator: DevnetNetworkOrchestrator;

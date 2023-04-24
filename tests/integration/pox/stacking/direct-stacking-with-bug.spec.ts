@@ -68,11 +68,8 @@ describe("testing solo stacker increase with bug", () => {
 
     // Bob increases by 10m
     response = await broadcastStackIncrease(
-      network,
-      10_000_000_000_100,
-      Accounts.WALLET_2,
-      fee,
-      1
+      { network, account: Accounts.WALLET_2, fee, nonce: 1 },
+      { amount: 10000000000100 }
     );
     expect(response.error).toBeUndefined();
     // let Bobx's stacking confirm to enforce reward index 1
@@ -87,11 +84,13 @@ describe("testing solo stacker increase with bug", () => {
 
     // Cloe increases by 10m
     response = await broadcastStackIncrease(
-      network,
-      10_000_000_010_000,
-      Accounts.WALLET_3,
-      fee,
-      1
+      {
+        network,
+        account: Accounts.WALLET_3,
+        fee,
+        nonce: 1,
+      },
+      { amount: 10_000_000_010_000 }
     );
     expect(response.error).toBeUndefined();
     await orchestrator.waitForStacksBlockIncludingTransaction(response.txid);

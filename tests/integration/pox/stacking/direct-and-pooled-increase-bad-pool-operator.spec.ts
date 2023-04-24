@@ -52,13 +52,8 @@ describe("testing stacker who is a bad pool operator under epoch 2.1", () => {
 
     // Bob delegates 80m to Alice address
     response = await broadcastDelegateSTX(
-      2,
-      network,
-      Accounts.WALLET_2,
-      fee,
-      0,
-      80_000_000_000_000,
-      Accounts.WALLET_1
+      { poxVersion: 2, network, account: Accounts.WALLET_2, fee, nonce: 0 },
+      { amount: 80000000000000, poolAddress: Accounts.WALLET_1 }
     );
     expect(response.error).toBeUndefined();
     let [block, tx] = await waitForStacksTransaction(
@@ -69,14 +64,12 @@ describe("testing stacker who is a bad pool operator under epoch 2.1", () => {
 
     // Alice tries to increase Bob's delegation by 80m
     response = await broadcastDelegateStackIncrease(
-      2,
-      network,
-      Accounts.WALLET_1,
-      fee,
-      1,
-      Accounts.WALLET_2,
-      Accounts.WALLET_1,
-      80_000_000_000_000
+      { poxVersion: 2, network, account: Accounts.WALLET_1, fee, nonce: 1 },
+      {
+        stacker: Accounts.WALLET_2,
+        poolRewardAccount: Accounts.WALLET_1,
+        increaseByAmountUstx: 80000000000000,
+      }
     );
     expect(response.error).toBeUndefined();
     [block, tx] = await waitForStacksTransaction(orchestrator, response.txid);
