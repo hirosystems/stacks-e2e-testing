@@ -99,3 +99,12 @@ export const getChainInfo = async (
     return await getChainInfo(network, retryCountdown - 1);
   }
 };
+
+export async function asyncExpectStacksTransactionSuccess(
+  orchestrator: DevnetNetworkOrchestrator,
+  txid: string
+) {
+  let [block, tx] = await waitForStacksTransaction(orchestrator, txid);
+  expect(tx.success, tx.result).toBeTruthy();
+  return [block, tx];
+}
