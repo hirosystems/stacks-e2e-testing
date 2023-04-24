@@ -26,6 +26,7 @@ describe("testing solo stacker increase with bug", () => {
     epoch_2_05: 102,
     epoch_2_1: 106,
     pox_2_activation: 109,
+    epoch_2_2: 114,
   };
 
   beforeAll(() => {
@@ -40,8 +41,13 @@ describe("testing solo stacker increase with bug", () => {
   it("using stacks-increase in the same cycle should result in increased rewards", async () => {
     const network = new StacksTestnet({ url: orchestrator.getStacksNodeUrl() });
 
+    let infoResponse = await fetch(network.getInfoUrl(), {});
+    let info = await infoResponse.json();
+    const hasFix = (info.peer_version & 0xff) == 7;
+
     // Wait for Stacks genesis block
     await orchestrator.waitForNextStacksBlock();
+
     // Wait for block N+1 where N is the height of the next reward phase
     await waitForNextRewardPhase(network, orchestrator, 1);
 
@@ -137,9 +143,6 @@ describe("testing solo stacker increase with bug", () => {
       Accounts.WALLET_2.stxAddress
     );
     // HERE'S THE BUG: THIS SHOULD BE `u90000000000110`
-    // expect(poxAddrInfo1["total-ustx"]).toEqual(
-    //   uintCV(90_000_000_000_110)
-    // );
     expect(poxAddrInfo1?.["total-ustx"]).toEqual(uintCV(990_000_000_000_111));
 
     // Check Cloe's table entry
@@ -149,8 +152,40 @@ describe("testing solo stacker increase with bug", () => {
       Accounts.WALLET_3.stxAddress
     );
     // HERE'S THE BUG: THIS SHOULD BE `u90000000011000`
-    // expect(poxAddrInfo2["total-ustx"]).toEqual(uintCV(90_000_000_011_000));
     expect(poxAddrInfo2?.["total-ustx"]).toEqual(uintCV(1080_000_000_011_111));
+
+    // Activate 2.2 and re-check the table entries
+    if (hasFix) {
+      await orchestrator.waitForStacksBlockAnchoredOnBitcoinBlockOfHeight(
+        timeline.epoch_2_2 + 2
+      );
+
+      // Check Faucets's table entry
+      const poxAddrInfo0 = await readRewardCyclePoxAddressForAddress(
+        network,
+        2,
+        Accounts.FAUCET.stxAddress
+      );
+      expect(poxAddrInfo0?.["total-ustx"]).toEqual(uintCV(900_000_000_000_001));
+
+      // Check Bob's table entry
+      const poxAddrInfo1 = await readRewardCyclePoxAddressForAddress(
+        network,
+        2,
+        Accounts.WALLET_2.stxAddress
+      );
+      // HERE'S THE FIX
+      expect(poxAddrInfo1?.["total-ustx"]).toEqual(uintCV(90_000_000_000_110));
+
+      // Check Cloe's table entry
+      const poxAddrInfo2 = await readRewardCyclePoxAddressForAddress(
+        network,
+        2,
+        Accounts.WALLET_3.stxAddress
+      );
+      // HERE'S THE FIX
+      expect(poxAddrInfo2?.["total-ustx"]).toEqual(uintCV(90_000_000_011_000));
+    }
 
     // advance to block 120, the last one before chain halt
     let coreInfo = await getCoreInfo(network);
