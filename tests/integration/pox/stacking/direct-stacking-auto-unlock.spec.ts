@@ -50,14 +50,8 @@ describe("testing solo stacker below minimum", () => {
 
     // Alice stacks 80m
     let response = await broadcastStackSTX(
-      2,
-      network,
-      80_000_000_000_000,
-      Accounts.WALLET_1,
-      blockHeight,
-      cycles,
-      fee,
-      0
+      { poxVersion: 2, network, account: Accounts.WALLET_1, fee, nonce: 0 },
+      { amount: 80_000_000_000_000, blockHeight, cycles }
     );
     expect(response.error).toBeUndefined();
     let [block, tx] = await waitForStacksTransaction(
@@ -68,14 +62,8 @@ describe("testing solo stacker below minimum", () => {
 
     // Faucet stacks 999m
     response = await broadcastStackSTX(
-      2,
-      network,
-      999_000_000_000_000,
-      Accounts.FAUCET,
-      blockHeight,
-      cycles,
-      fee,
-      0
+      { poxVersion: 2, network, account: Accounts.FAUCET, fee, nonce: 0 },
+      { amount: 999_000_000_000_000, blockHeight, cycles }
     );
     expect(response.error).toBeUndefined();
 

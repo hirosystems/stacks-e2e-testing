@@ -64,42 +64,24 @@ describe("testing stacking under epoch 2.0", () => {
     // WALLET_1 locking for 1 cycle
     let stackedByWallet1 = 25_000_000_000_000;
     let response = await broadcastStackSTX(
-      1,
-      network,
-      stackedByWallet1,
-      Accounts.WALLET_1,
-      blockHeight,
-      1,
-      fee,
-      0
+      { poxVersion: 1, network, account: Accounts.WALLET_1, fee, nonce: 0 },
+      { amount: stackedByWallet1, blockHeight, cycles: 1 }
     );
     expect(response.error).toBeUndefined();
 
     // WALLET_2 locking for 6 cycle
     let stackedByWallet2 = 50_000_000_000_000;
     response = await broadcastStackSTX(
-      1,
-      network,
-      stackedByWallet2,
-      Accounts.WALLET_2,
-      blockHeight,
-      6,
-      fee,
-      0
+      { poxVersion: 1, network, account: Accounts.WALLET_2, fee, nonce: 0 },
+      { amount: stackedByWallet2, blockHeight, cycles: 6 }
     );
     expect(response.error).toBeUndefined();
 
     // WALLET_3 locking for 12 cycle
     let stackedByWallet3 = 75_000_000_000_000;
     response = await broadcastStackSTX(
-      1,
-      network,
-      stackedByWallet3,
-      Accounts.WALLET_3,
-      blockHeight,
-      12,
-      fee,
-      0
+      { poxVersion: 1, network, account: Accounts.WALLET_3, fee, nonce: 0 },
+      { amount: stackedByWallet3, blockHeight, cycles: 12 }
     );
     expect(response.error).toBeUndefined();
 

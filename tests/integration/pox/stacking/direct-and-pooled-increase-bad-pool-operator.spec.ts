@@ -45,14 +45,8 @@ describe("testing stacker who is a bad pool operator under epoch 2.1", () => {
 
     // Alice stacks 90m STX
     let response = await broadcastStackSTX(
-      2,
-      network,
-      90_000_000_000_000,
-      Accounts.WALLET_1,
-      blockHeight,
-      cycles,
-      fee,
-      0
+      { poxVersion: 2, network, account: Accounts.WALLET_1, fee, nonce: 0 },
+      { amount: 90_000_000_000_000, blockHeight, cycles }
     );
     expect(response.error).toBeUndefined();
 

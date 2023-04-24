@@ -55,14 +55,8 @@ describe("testing mixed direct and pooled stacking with extend under epoch 2.1",
 
     // Alice stacks 75m STX
     let response = await broadcastStackSTX(
-      2,
-      network,
-      75_000_000_000_000,
-      Accounts.WALLET_1,
-      blockHeight,
-      cycles,
-      fee,
-      0
+      { poxVersion: 2, network, account: Accounts.WALLET_1, fee, nonce: 0 },
+      { amount: 75_000_000_000_000, blockHeight, cycles }
     );
     expect(response.error).toBeUndefined();
 
@@ -147,14 +141,8 @@ describe("testing mixed direct and pooled stacking with extend under epoch 2.1",
 
     // Faucet stacks 900m (1/4 of liquid suply)
     let response = await broadcastStackSTX(
-      2,
-      network,
-      900_000_000_000_000,
-      Accounts.FAUCET,
-      blockHeight,
-      cycles,
-      fee,
-      0
+      { poxVersion: 2, network, account: Accounts.FAUCET, fee, nonce: 0 },
+      { amount: 900_000_000_000_000, blockHeight, cycles }
     );
     expect(response.error).toBeUndefined();
 
@@ -229,14 +217,8 @@ describe("testing mixed direct and pooled stacking with extend under epoch 2.1",
 
     // Cloe stacks 80m
     let response = await broadcastStackSTX(
-      2,
-      network,
-      80_000_000_000_000,
-      Accounts.WALLET_3,
-      blockHeight,
-      cycles,
-      fee,
-      0
+      { poxVersion: 2, network, account: Accounts.WALLET_3, fee, nonce: 0 },
+      { amount: 80_000_000_000_000, blockHeight, cycles }
     );
     expect(response.error).toBeUndefined();
     await asyncExpectStacksTransactionSuccess(orchestrator, response.txid);

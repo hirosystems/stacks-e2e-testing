@@ -49,14 +49,8 @@ describe("testing solo stacker increase without bug", () => {
 
     // Bob stacks 30m
     let response = await broadcastStackSTX(
-      2,
-      network,
-      30_000_000_000_010,
-      Accounts.WALLET_2,
-      blockHeight,
-      cycles,
-      fee,
-      0
+      { poxVersion: 2, network, account: Accounts.WALLET_2, fee, nonce: 0 },
+      { amount: 30_000_000_000_010, blockHeight, cycles }
     );
     expect(response.error).toBeUndefined();
 
@@ -75,14 +69,8 @@ describe("testing solo stacker increase without bug", () => {
 
     // Alice stacks 50m
     response = await broadcastStackSTX(
-      2,
-      network,
-      50_000_000_000_001,
-      Accounts.WALLET_1,
-      blockHeight,
-      cycles,
-      fee,
-      0
+      { poxVersion: 2, network, account: Accounts.WALLET_1, fee, nonce: 0 },
+      { amount: 50_000_000_000_001, blockHeight, cycles }
     );
     expect(response.error).toBeUndefined();
 
@@ -107,13 +95,13 @@ describe("testing solo stacker increase without bug", () => {
     expect(cvToString(poxAddrInfo0["total-ustx"])).toBe("u50000000000110");
 
     // There is no bug here because total stack was 0 when stack-increase was called.
-    expect(poxAddrInfo0["total-ustx"]).toEqual(uintCV(50000000000110));
+    expect(poxAddrInfo0["total-ustx"]).toEqual(uintCV(50_000_000_000_110));
 
     const poxAddrInfo1 = (await readRewardCyclePoxAddressForAddress(
       network,
       2,
       Accounts.WALLET_1.stxAddress
     )) as Record<string, ClarityValue>;
-    expect(poxAddrInfo1["total-ustx"]).toEqual(uintCV(50000000000001));
+    expect(poxAddrInfo1["total-ustx"]).toEqual(uintCV(50_000_000_000_001));
   });
 });

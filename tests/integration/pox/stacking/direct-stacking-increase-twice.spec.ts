@@ -48,14 +48,8 @@ describe("testing solo stacker increase without bug", () => {
 
     // Bob stacks 30m
     let response = await broadcastStackSTX(
-      2,
-      network,
-      30_000_000_000_010,
-      Accounts.WALLET_2,
-      blockHeight,
-      cycles,
-      fee,
-      0
+      { poxVersion: 2, network, account: Accounts.WALLET_2, fee, nonce: 0 },
+      { amount: 30_000_000_000_010, blockHeight, cycles }
     );
     expect(response.error).toBeUndefined();
 

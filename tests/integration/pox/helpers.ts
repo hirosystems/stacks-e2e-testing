@@ -33,6 +33,14 @@ export interface Account {
   secretKey: string;
 }
 
+export interface BroadcastOptions {
+  poxVersion: number;
+  network: StacksNetwork;
+  account: Account;
+  fee: number;
+  nonce: number;
+}
+
 const delay = () => new Promise((resolve) => setTimeout(resolve, 3000));
 
 export const getCoreInfo = async (

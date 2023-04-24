@@ -51,14 +51,8 @@ describe("testing solo stacker increase with bug", () => {
 
     // Faucet stacks 900m (1/4 of liquid suply)
     let response = await broadcastStackSTX(
-      2,
-      network,
-      900_000_000_000_001,
-      Accounts.FAUCET,
-      blockHeight,
-      cycles,
-      fee,
-      0
+      { poxVersion: 2, network, account: Accounts.FAUCET, fee, nonce: 0 },
+      { amount: 900_000_000_000_001, blockHeight, cycles }
     );
     expect(response.error).toBeUndefined();
 
@@ -67,14 +61,8 @@ describe("testing solo stacker increase with bug", () => {
 
     // Bob stacks 80m
     response = await broadcastStackSTX(
-      2,
-      network,
-      80_000_000_000_010,
-      Accounts.WALLET_2,
-      blockHeight,
-      cycles,
-      fee,
-      0
+      { poxVersion: 2, network, account: Accounts.WALLET_2, fee, nonce: 0 },
+      { amount: 80_000_000_000_010, blockHeight, cycles }
     );
     expect(response.error).toBeUndefined();
 
@@ -92,14 +80,8 @@ describe("testing solo stacker increase with bug", () => {
 
     // Cloe stacks 80m
     response = await broadcastStackSTX(
-      2,
-      network,
-      80_000_000_001_000,
-      Accounts.WALLET_3,
-      blockHeight,
-      cycles,
-      fee,
-      0
+      { poxVersion: 2, network, account: Accounts.WALLET_3, fee, nonce: 0 },
+      { amount: 80_000_000_001_000, blockHeight, cycles }
     );
     expect(response.error).toBeUndefined();
 

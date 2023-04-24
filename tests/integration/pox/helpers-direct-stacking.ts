@@ -13,18 +13,16 @@ import { Contracts } from "../constants";
 
 import { toBytes } from "@stacks/common";
 import { decodeBtcAddress } from "@stacks/stacking";
-import { Account } from "./helpers";
+import { Account, BroadcastOptions } from "./helpers";
 const fetch = require("node-fetch");
 
 export const broadcastStackSTX = async (
-  poxVersion: number,
-  network: StacksNetwork,
-  amount: number,
-  account: Account,
-  blockHeight: number,
-  cycles: number,
-  fee: number,
-  nonce: number
+  { poxVersion, network, account, fee, nonce }: BroadcastOptions,
+  {
+    amount,
+    blockHeight,
+    cycles,
+  }: { amount: number; blockHeight: number; cycles: number }
 ): Promise<TxBroadcastResult> => {
   const { version, data } = decodeBtcAddress(account.btcAddress);
   const address = {

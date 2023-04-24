@@ -52,14 +52,8 @@ describe("testing mixed direct and pooled stacking under epoch 2.1", () => {
 
     // Faucet stacks 75m STX
     let response = await broadcastStackSTX(
-      2,
-      network,
-      75_000_000_000_000,
-      Accounts.FAUCET,
-      blockHeight,
-      cycles,
-      fee,
-      0
+      { poxVersion: 2, network, account: Accounts.FAUCET, fee, nonce: 0 },
+      { amount: 75_000_000_000_000, blockHeight, cycles }
     );
     expect(response.error).toBeUndefined();
 
