@@ -95,7 +95,7 @@ export const broadcastStackExtend = async (
     contractAddress: Contracts.POX_2.address,
     contractName: Contracts.POX_2.name,
     functionName: "stack-extend",
-    functionArgs: [tupleCV(address), uintCV(cycles)],
+    functionArgs: [uintCV(cycles), tupleCV(address)],
     fee,
     nonce,
     network,
