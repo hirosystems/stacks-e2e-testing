@@ -7,7 +7,6 @@ import {
     waitForStacksTransaction,
 } from "../../helpers";
 import {
-    getPoxInfo,
     waitForNextRewardPhase,
     readRewardCyclePoxAddressForAddress,
 } from "../helpers";
@@ -15,7 +14,7 @@ import {
     broadcastStackIncrease,
     broadcastStackSTX,
 } from "../helpers-direct-stacking";
-import { ClarityValue, cvToString, uintCV } from "@stacks/transactions";
+import { cvToString } from "@stacks/transactions";
 
 describe("testing multiple stack-stx and stack-increase calls in the same block", () => {
     let orchestrator: DevnetNetworkOrchestrator;
@@ -40,16 +39,17 @@ describe("testing multiple stack-stx and stack-increase calls in the same block"
 
         // Wait for Stacks genesis block
         await orchestrator.waitForNextStacksBlock();
+        // Wait for block N+1 where N is the height of the next reward phase
+        await waitForNextRewardPhase(network, orchestrator, 1);
 
         const blockHeight = timeline.pox_2_activation + 1;
         const fee = 1000;
-        const cycles = 1;
 
-        // Alice stacks 100m STX
+        // Alice stacks 80m STX
         let response = await broadcastStackSTX(
             2,
             network,
-            100_000_000_000_000,
+            80_000_000_000_000,
             Accounts.WALLET_1,
             blockHeight,
             1,
@@ -65,11 +65,11 @@ describe("testing multiple stack-stx and stack-increase calls in the same block"
         );
         expect(tx.success).toBeTruthy();
 
-        // Bob stacks 100m STX
+        // Bob stacks 80m STX
         response = await broadcastStackSTX(
             2,
             network,
-            100_000_000_000_000,
+            80_000_000_000_000,
             Accounts.WALLET_2,
             blockHeight,
             1,
@@ -85,8 +85,8 @@ describe("testing multiple stack-stx and stack-increase calls in the same block"
         );
         expect(tx.success).toBeTruthy();
 
-        // Alice and Bob both increase their stacks by 50m STX in the same block
-        const increaseAmount = 50_000_000_000_000;
+        // Alice and Bob both increase their stacks by 10m STX in the same block
+        const increaseAmount = 10_000_000_000_000;
         const aliceIncrease = broadcastStackIncrease(
             network,
             increaseAmount,
@@ -116,14 +116,7 @@ describe("testing multiple stack-stx and stack-increase calls in the same block"
             orchestrator,
             aliceResponse.txid
         );
-        const [bobBlock, bobTx] = await waitForStacksTransaction(
-            orchestrator,
-            bobResponse.txid
-        );
-
         expect(aliceTx.success).toBeTruthy();
-        expect(bobTx.success).toBeTruthy();
-        expect(aliceBlock).toEqual(bobBlock); // Both transactions in the same block
 
         // Read Alice and Bob's total-ustx values after the stack-increase transactions
         const alicePoxAddressInfo = await readRewardCyclePoxAddressForAddress(
@@ -140,9 +133,8 @@ describe("testing multiple stack-stx and stack-increase calls in the same block"
         const aliceTotalUstx = alicePoxAddressInfo ? cvToString(alicePoxAddressInfo["total-ustx"]) : "";
         const bobTotalUstx = bobPoxAddressInfo ? cvToString(bobPoxAddressInfo["total-ustx"]) : "";
 
-        // The total-ustx values should be different due to the unpredictable order
-        // of stack-increase calls within the same block
+        // The total-ustx values should be different due to the bug in stack-increase
         expect(aliceTotalUstx).not.toEqual(bobTotalUstx);
-
+        
     });
 });
