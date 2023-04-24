@@ -1,4 +1,3 @@
-import { StacksNetwork } from "@stacks/network";
 import {
   AnchorMode,
   PostConditionMode,
@@ -16,19 +15,22 @@ import { Contracts } from "../constants";
 
 import { toBytes } from "@stacks/common";
 import { decodeBtcAddress } from "@stacks/stacking";
-import { Account } from "./helpers";
+import { Account, BroadcastOptions, BroadcastOptionsPox2 } from "./helpers";
 const fetch = require("node-fetch");
 
 export const broadcastDelegateSTX = async (
-  poxVersion: number,
-  network: StacksNetwork,
-  account: Account,
-  fee: number,
-  nonce: number,
-  amount: number,
-  poolAddress: Account,
-  poolRewardAccount?: Account,
-  untilBurnHeight?: number
+  { poxVersion, network, account, fee, nonce }: BroadcastOptions,
+  {
+    amount,
+    poolAddress,
+    poolRewardAccount,
+    untilBurnHeight,
+  }: {
+    amount: number;
+    poolAddress: Account;
+    poolRewardAccount?: Account;
+    untilBurnHeight?: number;
+  }
 ): Promise<TxBroadcastResult> => {
   let poxAddressCV;
   if (poolRewardAccount) {
@@ -69,13 +71,13 @@ export const broadcastDelegateSTX = async (
   return result;
 };
 
-export const broadcastRevokeDelegateStx = async (
-  poxVersion: number,
-  network: StacksNetwork,
-  account: Account,
-  fee: number,
-  nonce: number
-): Promise<TxBroadcastResult> => {
+export const broadcastRevokeDelegateStx = async ({
+  poxVersion,
+  network,
+  account,
+  fee,
+  nonce,
+}: BroadcastOptions): Promise<TxBroadcastResult> => {
   const txOptions = {
     contractAddress: Contracts.POX_1.address,
     contractName: poxVersion == 1 ? Contracts.POX_1.name : Contracts.POX_2.name,
@@ -95,16 +97,20 @@ export const broadcastRevokeDelegateStx = async (
 };
 
 export const broadcastDelegateStackSTX = async (
-  poxVersion: number,
-  network: StacksNetwork,
-  account: Account,
-  fee: number,
-  nonce: number,
-  stacker: Account,
-  amount: number,
-  poolRewardAccount: Account,
-  startBurnHeight: number,
-  lockPeriodCycles: number
+  { poxVersion, network, account, fee, nonce }: BroadcastOptions,
+  {
+    stacker,
+    amount,
+    poolRewardAccount,
+    startBurnHeight,
+    lockPeriodCycles,
+  }: {
+    stacker: Account;
+    amount: number;
+    poolRewardAccount: Account;
+    startBurnHeight: number;
+    lockPeriodCycles: number;
+  }
 ): Promise<TxBroadcastResult> => {
   const { version, data } = decodeBtcAddress(poolRewardAccount.btcAddress);
   const poxAddress = {
@@ -137,14 +143,12 @@ export const broadcastDelegateStackSTX = async (
 };
 
 export const broadcastDelegateStackExtend = async (
-  poxVersion: number,
-  network: StacksNetwork,
-  account: Account,
-  fee: number,
-  nonce: number,
-  stacker: Account,
-  poolRewardAccount: Account,
-  extendByCount: number
+  { poxVersion, network, account, fee, nonce }: BroadcastOptions,
+  {
+    stacker,
+    poolRewardAccount,
+    extendByCount,
+  }: { stacker: Account; poolRewardAccount: Account; extendByCount: number }
 ): Promise<TxBroadcastResult> => {
   const { version, data } = decodeBtcAddress(poolRewardAccount.btcAddress);
   const poxAddress = {
@@ -175,14 +179,16 @@ export const broadcastDelegateStackExtend = async (
 };
 
 export const broadcastDelegateStackIncrease = async (
-  poxVersion: number,
-  network: StacksNetwork,
-  account: Account,
-  fee: number,
-  nonce: number,
-  stacker: Account,
-  poolRewardAccount: Account,
-  increaseByAmountUstx: number
+  { poxVersion, network, account, fee, nonce }: BroadcastOptions,
+  {
+    stacker,
+    poolRewardAccount,
+    increaseByAmountUstx,
+  }: {
+    stacker: Account;
+    poolRewardAccount: Account;
+    increaseByAmountUstx: number;
+  }
 ): Promise<TxBroadcastResult> => {
   const { version, data } = decodeBtcAddress(poolRewardAccount.btcAddress);
   const poxAddress = {
@@ -225,13 +231,11 @@ export const broadcastDelegateStackIncrease = async (
  * @returns
  */
 export const broadcastStackAggregationCommitIndexed = async (
-  poxVersion: number,
-  network: StacksNetwork,
-  account: Account,
-  fee: number,
-  nonce: number,
-  poolRewardAccount: Account,
-  cycleId: number
+  { poxVersion, network, account, fee, nonce }: BroadcastOptions,
+  {
+    poolRewardAccount,
+    cycleId,
+  }: { poolRewardAccount: Account; cycleId: number }
 ): Promise<TxBroadcastResult> => {
   const { version, data } = decodeBtcAddress(poolRewardAccount.btcAddress);
   const poxAddress = {
@@ -261,13 +265,12 @@ export const broadcastStackAggregationCommitIndexed = async (
 };
 
 export const broadcastStackAggregationIncrease = async (
-  network: StacksNetwork,
-  account: Account,
-  fee: number,
-  nonce: number,
-  poolRewardAccount: Account,
-  cycleId: number,
-  rewardIndex: number
+  { network, account, fee, nonce }: BroadcastOptionsPox2,
+  {
+    poolRewardAccount,
+    cycleId,
+    rewardIndex,
+  }: { poolRewardAccount: Account; cycleId: number; rewardIndex: number }
 ): Promise<TxBroadcastResult> => {
   const { version, data } = decodeBtcAddress(poolRewardAccount.btcAddress);
   const poxAddress = {

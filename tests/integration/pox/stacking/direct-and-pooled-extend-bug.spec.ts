@@ -1,7 +1,7 @@
 import { DevnetNetworkOrchestrator } from "@hirosystems/stacks-devnet-js";
 import { StacksTestnet } from "@stacks/network";
-import { ClarityType, SomeCV, cvToString, uintCV } from "@stacks/transactions";
-import { Accounts } from "../../constants";
+import { SomeCV, cvToString, uintCV } from "@stacks/transactions";
+import { Accounts, Constants } from "../../constants";
 import {
   asyncExpectStacksTransactionSuccess,
   buildDevnetNetworkOrchestrator,
@@ -18,19 +18,11 @@ import { broadcastStackSTX } from "../helpers-direct-stacking";
 import {
   broadcastDelegateSTX,
   broadcastDelegateStackExtend,
-  broadcastDelegateStackIncrease,
   broadcastStackAggregationCommitIndexed,
 } from "../helpers-pooled-stacking";
-import { poxAddressToBtcAddress } from "@stacks/stacking";
 
 describe("testing mixed direct and pooled stacking with extend under epoch 2.1", () => {
   let orchestrator: DevnetNetworkOrchestrator;
-  let timeline = {
-    epoch_2_0: 100,
-    epoch_2_05: 102,
-    epoch_2_1: 106,
-    pox_2_activation: 109,
-  };
   const fee = 1000;
 
   beforeAll(() => {
@@ -50,31 +42,20 @@ describe("testing mixed direct and pooled stacking with extend under epoch 2.1",
     // Wait for block N+1 where N is the height of the next reward phase
     await waitForNextRewardPhase(network, orchestrator, 1);
 
-    const blockHeight = timeline.pox_2_activation + 1;
+    const blockHeight = Constants.DEVNET_DEFAULT_POX_2_ACTIVATION + 1;
     const cycles = 1;
 
     // Alice stacks 75m STX
     let response = await broadcastStackSTX(
-      2,
-      network,
-      75_000_000_000_000,
-      Accounts.WALLET_1,
-      blockHeight,
-      cycles,
-      fee,
-      0
+      { poxVersion: 2, network, account: Accounts.WALLET_1, fee, nonce: 0 },
+      { amount: 75_000_000_000_000, blockHeight, cycles }
     );
     expect(response.error).toBeUndefined();
 
     // Alice delegates 100m to Bob
     response = await broadcastDelegateSTX(
-      2,
-      network,
-      Accounts.WALLET_1,
-      fee,
-      1,
-      100_000_000_000_000,
-      Accounts.WALLET_2
+      { poxVersion: 2, network, account: Accounts.WALLET_1, fee, nonce: 1 },
+      { amount: 100_000_000_000_000, poolAddress: Accounts.WALLET_2 }
     );
     expect(response.error).toBeUndefined();
     let [block, tx] = await waitForStacksTransaction(
@@ -85,14 +66,12 @@ describe("testing mixed direct and pooled stacking with extend under epoch 2.1",
 
     // Bob extends delegation by 1 cycle
     response = await broadcastDelegateStackExtend(
-      2,
-      network,
-      Accounts.WALLET_2,
-      fee,
-      0,
-      Accounts.WALLET_1,
-      Accounts.WALLET_2,
-      1
+      { poxVersion: 2, network, account: Accounts.WALLET_2, fee, nonce: 0 },
+      {
+        stacker: Accounts.WALLET_1,
+        poolRewardAccount: Accounts.WALLET_2,
+        extendByCount: 1,
+      }
     );
     expect(response.error).toBeUndefined();
 
@@ -102,13 +81,8 @@ describe("testing mixed direct and pooled stacking with extend under epoch 2.1",
     // Bob commits 75m for cycle #3
     // delegate-stack-extend only locks for the cycles after the current stacking
     response = await broadcastStackAggregationCommitIndexed(
-      2,
-      network,
-      Accounts.WALLET_2,
-      fee,
-      1,
-      Accounts.WALLET_2,
-      3
+      { poxVersion: 2, network, account: Accounts.WALLET_2, fee, nonce: 1 },
+      { poolRewardAccount: Accounts.WALLET_2, cycleId: 3 }
     );
     expect(response.error).toBeUndefined();
 
@@ -142,19 +116,13 @@ describe("testing mixed direct and pooled stacking with extend under epoch 2.1",
   it("stacking more should increase the slot price (cycle #1)", async () => {
     const network = new StacksTestnet({ url: orchestrator.getStacksNodeUrl() });
 
-    const blockHeight = timeline.pox_2_activation + 1;
+    const blockHeight = Constants.DEVNET_DEFAULT_POX_2_ACTIVATION + 1;
     const cycles = 1;
 
     // Faucet stacks 900m (1/4 of liquid suply)
     let response = await broadcastStackSTX(
-      2,
-      network,
-      900_000_000_000_000,
-      Accounts.FAUCET,
-      blockHeight,
-      cycles,
-      fee,
-      0
+      { poxVersion: 2, network, account: Accounts.FAUCET, fee, nonce: 0 },
+      { amount: 900_000_000_000_000, blockHeight, cycles }
     );
     expect(response.error).toBeUndefined();
 
@@ -224,19 +192,13 @@ describe("testing mixed direct and pooled stacking with extend under epoch 2.1",
 
   it("stacking by other user should activate pox for cycle #3 (cycle #2)", async () => {
     const network = new StacksTestnet({ url: orchestrator.getStacksNodeUrl() });
-    const blockHeight = timeline.pox_2_activation + 11;
+    const blockHeight = Constants.DEVNET_DEFAULT_POX_2_ACTIVATION + 11;
     const cycles = 1;
 
     // Cloe stacks 80m
     let response = await broadcastStackSTX(
-      2,
-      network,
-      80_000_000_000_000,
-      Accounts.WALLET_3,
-      blockHeight,
-      cycles,
-      fee,
-      0
+      { poxVersion: 2, network, account: Accounts.WALLET_3, fee, nonce: 0 },
+      { amount: 80_000_000_000_000, blockHeight, cycles }
     );
     expect(response.error).toBeUndefined();
     await asyncExpectStacksTransactionSuccess(orchestrator, response.txid);

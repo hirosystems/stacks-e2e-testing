@@ -1,7 +1,7 @@
 import { DevnetNetworkOrchestrator } from "@hirosystems/stacks-devnet-js";
 import { StacksTestnet } from "@stacks/network";
-import { ClarityValue, uintCV } from "@stacks/transactions";
-import { Accounts } from "../../constants";
+import { uintCV } from "@stacks/transactions";
+import { Accounts, Constants } from "../../constants";
 import {
   buildDevnetNetworkOrchestrator,
   getNetworkIdFromEnv,
@@ -21,12 +21,6 @@ import {
 
 describe("testing solo stacker increase with bug", () => {
   let orchestrator: DevnetNetworkOrchestrator;
-  let timeline = {
-    epoch_2_0: 100,
-    epoch_2_05: 102,
-    epoch_2_1: 106,
-    pox_2_activation: 109,
-  };
 
   beforeAll(() => {
     orchestrator = buildDevnetNetworkOrchestrator(getNetworkIdFromEnv());
@@ -45,20 +39,14 @@ describe("testing solo stacker increase with bug", () => {
     // Wait for block N+1 where N is the height of the next reward phase
     await waitForNextRewardPhase(network, orchestrator, 1);
 
-    const blockHeight = timeline.pox_2_activation + 1;
+    const blockHeight = Constants.DEVNET_DEFAULT_POX_2_ACTIVATION + 1;
     const fee = 1000;
     const cycles = 1;
 
     // Faucet stacks 900m (1/4 of liquid suply)
     let response = await broadcastStackSTX(
-      2,
-      network,
-      900_000_000_000_001,
-      Accounts.FAUCET,
-      blockHeight,
-      cycles,
-      fee,
-      0
+      { poxVersion: 2, network, account: Accounts.FAUCET, fee, nonce: 0 },
+      { amount: 900_000_000_000_001, blockHeight, cycles }
     );
     expect(response.error).toBeUndefined();
 
@@ -67,24 +55,15 @@ describe("testing solo stacker increase with bug", () => {
 
     // Bob stacks 80m
     response = await broadcastStackSTX(
-      2,
-      network,
-      80_000_000_000_010,
-      Accounts.WALLET_2,
-      blockHeight,
-      cycles,
-      fee,
-      0
+      { poxVersion: 2, network, account: Accounts.WALLET_2, fee, nonce: 0 },
+      { amount: 80_000_000_000_010, blockHeight, cycles }
     );
     expect(response.error).toBeUndefined();
 
     // Bob increases by 10m
     response = await broadcastStackIncrease(
-      network,
-      10_000_000_000_100,
-      Accounts.WALLET_2,
-      fee,
-      1
+      { network, account: Accounts.WALLET_2, fee, nonce: 1 },
+      { amount: 10000000000100 }
     );
     expect(response.error).toBeUndefined();
     // let Bobx's stacking confirm to enforce reward index 1
@@ -92,24 +71,20 @@ describe("testing solo stacker increase with bug", () => {
 
     // Cloe stacks 80m
     response = await broadcastStackSTX(
-      2,
-      network,
-      80_000_000_001_000,
-      Accounts.WALLET_3,
-      blockHeight,
-      cycles,
-      fee,
-      0
+      { poxVersion: 2, network, account: Accounts.WALLET_3, fee, nonce: 0 },
+      { amount: 80_000_000_001_000, blockHeight, cycles }
     );
     expect(response.error).toBeUndefined();
 
     // Cloe increases by 10m
     response = await broadcastStackIncrease(
-      network,
-      10_000_000_010_000,
-      Accounts.WALLET_3,
-      fee,
-      1
+      {
+        network,
+        account: Accounts.WALLET_3,
+        fee,
+        nonce: 1,
+      },
+      { amount: 10_000_000_010_000 }
     );
     expect(response.error).toBeUndefined();
     await orchestrator.waitForStacksBlockIncludingTransaction(response.txid);

@@ -1,6 +1,6 @@
 import { DevnetNetworkOrchestrator } from "@hirosystems/stacks-devnet-js";
 import { StacksTestnet } from "@stacks/network";
-import { Accounts } from "../../constants";
+import { Accounts, Constants } from "../../constants";
 import {
   buildDevnetNetworkOrchestrator,
   getNetworkIdFromEnv,
@@ -18,12 +18,6 @@ import {
 
 describe("testing solo stacker increase without bug", () => {
   let orchestrator: DevnetNetworkOrchestrator;
-  let timeline = {
-    epoch_2_0: 100,
-    epoch_2_05: 102,
-    epoch_2_1: 106,
-    pox_2_activation: 109,
-  };
 
   beforeAll(() => {
     orchestrator = buildDevnetNetworkOrchestrator(getNetworkIdFromEnv());
@@ -42,40 +36,33 @@ describe("testing solo stacker increase without bug", () => {
     // Wait for block N+1 where N is the height of the next reward phase
     await waitForNextRewardPhase(network, orchestrator, 1);
 
-    const blockHeight = timeline.pox_2_activation + 1;
+    const blockHeight = Constants.DEVNET_DEFAULT_POX_2_ACTIVATION + 1;
     const fee = 1000;
     const cycles = 1;
 
     // Bob stacks 30m
     let response = await broadcastStackSTX(
-      2,
-      network,
-      30_000_000_000_010,
-      Accounts.WALLET_2,
-      blockHeight,
-      cycles,
-      fee,
-      0
+      { poxVersion: 2, network, account: Accounts.WALLET_2, fee, nonce: 0 },
+      { amount: 30_000_000_000_010, blockHeight, cycles }
     );
     expect(response.error).toBeUndefined();
 
     // Bob increases by 20m
     response = await broadcastStackIncrease(
-      network,
-      20_000_000_000_100,
-      Accounts.WALLET_2,
-      fee,
-      1
+      { network, account: Accounts.WALLET_2, fee, nonce: 1 },
+      { amount: 20_000_000_000_100 }
     );
     expect(response.error).toBeUndefined();
 
     // Bob increases by another 5m
     response = await broadcastStackIncrease(
-      network,
-      5_000_000_001_000,
-      Accounts.WALLET_2,
-      fee,
-      2
+      {
+        network,
+        account: Accounts.WALLET_2,
+        fee,
+        nonce: 2,
+      },
+      { amount: 5_000_000_001_000 }
     );
     expect(response.error).toBeUndefined();
 

@@ -13,18 +13,16 @@ import { Contracts } from "../constants";
 
 import { toBytes } from "@stacks/common";
 import { decodeBtcAddress } from "@stacks/stacking";
-import { Account } from "./helpers";
+import { Account, BroadcastOptions, BroadcastOptionsPox2 } from "./helpers";
 const fetch = require("node-fetch");
 
 export const broadcastStackSTX = async (
-  poxVersion: number,
-  network: StacksNetwork,
-  amount: number,
-  account: Account,
-  blockHeight: number,
-  cycles: number,
-  fee: number,
-  nonce: number
+  { poxVersion, network, account, fee, nonce }: BroadcastOptions,
+  {
+    amount,
+    blockHeight,
+    cycles,
+  }: { amount: number; blockHeight: number; cycles: number }
 ): Promise<TxBroadcastResult> => {
   const { version, data } = decodeBtcAddress(account.btcAddress);
   const address = {
@@ -56,11 +54,8 @@ export const broadcastStackSTX = async (
 };
 
 export const broadcastStackIncrease = async (
-  network: StacksNetwork,
-  amount: number,
-  account: Account,
-  fee: number,
-  nonce: number
+  { network, account, fee, nonce }: BroadcastOptionsPox2,
+  { amount }: { amount: number }
 ): Promise<TxBroadcastResult> => {
   const txOptions = {
     contractAddress: Contracts.POX_2.address,
@@ -81,11 +76,8 @@ export const broadcastStackIncrease = async (
 };
 
 export const broadcastStackExtend = async (
-  network: StacksNetwork,
-  account: Account,
-  cycles: number,
-  fee: number,
-  nonce: number
+  { network, account, fee, nonce }: BroadcastOptionsPox2,
+  { cycles }: { cycles: number }
 ): Promise<TxBroadcastResult> => {
   const { version, data } = decodeBtcAddress(account.btcAddress);
   const address = {

@@ -1,32 +1,22 @@
+import { DevnetNetworkOrchestrator } from "@hirosystems/stacks-devnet-js";
+import { StacksTestnet } from "@stacks/network";
+import { Accounts, Constants } from "../../constants";
 import {
+  DEFAULT_EPOCH_TIMELINE,
   buildDevnetNetworkOrchestrator,
   getBitcoinBlockHeight,
   getNetworkIdFromEnv,
 } from "../../helpers";
-import {
-  waitForNextPreparePhase,
-  waitForNextRewardPhase,
-  getPoxInfo,
-  getAccount,
-} from "../helpers";
-import { Accounts } from "../../constants";
-import { StacksTestnet } from "@stacks/network";
-import { DevnetNetworkOrchestrator } from "@hirosystems/stacks-devnet-js";
+import { getAccount, getPoxInfo, waitForNextRewardPhase } from "../helpers";
 import { broadcastStackSTX } from "../helpers-direct-stacking";
 
 describe("testing stacking under epoch 2.0", () => {
   let orchestrator: DevnetNetworkOrchestrator;
-  let timeline = {
-    epoch_2_0: 100,
-    epoch_2_05: 102,
-    epoch_2_1: 122,
-    pox_2_activation: 130,
-  };
 
   beforeAll(() => {
     orchestrator = buildDevnetNetworkOrchestrator(
       getNetworkIdFromEnv(),
-      timeline
+      DEFAULT_EPOCH_TIMELINE
     );
     orchestrator.start();
   });
@@ -59,47 +49,29 @@ describe("testing stacking under epoch 2.0", () => {
     blockHeight += 1;
 
     // Broadcast some STX stacking orders
-    let fee = 1000;
+    const fee = 1000;
 
     // WALLET_1 locking for 1 cycle
     let stackedByWallet1 = 25_000_000_000_000;
     let response = await broadcastStackSTX(
-      1,
-      network,
-      stackedByWallet1,
-      Accounts.WALLET_1,
-      blockHeight,
-      1,
-      fee,
-      0
+      { poxVersion: 1, network, account: Accounts.WALLET_1, fee, nonce: 0 },
+      { amount: stackedByWallet1, blockHeight, cycles: 1 }
     );
     expect(response.error).toBeUndefined();
 
     // WALLET_2 locking for 6 cycle
     let stackedByWallet2 = 50_000_000_000_000;
     response = await broadcastStackSTX(
-      1,
-      network,
-      stackedByWallet2,
-      Accounts.WALLET_2,
-      blockHeight,
-      6,
-      fee,
-      0
+      { poxVersion: 1, network, account: Accounts.WALLET_2, fee, nonce: 0 },
+      { amount: stackedByWallet2, blockHeight, cycles: 6 }
     );
     expect(response.error).toBeUndefined();
 
     // WALLET_3 locking for 12 cycle
     let stackedByWallet3 = 75_000_000_000_000;
     response = await broadcastStackSTX(
-      1,
-      network,
-      stackedByWallet3,
-      Accounts.WALLET_3,
-      blockHeight,
-      12,
-      fee,
-      0
+      { poxVersion: 1, network, account: Accounts.WALLET_3, fee, nonce: 0 },
+      { amount: stackedByWallet3, blockHeight, cycles: 12 }
     );
     expect(response.error).toBeUndefined();
 
@@ -138,7 +110,7 @@ describe("testing stacking under epoch 2.0", () => {
 
     // Wait for next PoX cycle (Bitcoin block #121)
     await orchestrator.waitForStacksBlockAnchoredOnBitcoinBlockOfHeight(
-      timeline.pox_2_activation + 1
+      Constants.DEVNET_DEFAULT_POX_2_ACTIVATION + 1
     );
     poxInfo = await getPoxInfo(network);
 

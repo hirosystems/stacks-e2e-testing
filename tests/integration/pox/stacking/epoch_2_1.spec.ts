@@ -1,6 +1,6 @@
 import { DevnetNetworkOrchestrator } from "@hirosystems/stacks-devnet-js";
 import { StacksTestnet } from "@stacks/network";
-import { Accounts } from "../../constants";
+import { Accounts, Constants } from "../../constants";
 import {
   buildDevnetNetworkOrchestrator,
   getNetworkIdFromEnv,
@@ -10,12 +10,6 @@ import { broadcastStackSTX } from "../helpers-direct-stacking";
 
 describe("testing stacking under epoch 2.1", () => {
   let orchestrator: DevnetNetworkOrchestrator;
-  let timeline = {
-    epoch_2_0: 100,
-    epoch_2_05: 101,
-    epoch_2_1: 103,
-    pox_2_activation: 110,
-  };
 
   beforeAll(() => {
     orchestrator = buildDevnetNetworkOrchestrator(getNetworkIdFromEnv());
@@ -33,7 +27,7 @@ describe("testing stacking under epoch 2.1", () => {
     await orchestrator.waitForNextStacksBlock();
 
     // Wait for block N-2 where N is the height of the next prepare phase
-    let blockHeight = timeline.pox_2_activation + 1;
+    let blockHeight = Constants.DEVNET_DEFAULT_POX_2_ACTIVATION + 1;
     let chainUpdate =
       await orchestrator.waitForStacksBlockAnchoredOnBitcoinBlockOfHeight(
         blockHeight
@@ -43,38 +37,20 @@ describe("testing stacking under epoch 2.1", () => {
     let fee = 1000;
     let cycles = 1;
     let response = await broadcastStackSTX(
-      2,
-      network,
-      25_000_000_000_000,
-      Accounts.WALLET_1,
-      blockHeight,
-      cycles,
-      fee,
-      0
+      { poxVersion: 2, network, account: Accounts.WALLET_1, fee, nonce: 0 },
+      { amount: 25_000_000_000_000, blockHeight, cycles }
     );
     expect(response.error).toBeUndefined();
 
     response = await broadcastStackSTX(
-      2,
-      network,
-      50_000_000_000_000,
-      Accounts.WALLET_2,
-      blockHeight,
-      cycles,
-      fee,
-      0
+      { poxVersion: 2, network, account: Accounts.WALLET_2, fee, nonce: 0 },
+      { amount: 50_000_000_000_000, blockHeight, cycles }
     );
     expect(response.error).toBeUndefined();
 
     response = await broadcastStackSTX(
-      2,
-      network,
-      75_000_000_000_000,
-      Accounts.WALLET_3,
-      blockHeight,
-      cycles,
-      fee,
-      0
+      { poxVersion: 2, network, account: Accounts.WALLET_3, fee, nonce: 0 },
+      { amount: 75_000_000_000_000, blockHeight, cycles }
     );
     expect(response.error).toBeUndefined();
 

@@ -1,7 +1,7 @@
 import { DevnetNetworkOrchestrator } from "@hirosystems/stacks-devnet-js";
 import { StacksTestnet } from "@stacks/network";
 import { uintCV } from "@stacks/transactions";
-import { Accounts } from "../../constants";
+import { Accounts, Constants } from "../../constants";
 import {
   buildDevnetNetworkOrchestrator,
   getNetworkIdFromEnv,
@@ -22,12 +22,6 @@ import {
 
 describe("testing direct stacker as pool operator without auto-unlock under epoch 2.1", () => {
   let orchestrator: DevnetNetworkOrchestrator;
-  let timeline = {
-    epoch_2_0: 100,
-    epoch_2_05: 102,
-    epoch_2_1: 106,
-    pox_2_activation: 109,
-  };
   const fee = 1000;
 
   beforeAll(() => {
@@ -47,31 +41,20 @@ describe("testing direct stacker as pool operator without auto-unlock under epoc
     // Wait for block N+1 where N is the height of the next reward phase
     await waitForNextRewardPhase(network, orchestrator, 1);
 
-    const blockHeight = timeline.pox_2_activation + 1;
+    const blockHeight = Constants.DEVNET_DEFAULT_POX_2_ACTIVATION + 1;
     const cycles = 1;
 
     // Alice stacks 80m STX
     let response = await broadcastStackSTX(
-      2,
-      network,
-      80_000_000_000_000,
-      Accounts.WALLET_1,
-      blockHeight,
-      cycles,
-      fee,
-      0
+      { poxVersion: 2, network, account: Accounts.WALLET_1, fee, nonce: 0 },
+      { amount: 80_000_000_000_000, blockHeight, cycles }
     );
     expect(response.error).toBeUndefined();
 
     // Faucet delegates 999m to Alice address
     response = await broadcastDelegateSTX(
-      2,
-      network,
-      Accounts.FAUCET,
-      fee,
-      0,
-      999_000_000_000_000,
-      Accounts.WALLET_1
+      { poxVersion: 2, network, account: Accounts.FAUCET, fee, nonce: 0 },
+      { amount: 999000000000000, poolAddress: Accounts.WALLET_1 }
     );
     expect(response.error).toBeUndefined();
     let [block, tx] = await waitForStacksTransaction(
@@ -82,16 +65,14 @@ describe("testing direct stacker as pool operator without auto-unlock under epoc
 
     // Alice locks 999m as pool operator
     response = await broadcastDelegateStackSTX(
-      2,
-      network,
-      Accounts.WALLET_1,
-      fee,
-      1,
-      Accounts.FAUCET,
-      999_000_000_000_000,
-      Accounts.WALLET_1,
-      blockHeight,
-      1
+      { poxVersion: 2, network, account: Accounts.WALLET_1, fee, nonce: 1 },
+      {
+        stacker: Accounts.FAUCET,
+        amount: 999000000000000,
+        poolRewardAccount: Accounts.WALLET_1,
+        startBurnHeight: blockHeight,
+        lockPeriodCycles: 1,
+      }
     );
     expect(response.error).toBeUndefined();
     [block, tx] = await waitForStacksTransaction(orchestrator, response.txid);
@@ -99,13 +80,8 @@ describe("testing direct stacker as pool operator without auto-unlock under epoc
 
     // Alice commits 999m
     response = await broadcastStackAggregationCommitIndexed(
-      2,
-      network,
-      Accounts.WALLET_1,
-      fee,
-      2,
-      Accounts.WALLET_1,
-      2
+      { poxVersion: 2, network, account: Accounts.WALLET_1, fee, nonce: 2 },
+      { poolRewardAccount: Accounts.WALLET_1, cycleId: 2 }
     );
     expect(response.error).toBeUndefined();
 

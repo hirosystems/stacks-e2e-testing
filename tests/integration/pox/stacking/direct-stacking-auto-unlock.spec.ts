@@ -1,6 +1,7 @@
 import { DevnetNetworkOrchestrator } from "@hirosystems/stacks-devnet-js";
-import { StacksNetwork, StacksTestnet } from "@stacks/network";
-import { Accounts } from "../../constants";
+import { StacksTestnet } from "@stacks/network";
+import { uintCV } from "@stacks/transactions";
+import { Accounts, Constants } from "../../constants";
 import {
   buildDevnetNetworkOrchestrator,
   getNetworkIdFromEnv,
@@ -12,20 +13,10 @@ import {
   readRewardCyclePoxAddressForAddress,
   waitForNextRewardPhase,
 } from "../helpers";
-import {
-  broadcastStackIncrease,
-  broadcastStackSTX,
-} from "../helpers-direct-stacking";
-import { uintCV } from "@stacks/transactions";
+import { broadcastStackSTX } from "../helpers-direct-stacking";
 
 describe("testing solo stacker below minimum", () => {
   let orchestrator: DevnetNetworkOrchestrator;
-  let timeline = {
-    epoch_2_0: 100,
-    epoch_2_05: 102,
-    epoch_2_1: 106,
-    pox_2_activation: 109,
-  };
   const fee = 1000;
 
   beforeAll(() => {
@@ -45,19 +36,13 @@ describe("testing solo stacker below minimum", () => {
     // Wait for block N+1 where N is the height of the next reward phase
     await waitForNextRewardPhase(network, orchestrator, 1);
 
-    const blockHeight = timeline.pox_2_activation + 1;
+    const blockHeight = Constants.DEVNET_DEFAULT_POX_2_ACTIVATION + 1;
     const cycles = 1;
 
     // Alice stacks 80m
     let response = await broadcastStackSTX(
-      2,
-      network,
-      80_000_000_000_000,
-      Accounts.WALLET_1,
-      blockHeight,
-      cycles,
-      fee,
-      0
+      { poxVersion: 2, network, account: Accounts.WALLET_1, fee, nonce: 0 },
+      { amount: 80_000_000_000_000, blockHeight, cycles }
     );
     expect(response.error).toBeUndefined();
     let [block, tx] = await waitForStacksTransaction(
@@ -68,14 +53,8 @@ describe("testing solo stacker below minimum", () => {
 
     // Faucet stacks 999m
     response = await broadcastStackSTX(
-      2,
-      network,
-      999_000_000_000_000,
-      Accounts.FAUCET,
-      blockHeight,
-      cycles,
-      fee,
-      0
+      { poxVersion: 2, network, account: Accounts.FAUCET, fee, nonce: 0 },
+      { amount: 999_000_000_000_000, blockHeight, cycles }
     );
     expect(response.error).toBeUndefined();
 

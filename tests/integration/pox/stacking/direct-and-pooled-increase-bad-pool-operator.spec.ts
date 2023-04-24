@@ -1,6 +1,6 @@
 import { DevnetNetworkOrchestrator } from "@hirosystems/stacks-devnet-js";
 import { StacksTestnet } from "@stacks/network";
-import { Accounts } from "../../constants";
+import { Accounts, Constants } from "../../constants";
 import {
   buildDevnetNetworkOrchestrator,
   getNetworkIdFromEnv,
@@ -15,12 +15,6 @@ import {
 
 describe("testing stacker who is a bad pool operator under epoch 2.1", () => {
   let orchestrator: DevnetNetworkOrchestrator;
-  let timeline = {
-    epoch_2_0: 100,
-    epoch_2_05: 102,
-    epoch_2_1: 106,
-    pox_2_activation: 109,
-  };
   const fee = 1000;
 
   beforeAll(() => {
@@ -40,31 +34,20 @@ describe("testing stacker who is a bad pool operator under epoch 2.1", () => {
     // Wait for block N+1 where N is the height of the next reward phase
     await waitForNextRewardPhase(network, orchestrator, 1);
 
-    const blockHeight = timeline.pox_2_activation + 1;
+    const blockHeight = Constants.DEVNET_DEFAULT_POX_2_ACTIVATION + 1;
     const cycles = 1;
 
     // Alice stacks 90m STX
     let response = await broadcastStackSTX(
-      2,
-      network,
-      90_000_000_000_000,
-      Accounts.WALLET_1,
-      blockHeight,
-      cycles,
-      fee,
-      0
+      { poxVersion: 2, network, account: Accounts.WALLET_1, fee, nonce: 0 },
+      { amount: 90_000_000_000_000, blockHeight, cycles }
     );
     expect(response.error).toBeUndefined();
 
     // Bob delegates 80m to Alice address
     response = await broadcastDelegateSTX(
-      2,
-      network,
-      Accounts.WALLET_2,
-      fee,
-      0,
-      80_000_000_000_000,
-      Accounts.WALLET_1
+      { poxVersion: 2, network, account: Accounts.WALLET_2, fee, nonce: 0 },
+      { amount: 80000000000000, poolAddress: Accounts.WALLET_1 }
     );
     expect(response.error).toBeUndefined();
     let [block, tx] = await waitForStacksTransaction(
@@ -75,14 +58,12 @@ describe("testing stacker who is a bad pool operator under epoch 2.1", () => {
 
     // Alice tries to increase Bob's delegation by 80m
     response = await broadcastDelegateStackIncrease(
-      2,
-      network,
-      Accounts.WALLET_1,
-      fee,
-      1,
-      Accounts.WALLET_2,
-      Accounts.WALLET_1,
-      80_000_000_000_000
+      { poxVersion: 2, network, account: Accounts.WALLET_1, fee, nonce: 1 },
+      {
+        stacker: Accounts.WALLET_2,
+        poolRewardAccount: Accounts.WALLET_1,
+        increaseByAmountUstx: 80000000000000,
+      }
     );
     expect(response.error).toBeUndefined();
     [block, tx] = await waitForStacksTransaction(orchestrator, response.txid);

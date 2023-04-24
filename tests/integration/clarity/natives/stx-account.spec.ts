@@ -11,7 +11,6 @@ import { StacksNetwork, StacksTestnet } from "@stacks/network";
 import { Accounts, Constants } from "../../constants";
 import { DevnetNetworkOrchestrator } from "@hirosystems/stacks-devnet-js";
 import {
-  broadcastStackSTX,
   getPoxInfo,
   waitForNextPreparePhase,
   waitForNextRewardPhase,
@@ -24,6 +23,7 @@ import {
   getChainInfo,
 } from "../../helpers";
 import { principalCV } from "@stacks/transactions/dist/clarity/types/principalCV";
+import { broadcastStackSTX } from "../../pox/helpers-direct-stacking";
 
 describe("stx-account", () => {
   let orchestrator: DevnetNetworkOrchestrator;
@@ -337,14 +337,14 @@ describe("stx-account", () => {
       // Broadcast some STX stacking orders
       let cycles = 12;
       let response = await broadcastStackSTX(
-        2,
-        network,
-        25_000_000_000_000,
-        Accounts.WALLET_1,
-        blockHeight,
-        cycles,
-        1000,
-        5
+        {
+          poxVersion: 2,
+          network,
+          account: Accounts.WALLET_1,
+          fee: 1000,
+          nonce: 1,
+        },
+        { amount: 25_000_000_000_000, blockHeight, cycles: 5 }
       );
       expect(response.error).toBeUndefined();
 
