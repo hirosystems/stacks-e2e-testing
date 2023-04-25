@@ -3,8 +3,11 @@ export namespace Constants {
   export const DEVNET_DEFAULT_EPOCH_2_05 = 102;
   export const DEVNET_DEFAULT_EPOCH_2_1 = 106;
   export const DEVNET_DEFAULT_POX_2_ACTIVATION = 110;
-  export const DEVNET_DEFAULT_EPOCH_2_2 = 120;
+  export const DEVNET_DEFAULT_EPOCH_2_2 = 122;
+  export const DEVNET_DEFAULT_POX_2_UNLOCK_HEIGHT = 123;
   export const BITCOIN_BLOCK_TIME = 10_000;
+
+  export const PROPOSED_2_2_STACKS_NODE_IMAGE_URL = "blockstack/stacks-blockchain:sip-022-pox-disable-devnet";
 }
 
 export namespace Contracts {

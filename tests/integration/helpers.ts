@@ -7,6 +7,13 @@ import {
 } from "@hirosystems/stacks-devnet-js";
 import { StacksNetwork } from "@stacks/network";
 import { Constants } from "./constants";
+import {
+  AnchorMode,
+  TxBroadcastResult,
+  broadcastTransaction,
+  makeContractCall,
+  makeSTXTokenTransfer,
+} from "@stacks/transactions";
 const fetch = require("node-fetch");
 
 interface EpochTimeline {
@@ -15,6 +22,7 @@ interface EpochTimeline {
   epoch_2_1: number;
   pox_2_activation: number;
   epoch_2_2: number;
+  pox_2_unlock_height: number;
 }
 
 export const DEFAULT_EPOCH_TIMELINE = {
@@ -23,6 +31,7 @@ export const DEFAULT_EPOCH_TIMELINE = {
   epoch_2_1: Constants.DEVNET_DEFAULT_EPOCH_2_1,
   pox_2_activation: Constants.DEVNET_DEFAULT_POX_2_ACTIVATION,
   epoch_2_2: Constants.DEVNET_DEFAULT_EPOCH_2_2,
+  pox_2_unlock_height: Constants.DEVNET_DEFAULT_POX_2_UNLOCK_HEIGHT,
 };
 
 export function buildDevnetNetworkOrchestrator(
@@ -43,10 +52,13 @@ export function buildDevnetNetworkOrchestrator(
       epoch_2_1: timeline.epoch_2_1,
       pox_2_activation: timeline.pox_2_activation,
       epoch_2_2: timeline.epoch_2_2,
+      pox_2_unlock_height: timeline.pox_2_unlock_height,
       bitcoin_controller_automining_disabled: false,
       working_dir,
       use_docker_gateway_routing: process.env.GITHUB_ACTIONS ? true : false,
-      ...(typeof stacks_node_image_url !== 'undefined' && { stacks_node_image_url }),
+      ...(typeof stacks_node_image_url !== "undefined" && {
+        stacks_node_image_url,
+      }),
     },
   };
   let consolidatedConfig = getIsolatedNetworkConfigUsingNetworkId(
@@ -104,6 +116,35 @@ export const getChainInfo = async (
   }
 };
 
+export interface AccountInfo {
+  balance: number;
+  locked: number;
+  unlock_height: number;
+  nonce: number;
+}
+
+export const getAccountInfo = async (
+  network: StacksNetwork,
+  address: string,
+  retry?: number
+): Promise<AccountInfo> => {
+  let retryCountdown = retry ? retry : 20;
+  if (retryCountdown == 0) return Promise.reject();
+  try {
+    let response = await fetch(network.getAccountApiUrl(address), {});
+    let info = await response.json();
+    return {
+      balance: parseInt(info.balance),
+      locked: parseInt(info.locked),
+      unlock_height: parseInt(info.unlock_height),
+      nonce: parseInt(info.nonce),
+    };
+  } catch (e) {
+    await delay();
+    return await getAccountInfo(network, address, retryCountdown - 1);
+  }
+};
+
 export async function asyncExpectStacksTransactionSuccess(
   orchestrator: DevnetNetworkOrchestrator,
   txid: string
@@ -112,3 +153,36 @@ export async function asyncExpectStacksTransactionSuccess(
   expect(tx.success, tx.result).toBeTruthy();
   return [block, tx];
 }
+
+export interface Account {
+  stxAddress: string;
+  btcAddress: string;
+  secretKey: string;
+}
+
+export interface BroadcastOptions {
+  network: StacksNetwork;
+  account: Account;
+  fee: number;
+  nonce: number;
+}
+
+export const broadcastSTXTransfer = async (
+  { network, account, fee, nonce }: BroadcastOptions,
+  { recipient, amount }: { recipient: string; amount: number }
+): Promise<TxBroadcastResult> => {
+  const txOptions = {
+    recipient,
+    amount,
+    senderKey: account.secretKey,
+    network,
+    nonce,
+    fee,
+    anchorMode: AnchorMode.Any,
+  };
+  const tx = await makeSTXTokenTransfer(txOptions);
+
+  // Broadcast transaction to our Devnet stacks node
+  const result = await broadcastTransaction(tx, network);
+  return result;
+};

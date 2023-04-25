@@ -863,7 +863,7 @@
     ripemd160-min "^0.0.6"
     varuint-bitcoin "^1.1.2"
 
-"@stacks/network@^6.0.0", "@stacks/network@^6.3.0":
+"@stacks/network@^6.3.0":
   version "6.3.0"
   resolved "https://registry.yarnpkg.com/@stacks/network/-/network-6.3.0.tgz#6ce412dd06bfa2128b62fe9d8f6bf8518f542953"
   integrity sha512-573ZldQ+Iy0nCCxprXLLvkAo1AMEXncfmMUvqQ+5TN3m7VqCVADtb5G5WzMZsyR4m/k9oPsv076Lmqyl8AtR2A==
@@ -871,7 +871,7 @@
     "@stacks/common" "^6.0.0"
     cross-fetch "^3.1.5"
 
-"@stacks/stacking@^6.0.0":
+"@stacks/stacking@^6.0.2":
   version "6.5.0"
   resolved "https://registry.yarnpkg.com/@stacks/stacking/-/stacking-6.5.0.tgz#798e9649ae6acf90363d37376685ac2907ed39c4"
   integrity sha512-Kb8FK+NxEFDXP2r9xXGdeR7cZp52Cz5btpW4xKAEM7Ze3QPB6cM8IALvMBh3e53qqw8sO/dpRqcIjrNgLf5gqg==
@@ -889,7 +889,7 @@
   resolved "https://registry.yarnpkg.com/@stacks/stacks-blockchain-api-types/-/stacks-blockchain-api-types-0.61.0.tgz#f8bc61ad7781fdc0d9e9db711580db984f164e93"
   integrity sha512-yPOfTUboo5eA9BZL/hqMcM71GstrFs9YWzOrJFPeP4cOO1wgYvAcckgBRbgiE3NqeX0A7SLZLDAXLZbATuRq9w==
 
-"@stacks/transactions@^6.0.0", "@stacks/transactions@^6.5.0":
+"@stacks/transactions@^6.5.0":
   version "6.5.0"
   resolved "https://registry.yarnpkg.com/@stacks/transactions/-/transactions-6.5.0.tgz#ec6bd94b21fe34683b53af28fcaeaf9cac093bdd"
   integrity sha512-kwE8cZq+QdAum4/LC+lSlAXVvzkdsSHTkCbfg4+VCWPBqA+gdXEqZe6R9SNBtMb8yGQrqUY8uIGRLVCWcXJ8zQ==
