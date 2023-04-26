@@ -60,12 +60,12 @@ describe("testing pooled stacking under epoch 2.1", () => {
     );
     expect(response.error).toBeUndefined();
 
-    // Cloe locks 30m for Alice
+    // Cloe locks 80m for Alice
     response = await broadcastDelegateStackSTX(
       { poxVersion: 2, network, account: Accounts.WALLET_3, fee, nonce: 0 },
       {
         stacker: Accounts.WALLET_1,
-        amount: 80000000000000,
+        amount: 80_000_000_000_000,
         poolRewardAccount: Accounts.WALLET_3,
         startBurnHeight: Constants.DEVNET_DEFAULT_POX_2_ACTIVATION + 6,
         lockPeriodCycles: 1,
@@ -156,7 +156,7 @@ describe("testing pooled stacking under epoch 2.1", () => {
 
     let poxInfo = await getPoxInfo(network);
 
-    // Assert that the next cycle has 80m STX locked
+    // Assert that the next cycle has 130m STX locked
     expect(poxInfo.current_cycle.id).toBe(1);
     expect(poxInfo.current_cycle.stacked_ustx).toBe(0);
     expect(poxInfo.current_cycle.is_pox_active).toBe(false);

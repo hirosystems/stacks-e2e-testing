@@ -18,13 +18,11 @@ import {
   ClarityType,
   ClarityValue,
   PrincipalCV,
-  someCV,
-  principalCV,
-  noneCV,
   OptionalCV,
 } from "@stacks/transactions";
 
 import { expect } from "vitest";
+import { BroadcastOptions } from "../helpers";
 const fetch = require("node-fetch");
 
 export interface Account {
@@ -33,13 +31,7 @@ export interface Account {
   secretKey: string;
 }
 
-export interface BroadcastOptionsPox2 {
-  network: StacksNetwork;
-  account: Account;
-  fee: number;
-  nonce: number;
-}
-export interface BroadcastOptions extends BroadcastOptionsPox2 {
+export interface BroadcastOptionsPox extends BroadcastOptions {
   poxVersion: number;
 }
 

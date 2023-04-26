@@ -15,11 +15,12 @@ import { Contracts } from "../constants";
 
 import { toBytes } from "@stacks/common";
 import { decodeBtcAddress } from "@stacks/stacking";
-import { Account, BroadcastOptions, BroadcastOptionsPox2 } from "./helpers";
+import { Account, BroadcastOptionsPox } from "./helpers";
+import { BroadcastOptions } from "../helpers";
 const fetch = require("node-fetch");
 
 export const broadcastDelegateSTX = async (
-  { poxVersion, network, account, fee, nonce }: BroadcastOptions,
+  { poxVersion, network, account, fee, nonce }: BroadcastOptionsPox,
   {
     amount,
     poolAddress,
@@ -77,7 +78,7 @@ export const broadcastRevokeDelegateStx = async ({
   account,
   fee,
   nonce,
-}: BroadcastOptions): Promise<TxBroadcastResult> => {
+}: BroadcastOptionsPox): Promise<TxBroadcastResult> => {
   const txOptions = {
     contractAddress: Contracts.POX_1.address,
     contractName: poxVersion == 1 ? Contracts.POX_1.name : Contracts.POX_2.name,
@@ -97,7 +98,7 @@ export const broadcastRevokeDelegateStx = async ({
 };
 
 export const broadcastDelegateStackSTX = async (
-  { poxVersion, network, account, fee, nonce }: BroadcastOptions,
+  { poxVersion, network, account, fee, nonce }: BroadcastOptionsPox,
   {
     stacker,
     amount,
@@ -143,7 +144,7 @@ export const broadcastDelegateStackSTX = async (
 };
 
 export const broadcastDelegateStackExtend = async (
-  { poxVersion, network, account, fee, nonce }: BroadcastOptions,
+  { poxVersion, network, account, fee, nonce }: BroadcastOptionsPox,
   {
     stacker,
     poolRewardAccount,
@@ -179,7 +180,7 @@ export const broadcastDelegateStackExtend = async (
 };
 
 export const broadcastDelegateStackIncrease = async (
-  { poxVersion, network, account, fee, nonce }: BroadcastOptions,
+  { poxVersion, network, account, fee, nonce }: BroadcastOptionsPox,
   {
     stacker,
     poolRewardAccount,
@@ -231,7 +232,7 @@ export const broadcastDelegateStackIncrease = async (
  * @returns
  */
 export const broadcastStackAggregationCommitIndexed = async (
-  { poxVersion, network, account, fee, nonce }: BroadcastOptions,
+  { poxVersion, network, account, fee, nonce }: BroadcastOptionsPox,
   {
     poolRewardAccount,
     cycleId,
@@ -265,7 +266,7 @@ export const broadcastStackAggregationCommitIndexed = async (
 };
 
 export const broadcastStackAggregationIncrease = async (
-  { network, account, fee, nonce }: BroadcastOptionsPox2,
+  { network, account, fee, nonce }: BroadcastOptions,
   {
     poolRewardAccount,
     cycleId,
