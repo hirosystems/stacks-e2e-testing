@@ -1,26 +1,26 @@
 import { DevnetNetworkOrchestrator } from "@hirosystems/stacks-devnet-js";
 import { StacksTestnet } from "@stacks/network";
-import { Accounts, Constants } from "../../constants";
+import { Accounts, Constants } from "../../../constants";
 import {
   asyncExpectStacksTransactionSuccess,
   broadcastSTXTransfer,
   buildDevnetNetworkOrchestrator,
   getNetworkIdFromEnv,
   waitForStacksTransaction,
-} from "../../helpers";
+} from "../../../helpers";
 import {
   getPoxInfo,
   waitForNextRewardPhase,
   readRewardCyclePoxAddressListAtIndex,
   expectAccountToBe,
-} from "../helpers";
+} from "../../helpers";
 import { uintCV } from "@stacks/transactions";
 import {
   broadcastDelegateSTX,
   broadcastDelegateStackSTX,
   broadcastStackAggregationCommitIndexed,
   broadcastStackAggregationIncrease,
-} from "../helpers-pooled-stacking";
+} from "../../helpers-pooled-stacking";
 
 describe("pooled stacker with pox disable", () => {
   let orchestrator: DevnetNetworkOrchestrator;
