@@ -6,20 +6,19 @@ import {
   asyncExpectStacksTransactionSuccess,
   buildDevnetNetworkOrchestrator,
   getNetworkIdFromEnv,
-  waitForStacksTransaction,
 } from "../../helpers";
 import {
   getPoxInfo,
   readRewardCyclePoxAddressForAddress,
   readRewardCyclePoxAddressListAtIndex,
-  waitForNextRewardPhase
+  waitForNextRewardPhase,
 } from "../helpers";
 import {
   broadcastDelegateSTX,
   broadcastDelegateStackExtend,
   broadcastDelegateStackSTX,
   broadcastRevokeDelegateStx,
-  broadcastStackAggregationCommitIndexed
+  broadcastStackAggregationCommitIndexed,
 } from "../helpers-pooled-stacking";
 
 describe("testing pooled stacking under epoch 2.1", () => {
@@ -62,12 +61,7 @@ describe("testing pooled stacking under epoch 2.1", () => {
       }
     );
     expect(response.error).toBeUndefined();
-
-    let [block, tx] = await waitForStacksTransaction(
-      orchestrator,
-      response.txid
-    );
-    expect(tx.success).toBeTruthy();
+    asyncExpectStacksTransactionSuccess(orchestrator, response.txid);
 
     // Cloe commits 80m
     response = await broadcastStackAggregationCommitIndexed(
@@ -100,10 +94,10 @@ describe("testing pooled stacking under epoch 2.1", () => {
     expect(poxAddrInfo1?.["total-ustx"]).toEqual(uintCV(80_000_000_000_000));
   });
 
-  it("user can swith pools and new pool operator can extend (cycle #1)", async () => {
+  it("user can switch pools and new pool operator can extend (cycle #1)", async () => {
     const network = new StacksTestnet({ url: orchestrator.getStacksNodeUrl() });
 
-    // Alice revokes delegates 90m STX to Bob
+    // Alice revokes, then delegates 90m STX to Bob
     let response = await broadcastRevokeDelegateStx({
       poxVersion: 2,
       network,
@@ -148,7 +142,7 @@ describe("testing pooled stacking under epoch 2.1", () => {
 
     let poxInfo = await getPoxInfo(network);
 
-    // Assert that the next cycle has 130m STX locked
+    // Assert that the next cycle has 80m STX locked
     expect(poxInfo.current_cycle.id).toBe(1);
     expect(poxInfo.current_cycle.stacked_ustx).toBe(0);
     expect(poxInfo.current_cycle.is_pox_active).toBe(false);
