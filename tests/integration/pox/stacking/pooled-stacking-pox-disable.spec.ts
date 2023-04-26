@@ -193,33 +193,36 @@ describe("pooled stacker with pox disable", () => {
     );
 
     // Check Bob's account info
-    const bobInfo = await getAccountInfo(network, Accounts.WALLET_2.stxAddress);
-    expect(bobInfo.balance).toBe(100_000_000_000_000 - bobNonce * fee);
-    expect(bobInfo.locked).toBe(0);
+    await expectAccountToBe(
+      network,
+      Accounts.WALLET_2.stxAddress,
+      100_000_000_000_000 - bobNonce * fee,
+      0
+    );
 
     // Verify that Bob's STX are really unlocked by doing a transfer
     response = await broadcastSTXTransfer(
       { network, account: Accounts.WALLET_2, fee, nonce: bobNonce++ },
       {
-        amount: bobInfo.balance - fee,
+        amount: 100_000_000_000_000 - bobNonce * fee,
         recipient: Accounts.WALLET_3.stxAddress,
       }
     );
     await asyncExpectStacksTransactionSuccess(orchestrator, response.txid);
 
     // Check Alice's account info
-    const aliceInfo = await getAccountInfo(
+    await expectAccountToBe(
       network,
-      Accounts.WALLET_1.stxAddress
+      Accounts.WALLET_1.stxAddress,
+      100_000_000_000_000 - aliceNonce * fee,
+      0
     );
-    expect(aliceInfo.balance).toBe(100_000_000_000_000 - aliceNonce * fee);
-    expect(aliceInfo.locked).toBe(0);
 
     // Verify that Alice's STX are really unlocked by doing a transfer
     response = await broadcastSTXTransfer(
       { network, account: Accounts.WALLET_1, fee, nonce: aliceNonce++ },
       {
-        amount: aliceInfo.balance - fee,
+        amount: 100_000_000_000_000 - aliceNonce * fee,
         recipient: Accounts.WALLET_3.stxAddress,
       }
     );
