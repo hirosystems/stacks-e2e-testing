@@ -5,26 +5,16 @@ import {
   asyncExpectStacksTransactionSuccess,
   broadcastSTXTransfer,
   buildDevnetNetworkOrchestrator,
-  getAccountInfo,
   getNetworkIdFromEnv,
   waitForStacksTransaction,
 } from "../../helpers";
 import {
   getPoxInfo,
   waitForNextRewardPhase,
-  readRewardCyclePoxAddressForAddress,
   readRewardCyclePoxAddressListAtIndex,
+  expectAccountToBe,
 } from "../helpers";
-import {
-  broadcastStackIncrease,
-  broadcastStackSTX,
-} from "../helpers-direct-stacking";
-import {
-  ClarityValue,
-  cvToString,
-  uintCV,
-  makeSTXTokenTransfer,
-} from "@stacks/transactions";
+import { uintCV } from "@stacks/transactions";
 import {
   broadcastDelegateSTX,
   broadcastDelegateStackSTX,
