@@ -5,7 +5,6 @@ import {
   asyncExpectStacksTransactionSuccess,
   broadcastSTXTransfer,
   buildDevnetNetworkOrchestrator,
-  getAccountInfo,
   getNetworkIdFromEnv,
   waitForStacksTransaction,
 } from "../../helpers";
@@ -13,6 +12,7 @@ import {
   getPoxInfo,
   waitForNextRewardPhase,
   readRewardCyclePoxAddressForAddress,
+  expectAccountToBe,
 } from "../helpers";
 import {
   broadcastStackIncrease,
@@ -140,33 +140,36 @@ describe("PoX disable", () => {
     expect(poxInfo.current_cycle.is_pox_active).toBeFalsy();
 
     // Check Bob's account info
-    const bobInfo = await getAccountInfo(network, Accounts.WALLET_2.stxAddress);
-    expect(bobInfo.balance).toBe(100_000_000_000_000 - 2 * fee);
-    expect(bobInfo.locked).toBe(0);
+    await expectAccountToBe(
+      network,
+      Accounts.WALLET_2.stxAddress,
+      100_000_000_000_000 - bobNonce * fee,
+      0
+    );
 
     // Verify that Bob's STX are really unlocked by doing a transfer
     response = await broadcastSTXTransfer(
       { network, account: Accounts.WALLET_2, fee, nonce: bobNonce++ },
       {
-        amount: bobInfo.balance - fee,
+        amount: 100_000_000_000_000 - bobNonce * fee,
         recipient: Accounts.WALLET_3.stxAddress,
       }
     );
     await asyncExpectStacksTransactionSuccess(orchestrator, response.txid);
 
     // Check Alice's account info
-    const aliceInfo = await getAccountInfo(
+    await expectAccountToBe(
       network,
-      Accounts.WALLET_1.stxAddress
+      Accounts.WALLET_1.stxAddress,
+      100_000_000_000_000 - aliceNonce * fee,
+      0
     );
-    expect(aliceInfo.balance).toBe(100_000_000_000_000 - fee);
-    expect(aliceInfo.locked).toBe(0);
 
     // Verify that Alice's STX are really unlocked by doing a transfer
     response = await broadcastSTXTransfer(
       { network, account: Accounts.WALLET_1, fee, nonce: aliceNonce++ },
       {
-        amount: aliceInfo.balance - fee,
+        amount: 100_000_000_000_000 - aliceNonce * fee,
         recipient: Accounts.WALLET_3.stxAddress,
       }
     );
@@ -212,12 +215,12 @@ describe("PoX disable", () => {
     expect(poxInfo.current_cycle.is_pox_active).toBeFalsy();
 
     // Check Chloe's account info
-    const chloeInfo = await getAccountInfo(
+    await expectAccountToBe(
       network,
-      Accounts.WALLET_3.stxAddress
+      Accounts.WALLET_3.stxAddress,
+      300_000_000_000_000 - (aliceNonce + bobNonce + chloeNonce) * fee,
+      0
     );
-    expect(chloeInfo.balance).toBe(299_999_999_994_000);
-    expect(chloeInfo.locked).toBe(0);
 
     // Verify that Chloe's STX are really unlocked by doing a transfer
     response = await broadcastSTXTransfer(

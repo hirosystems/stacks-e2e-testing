@@ -123,28 +123,6 @@ export interface AccountInfo {
   nonce: number;
 }
 
-export const getAccountInfo = async (
-  network: StacksNetwork,
-  address: string,
-  retry?: number
-): Promise<AccountInfo> => {
-  let retryCountdown = retry ? retry : 20;
-  if (retryCountdown == 0) return Promise.reject();
-  try {
-    let response = await fetch(network.getAccountApiUrl(address), {});
-    let info = await response.json();
-    return {
-      balance: parseInt(info.balance),
-      locked: parseInt(info.locked),
-      unlock_height: parseInt(info.unlock_height),
-      nonce: parseInt(info.nonce),
-    };
-  } catch (e) {
-    await delay();
-    return await getAccountInfo(network, address, retryCountdown - 1);
-  }
-};
-
 export async function asyncExpectStacksTransactionSuccess(
   orchestrator: DevnetNetworkOrchestrator,
   txid: string
