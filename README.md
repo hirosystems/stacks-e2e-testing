@@ -23,7 +23,7 @@ yarn test:dev run -t "using stacks-increase in the same cycle should result in i
 
 #### Using 2.2 node
 
-To run the tests using the 2.2 node, you'll need to use a currently unpublished version of the `stacks-devnet-js` package which has support for the new settings. To build this locally:
+To run tests using the 2.2 node (the tests in the _pox-disabled/_ directory), you'll need to use a currently unpublished version of the `stacks-devnet-js` package which has support for the new settings. To build this locally:
 
 ```
 git clone https://github.com/hirosystems/clarinet.git
@@ -57,7 +57,7 @@ Then back in this testing directory, run:
 npm link @hirosystems/stacks-devnet-js
 ```
 
-Now, you can run the tests expecting this 2.2 node, e.g. those with `-pox-disable` in the file name.
+Now, you can run the tests expecting this 2.2 node, i.e. those in the _pox-disabled/_ directory.
 
 To switch back to the default version, run:
 
