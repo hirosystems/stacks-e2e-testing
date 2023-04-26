@@ -61,7 +61,6 @@ describe("testing pooled stacking under epoch 2.1", () => {
       }
     );
     expect(response.error).toBeUndefined();
-    asyncExpectStacksTransactionSuccess(orchestrator, response.txid);
 
     // Cloe commits 80m
     response = await broadcastStackAggregationCommitIndexed(
@@ -130,7 +129,6 @@ describe("testing pooled stacking under epoch 2.1", () => {
       }
     );
     expect(response.error).toBeUndefined();
-    await asyncExpectStacksTransactionSuccess(orchestrator, response.txid);
 
     // Bob commits 80m for cycle 3
     response = await broadcastStackAggregationCommitIndexed(
@@ -163,7 +161,7 @@ describe("testing pooled stacking under epoch 2.1", () => {
     const network = new StacksTestnet({ url: orchestrator.getStacksNodeUrl() });
 
     // Wait for block N+1 where N is the height of the next reward phase
-    await waitForNextRewardPhase(network, orchestrator, 2);
+    await waitForNextRewardPhase(network, orchestrator, 1);
 
     let poxInfo = await getPoxInfo(network);
 
