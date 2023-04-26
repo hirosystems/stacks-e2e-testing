@@ -20,32 +20,22 @@ import {
 } from "../helpers-direct-stacking";
 import {
   ClarityValue,
-  cvToString,
   uintCV,
-  makeSTXTokenTransfer,
 } from "@stacks/transactions";
 
 describe("PoX disable", () => {
   let orchestrator: DevnetNetworkOrchestrator;
-  let timeline = {
-    epoch_2_0: 100,
-    epoch_2_05: 102,
-    epoch_2_1: 106,
-    pox_2_activation: 109,
-    epoch_2_2: 122,
-    pox_2_unlock_height: 123,
-  };
   const fee = 1000;
   const cycles = 12;
   let bobNonce = 0;
   let aliceNonce = 0;
   let chloeNonce = 0;
-  const blockHeight = timeline.pox_2_activation + 1;
+  const blockHeight = Constants.DEVNET_DEFAULT_POX_2_ACTIVATION + 1;
 
   beforeAll(() => {
     orchestrator = buildDevnetNetworkOrchestrator(
       getNetworkIdFromEnv(),
-      timeline,
+      undefined,
       undefined,
       Constants.PROPOSED_2_2_STACKS_NODE_IMAGE_URL
     );
@@ -131,7 +121,7 @@ describe("PoX disable", () => {
 
     // Wait for 2.2 activation and unlock
     await orchestrator.waitForStacksBlockAnchoredOnBitcoinBlockOfHeight(
-      timeline.epoch_2_2 + 1
+      Constants.DEVNET_DEFAULT_EPOCH_2_2 + 1
     );
 
     poxInfo = await getPoxInfo(network);
