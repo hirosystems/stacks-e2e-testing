@@ -142,7 +142,6 @@ describe("testing solo stacker increase with bug", () => {
     let poxInfo = await getPoxInfo(network);
 
     expect(poxInfo.current_cycle.id).toBe(1);
-    console.log(poxInfo);
 
     // Assert that the next cycle has 1_080m STX locked
     // that is more than the liquidity of 1_405m STX
