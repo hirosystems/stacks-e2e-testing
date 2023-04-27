@@ -1,8 +1,12 @@
-import { DevnetNetworkOrchestrator } from "@hirosystems/stacks-devnet-js";
+import {
+  DevnetNetworkOrchestrator,
+  stacksNodeVersion,
+} from "@hirosystems/stacks-devnet-js";
 import { StacksTestnet } from "@stacks/network";
 import { cvToString } from "@stacks/transactions";
 import { Accounts, Constants } from "../../constants";
 import {
+  DEFAULT_EPOCH_TIMELINE,
   buildDevnetNetworkOrchestrator,
   getNetworkIdFromEnv,
   waitForStacksTransaction,
@@ -18,9 +22,24 @@ import {
 
 describe("testing multiple stack-stx and stack-increase calls in the same block", () => {
   let orchestrator: DevnetNetworkOrchestrator;
+  let version: string;
+  if (typeof stacksNodeVersion === "function") {
+    version = stacksNodeVersion();
+  } else {
+    version = "2.1";
+  }
 
   beforeAll(() => {
-    orchestrator = buildDevnetNetworkOrchestrator(getNetworkIdFromEnv());
+    const timeline = {
+      ...DEFAULT_EPOCH_TIMELINE,
+      epoch_2_2: 2000,
+      pox_2_unlock_height: 2001,
+    };
+    orchestrator = buildDevnetNetworkOrchestrator(
+      getNetworkIdFromEnv(),
+      version,
+      timeline
+    );
     orchestrator.start();
   });
 

@@ -1,6 +1,6 @@
 import {
   DevnetNetworkOrchestrator,
-  stacks_node_version,
+  stacksNodeVersion,
 } from "@hirosystems/stacks-devnet-js";
 import { StacksTestnet } from "@stacks/network";
 import { uintCV } from "@stacks/transactions";
@@ -25,27 +25,24 @@ import {
 
 describe("testing solo stacker increase with bug", () => {
   let orchestrator: DevnetNetworkOrchestrator;
-  const using_2_2 =
-    typeof stacks_node_version === "function" &&
-    stacks_node_version() === "2.2";
+  let version: string;
+  if (typeof stacksNodeVersion === "function") {
+    version = stacksNodeVersion();
+  } else {
+    version = "2.1";
+  }
 
   beforeAll(() => {
-    if (using_2_2) {
-      console.log("Using 2.2");
-      const timeline = {
-        ...DEFAULT_EPOCH_TIMELINE,
-        epoch_2_2: 118,
-        pox_2_unlock_height: 119,
-      };
-      orchestrator = buildDevnetNetworkOrchestrator(
-        getNetworkIdFromEnv(),
-        timeline,
-        undefined,
-        Constants.PROPOSED_2_2_STACKS_NODE_IMAGE_URL
-      );
-    } else {
-      orchestrator = buildDevnetNetworkOrchestrator(getNetworkIdFromEnv());
-    }
+    const timeline = {
+      ...DEFAULT_EPOCH_TIMELINE,
+      epoch_2_2: 118,
+      pox_2_unlock_height: 119,
+    };
+    orchestrator = buildDevnetNetworkOrchestrator(
+      getNetworkIdFromEnv(),
+      version,
+      timeline
+    );
     orchestrator.start();
   });
 
@@ -162,7 +159,7 @@ describe("testing solo stacker increase with bug", () => {
       stxIndex: coreInfo.stacks_tip_height + mineUntilHalt,
     });
 
-    if (using_2_2) {
+    if (version === "2.2") {
       // Mine a couple more blocks and verify that the chain is still advancing
       await orchestrator.mineBitcoinBlockAndHopeForStacksBlock();
       await orchestrator.mineBitcoinBlockAndHopeForStacksBlock();
