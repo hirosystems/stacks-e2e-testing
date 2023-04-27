@@ -1,4 +1,7 @@
-import { DevnetNetworkOrchestrator } from "@hirosystems/stacks-devnet-js";
+import {
+  DevnetNetworkOrchestrator,
+  stacksNodeVersion,
+} from "@hirosystems/stacks-devnet-js";
 import { StacksTestnet } from "@stacks/network";
 import { Accounts, Constants } from "../../constants";
 import {
@@ -12,11 +15,25 @@ import { broadcastStackSTX } from "../helpers-direct-stacking";
 
 describe("testing stacking under epoch 2.0", () => {
   let orchestrator: DevnetNetworkOrchestrator;
+  let version: string;
+  if (typeof stacksNodeVersion === "function") {
+    version = stacksNodeVersion();
+  } else {
+    version = "2.1";
+  }
+  const timeline = {
+    ...DEFAULT_EPOCH_TIMELINE,
+    epoch_2_1: 126,
+    pox_2_activation: 130,
+    epoch_2_2: 2000,
+    pox_2_unlock_height: 2001,
+  };
 
   beforeAll(() => {
     orchestrator = buildDevnetNetworkOrchestrator(
       getNetworkIdFromEnv(),
-      DEFAULT_EPOCH_TIMELINE
+      version,
+      timeline
     );
     orchestrator.start();
   });
@@ -108,9 +125,9 @@ describe("testing stacking under epoch 2.0", () => {
     );
     expect(wallet3.locked).toBe(BigInt(stackedByWallet3));
 
-    // Wait for next PoX cycle (Bitcoin block #121)
+    // Wait for next PoX cycle (Bitcoin block #131)
     await orchestrator.waitForStacksBlockAnchoredOnBitcoinBlockOfHeight(
-      Constants.DEVNET_DEFAULT_POX_2_ACTIVATION + 1
+      timeline.pox_2_activation + 1
     );
     poxInfo = await getPoxInfo(network);
 

@@ -36,12 +36,20 @@ export const DEFAULT_EPOCH_TIMELINE = {
 
 export function buildDevnetNetworkOrchestrator(
   networkId: number,
+  stacksVersion: string,
   timeline: EpochTimeline = DEFAULT_EPOCH_TIMELINE,
   logs = false,
   stacks_node_image_url?: string
 ) {
   let uuid = Date.now();
   let working_dir = `/tmp/stacks-test-${uuid}-${networkId}`;
+  // Set the stacks-node image URL to the default image for the version if it's
+  // not explicitly set
+  if (stacks_node_image_url === undefined) {
+    if (stacksVersion === "2.2") {
+      stacks_node_image_url = Constants.PROPOSED_2_2_STACKS_NODE_IMAGE_URL;
+    }
+  }
   let config = {
     logs,
     devnet: {
@@ -56,7 +64,7 @@ export function buildDevnetNetworkOrchestrator(
       bitcoin_controller_automining_disabled: false,
       working_dir,
       use_docker_gateway_routing: process.env.GITHUB_ACTIONS ? true : false,
-      ...(typeof stacks_node_image_url !== "undefined" && {
+      ...(stacks_node_image_url !== undefined && {
         stacks_node_image_url,
       }),
     },

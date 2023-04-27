@@ -1,4 +1,7 @@
-import { DevnetNetworkOrchestrator } from "@hirosystems/stacks-devnet-js";
+import {
+  DevnetNetworkOrchestrator,
+  stacksNodeVersion,
+} from "@hirosystems/stacks-devnet-js";
 import { StacksTestnet } from "@stacks/network";
 import {
   buildDevnetNetworkOrchestrator,
@@ -8,9 +11,18 @@ import { getPoxInfo, waitForNextRewardPhase } from "../helpers";
 
 describe("testing devnet settings", () => {
   let orchestrator: DevnetNetworkOrchestrator;
+  let version: string;
+  if (typeof stacksNodeVersion === "function") {
+    version = stacksNodeVersion();
+  } else {
+    version = "2.1";
+  }
 
   beforeAll(() => {
-    orchestrator = buildDevnetNetworkOrchestrator(getNetworkIdFromEnv());
+    orchestrator = buildDevnetNetworkOrchestrator(
+      getNetworkIdFromEnv(),
+      version
+    );
     orchestrator.start();
   });
 

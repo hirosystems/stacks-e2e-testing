@@ -1,8 +1,12 @@
-import { DevnetNetworkOrchestrator } from "@hirosystems/stacks-devnet-js";
+import {
+  DevnetNetworkOrchestrator,
+  stacksNodeVersion,
+} from "@hirosystems/stacks-devnet-js";
 import { StacksTestnet } from "@stacks/network";
 import { uintCV } from "@stacks/transactions";
 import { Accounts, Constants } from "../../constants";
 import {
+  DEFAULT_EPOCH_TIMELINE,
   buildDevnetNetworkOrchestrator,
   getNetworkIdFromEnv,
   waitForStacksTransaction,
@@ -21,9 +25,24 @@ import {
 
 describe("testing solo stacker increase with bug", () => {
   let orchestrator: DevnetNetworkOrchestrator;
+  let version: string;
+  if (typeof stacksNodeVersion === "function") {
+    version = stacksNodeVersion();
+  } else {
+    version = "2.1";
+  }
 
   beforeAll(() => {
-    orchestrator = buildDevnetNetworkOrchestrator(getNetworkIdFromEnv());
+    const timeline = {
+      ...DEFAULT_EPOCH_TIMELINE,
+      epoch_2_2: 118,
+      pox_2_unlock_height: 119,
+    };
+    orchestrator = buildDevnetNetworkOrchestrator(
+      getNetworkIdFromEnv(),
+      version,
+      timeline
+    );
     orchestrator.start();
   });
 
@@ -130,6 +149,7 @@ describe("testing solo stacker increase with bug", () => {
     // advance to block 120, the last one before chain halt
     let coreInfo = await getCoreInfo(network);
     const mineUntilHalt = 120 - coreInfo.burn_block_height;
+    const potentialCrashHeight = coreInfo.stacks_tip_height + mineUntilHalt;
     let lastIndices;
     for (let i = 0; i < mineUntilHalt; i++) {
       lastIndices = await mineBitcoinBlockAndHopeForStacksBlock(orchestrator);
@@ -139,16 +159,25 @@ describe("testing solo stacker increase with bug", () => {
       stxIndex: coreInfo.stacks_tip_height + mineUntilHalt,
     });
 
-    // try two bitcoin blocks and assert that no more stacks blocks are mined
-    lastIndices = await mineBitcoinBlockAndHopeForStacksBlock(orchestrator);
-    expect(lastIndices).toStrictEqual({
-      stxIndex: undefined,
-      btcIndex: undefined,
-    });
-    lastIndices = await mineBitcoinBlockAndHopeForStacksBlock(orchestrator);
-    expect(lastIndices).toStrictEqual({
-      stxIndex: undefined,
-      btcIndex: undefined,
-    });
+    if (version === "2.2") {
+      // Mine a couple more blocks and verify that the chain is still advancing
+      await orchestrator.mineBitcoinBlockAndHopeForStacksBlock();
+      await orchestrator.mineBitcoinBlockAndHopeForStacksBlock();
+      coreInfo = await getCoreInfo(network);
+      expect(coreInfo.burn_block_height).toBeGreaterThan(120);
+      expect(coreInfo.stacks_tip_height).toBeGreaterThan(potentialCrashHeight);
+    } else {
+      // try two bitcoin blocks and assert that no more stacks blocks are mined
+      lastIndices = await mineBitcoinBlockAndHopeForStacksBlock(orchestrator);
+      expect(lastIndices).toStrictEqual({
+        stxIndex: undefined,
+        btcIndex: undefined,
+      });
+      lastIndices = await mineBitcoinBlockAndHopeForStacksBlock(orchestrator);
+      expect(lastIndices).toStrictEqual({
+        stxIndex: undefined,
+        btcIndex: undefined,
+      });
+    }
   });
 });
