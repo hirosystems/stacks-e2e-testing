@@ -202,7 +202,7 @@ describe("testing solo stacker increase with bug", () => {
 
     // Wait for the 2.2 activation, then check again
     await orchestrator.waitForStacksBlockAnchoredOnBitcoinBlockOfHeight(
-      timeline.epoch_2_2,
+      timeline.epoch_2_2
     );
 
     // Verify that calling the clarity contract gives the same incorrect result
