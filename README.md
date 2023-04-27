@@ -21,6 +21,12 @@ Or to run a specific test, use the `-t` flag to specify the complete name:
 yarn test:dev run -t "using stacks-increase in the same cycle should result in increased rewards"
 ```
 
+When running multiple tests, you'll want to limit it to one test at a time because multiple tests in parallel will sometimes cross contaminate. To avoid this, you can use the `--threads false` flag, for example, the following will run all of the tests in the _pox/stacking/_ directory, one at a time:
+
+```sh
+yarn vitest --run tests/integration/pox/stacking/ --threads false
+```
+
 #### Using 2.2 node
 
 To run tests using the 2.2 node (the tests in the _pox-disabled/_ directory), you'll need to use a currently unpublished version of the `stacks-devnet-js` package which has support for the new settings. To build this locally:
