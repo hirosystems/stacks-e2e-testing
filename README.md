@@ -68,7 +68,7 @@ yarn install
 
 #### 2.2 Node Image
 
-On a Mac with Apple Silicon, the published stacks-node image, `blockstack/stacks-blockchain:sip-022-pox-disable-devnet` does not seem to work correctly. You will know you have run into this problem if your tests fail with:
+On a Mac with Apple Silicon, the published stacks-node image, `blockstack/stacks-blockchain:fix-epoch-gate` does not seem to work correctly. You will know you have run into this problem if your tests fail with:
 
 ```
 Unknown Error: waitForNextStacksBlock maxErrors reached
@@ -91,6 +91,6 @@ As an alternative, you can build this image locally, or update the image URL in 
    export const BITCOIN_BLOCK_TIME = 10_000;
 
 -  export const PROPOSED_2_2_STACKS_NODE_IMAGE_URL = "blockstack/stacks-blockchain:sip-022-pox-disable-devnet";
-+  export const PROPOSED_2_2_STACKS_NODE_IMAGE_URL = "stacksbrice/sip-022-pox-disable-devnet";
++  export const PROPOSED_2_2_STACKS_NODE_IMAGE_URL = "stacksbrice/staks-node:2.2.0.0.1";
  }
 ```
