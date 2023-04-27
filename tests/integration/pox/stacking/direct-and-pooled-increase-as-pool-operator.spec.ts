@@ -7,6 +7,8 @@ import { uintCV } from "@stacks/transactions";
 import { Accounts, Constants } from "../../constants";
 import {
   DEFAULT_EPOCH_TIMELINE,
+  asyncExpectStacksTransactionSuccess,
+  broadcastSTXTransfer,
   buildDevnetNetworkOrchestrator,
   getNetworkIdFromEnv,
   waitForStacksTransaction,
@@ -33,13 +35,15 @@ describe("testing direct stacker as pool operator without auto-unlock under epoc
     version = "2.1";
   }
   const fee = 1000;
+  const timeline = {
+    ...DEFAULT_EPOCH_TIMELINE,
+    epoch_2_2: 127,
+    pox_2_unlock_height: 128,
+  };
+  let aliceNonce = 0;
+  let faucetNonce = 0;
 
   beforeAll(() => {
-    const timeline = {
-      ...DEFAULT_EPOCH_TIMELINE,
-      epoch_2_2: 2000,
-      pox_2_unlock_height: 2001,
-    };
     orchestrator = buildDevnetNetworkOrchestrator(
       getNetworkIdFromEnv(),
       version,
@@ -65,14 +69,26 @@ describe("testing direct stacker as pool operator without auto-unlock under epoc
 
     // Alice stacks 80m STX
     let response = await broadcastStackSTX(
-      { poxVersion: 2, network, account: Accounts.WALLET_1, fee, nonce: 0 },
+      {
+        poxVersion: 2,
+        network,
+        account: Accounts.WALLET_1,
+        fee,
+        nonce: aliceNonce++,
+      },
       { amount: 80_000_000_000_000, blockHeight, cycles }
     );
     expect(response.error).toBeUndefined();
 
     // Faucet delegates 999m to Alice address
     response = await broadcastDelegateSTX(
-      { poxVersion: 2, network, account: Accounts.FAUCET, fee, nonce: 0 },
+      {
+        poxVersion: 2,
+        network,
+        account: Accounts.FAUCET,
+        fee,
+        nonce: faucetNonce++,
+      },
       { amount: 999000000000000, poolAddress: Accounts.WALLET_1 }
     );
     expect(response.error).toBeUndefined();
@@ -84,7 +100,13 @@ describe("testing direct stacker as pool operator without auto-unlock under epoc
 
     // Alice locks 999m as pool operator
     response = await broadcastDelegateStackSTX(
-      { poxVersion: 2, network, account: Accounts.WALLET_1, fee, nonce: 1 },
+      {
+        poxVersion: 2,
+        network,
+        account: Accounts.WALLET_1,
+        fee,
+        nonce: aliceNonce++,
+      },
       {
         stacker: Accounts.FAUCET,
         amount: 999000000000000,
@@ -99,7 +121,13 @@ describe("testing direct stacker as pool operator without auto-unlock under epoc
 
     // Alice commits 999m
     response = await broadcastStackAggregationCommitIndexed(
-      { poxVersion: 2, network, account: Accounts.WALLET_1, fee, nonce: 2 },
+      {
+        poxVersion: 2,
+        network,
+        account: Accounts.WALLET_1,
+        fee,
+        nonce: aliceNonce++,
+      },
       { poolRewardAccount: Accounts.WALLET_1, cycleId: 2 }
     );
     expect(response.error).toBeUndefined();
@@ -132,7 +160,7 @@ describe("testing direct stacker as pool operator without auto-unlock under epoc
     await expectAccountToBe(
       network,
       Accounts.WALLET_1.stxAddress,
-      100_000_000_000_000 - 80_000_000_000_000 - fee * 3,
+      100_000_000_000_000 - 80_000_000_000_000 - aliceNonce * fee,
       80_000_000_000_000
     );
 
@@ -159,8 +187,75 @@ describe("testing direct stacker as pool operator without auto-unlock under epoc
     await expectAccountToBe(
       network,
       Accounts.WALLET_1.stxAddress,
-      100_000_000_000_000 - 80_000_000_000_000 - fee * 3,
+      100_000_000_000_000 - 80_000_000_000_000 - aliceNonce * fee,
       80_000_000_000_000
     );
+  });
+
+  it("everything unlocks as expected upon v2 unlock height", async () => {
+    // This test should only run when running a 2.2 node
+    if (version !== "2.2") {
+      return;
+    }
+    const network = new StacksTestnet({ url: orchestrator.getStacksNodeUrl() });
+
+    // Wait for 2.2 activation and unlock
+    await orchestrator.waitForStacksBlockAnchoredOnBitcoinBlockOfHeight(
+      timeline.pox_2_unlock_height + 1
+    );
+
+    // Check Alice's account info
+    await expectAccountToBe(
+      network,
+      Accounts.WALLET_1.stxAddress,
+      100_000_000_000_000 - aliceNonce * fee,
+      0
+    );
+
+    // Verify that Alice's STX are really unlocked by doing a transfer
+    let response = await broadcastSTXTransfer(
+      { network, account: Accounts.WALLET_1, fee, nonce: aliceNonce++ },
+      {
+        amount: 100_000_000_000_000 - aliceNonce * fee,
+        recipient: Accounts.WALLET_3.stxAddress,
+      }
+    );
+    await asyncExpectStacksTransactionSuccess(orchestrator, response.txid);
+
+    // Check Faucet's account info
+    await expectAccountToBe(
+      network,
+      Accounts.FAUCET.stxAddress,
+      1_000_000_000_000_000 - faucetNonce * fee,
+      0
+    );
+
+    // Verify that Faucet's STX are really unlocked by doing a transfer
+    response = await broadcastSTXTransfer(
+      { network, account: Accounts.FAUCET, fee, nonce: faucetNonce++ },
+      {
+        amount: 1_000_000_000_000_000 - faucetNonce * fee,
+        recipient: Accounts.WALLET_3.stxAddress,
+      }
+    );
+    await asyncExpectStacksTransactionSuccess(orchestrator, response.txid);
+  });
+
+  it("PoX should stay disabled indefinitely", async () => {
+    // This test should only run when running a 2.2 node
+    if (version !== "2.2") {
+      return;
+    }
+
+    const network = new StacksTestnet({ url: orchestrator.getStacksNodeUrl() });
+    let poxInfo = await getPoxInfo(network);
+    await waitForNextRewardPhase(
+      network,
+      orchestrator,
+      poxInfo.current_cycle.id + 1
+    );
+
+    poxInfo = await getPoxInfo(network);
+    expect(poxInfo.current_cycle.is_pox_active).toBeFalsy();
   });
 });

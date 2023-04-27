@@ -8,6 +8,7 @@ import { Accounts, Constants } from "../../constants";
 import {
   DEFAULT_EPOCH_TIMELINE,
   asyncExpectStacksTransactionSuccess,
+  broadcastSTXTransfer,
   buildDevnetNetworkOrchestrator,
   getNetworkIdFromEnv,
   waitForStacksTransaction,
@@ -34,13 +35,17 @@ describe("testing mixed direct and pooled stacking with extend under epoch 2.1",
     version = "2.1";
   }
   const fee = 1000;
+  const timeline = {
+    ...DEFAULT_EPOCH_TIMELINE,
+    epoch_2_2: 138,
+    pox_2_unlock_height: 139,
+  };
+  let aliceNonce = 0;
+  let bobNonce = 0;
+  let chloeNonce = 0;
+  let faucetNonce = 0;
 
   beforeAll(() => {
-    const timeline = {
-      ...DEFAULT_EPOCH_TIMELINE,
-      epoch_2_2: 2000,
-      pox_2_unlock_height: 2001,
-    };
     orchestrator = buildDevnetNetworkOrchestrator(
       getNetworkIdFromEnv(),
       version,
@@ -66,14 +71,26 @@ describe("testing mixed direct and pooled stacking with extend under epoch 2.1",
 
     // Alice stacks 75m STX
     let response = await broadcastStackSTX(
-      { poxVersion: 2, network, account: Accounts.WALLET_1, fee, nonce: 0 },
+      {
+        poxVersion: 2,
+        network,
+        account: Accounts.WALLET_1,
+        fee,
+        nonce: aliceNonce++,
+      },
       { amount: 75_000_000_000_000, blockHeight, cycles }
     );
     expect(response.error).toBeUndefined();
 
     // Alice delegates 100m to Bob
     response = await broadcastDelegateSTX(
-      { poxVersion: 2, network, account: Accounts.WALLET_1, fee, nonce: 1 },
+      {
+        poxVersion: 2,
+        network,
+        account: Accounts.WALLET_1,
+        fee,
+        nonce: aliceNonce++,
+      },
       { amount: 100_000_000_000_000, poolAddress: Accounts.WALLET_2 }
     );
     expect(response.error).toBeUndefined();
@@ -85,7 +102,13 @@ describe("testing mixed direct and pooled stacking with extend under epoch 2.1",
 
     // Bob extends delegation by 1 cycle
     response = await broadcastDelegateStackExtend(
-      { poxVersion: 2, network, account: Accounts.WALLET_2, fee, nonce: 0 },
+      {
+        poxVersion: 2,
+        network,
+        account: Accounts.WALLET_2,
+        fee,
+        nonce: bobNonce++,
+      },
       {
         stacker: Accounts.WALLET_1,
         poolRewardAccount: Accounts.WALLET_2,
@@ -100,7 +123,13 @@ describe("testing mixed direct and pooled stacking with extend under epoch 2.1",
     // Bob commits 75m for cycle #3
     // delegate-stack-extend only locks for the cycles after the current stacking
     response = await broadcastStackAggregationCommitIndexed(
-      { poxVersion: 2, network, account: Accounts.WALLET_2, fee, nonce: 1 },
+      {
+        poxVersion: 2,
+        network,
+        account: Accounts.WALLET_2,
+        fee,
+        nonce: bobNonce++,
+      },
       { poolRewardAccount: Accounts.WALLET_2, cycleId: 3 }
     );
     expect(response.error).toBeUndefined();
@@ -140,7 +169,13 @@ describe("testing mixed direct and pooled stacking with extend under epoch 2.1",
 
     // Faucet stacks 900m (1/4 of liquid suply)
     let response = await broadcastStackSTX(
-      { poxVersion: 2, network, account: Accounts.FAUCET, fee, nonce: 0 },
+      {
+        poxVersion: 2,
+        network,
+        account: Accounts.FAUCET,
+        fee,
+        nonce: faucetNonce++,
+      },
       { amount: 900_000_000_000_000, blockHeight, cycles }
     );
     expect(response.error).toBeUndefined();
@@ -216,7 +251,13 @@ describe("testing mixed direct and pooled stacking with extend under epoch 2.1",
 
     // Cloe stacks 80m
     let response = await broadcastStackSTX(
-      { poxVersion: 2, network, account: Accounts.WALLET_3, fee, nonce: 0 },
+      {
+        poxVersion: 2,
+        network,
+        account: Accounts.WALLET_3,
+        fee,
+        nonce: chloeNonce++,
+      },
       { amount: 80_000_000_000_000, blockHeight, cycles }
     );
     expect(response.error).toBeUndefined();
@@ -272,5 +313,72 @@ describe("testing mixed direct and pooled stacking with extend under epoch 2.1",
       100_000_000_000_000 - fee * 2,
       0
     );
+  });
+
+  it("everything unlocks as expected upon v2 unlock height", async () => {
+    // This test should only run when running a 2.2 node
+    if (version !== "2.2") {
+      return;
+    }
+    const network = new StacksTestnet({ url: orchestrator.getStacksNodeUrl() });
+
+    // Wait for 2.2 activation and unlock
+    await orchestrator.waitForStacksBlockAnchoredOnBitcoinBlockOfHeight(
+      timeline.pox_2_unlock_height + 1
+    );
+
+    // Check Alice's account info
+    await expectAccountToBe(
+      network,
+      Accounts.WALLET_1.stxAddress,
+      100_000_000_000_000 - aliceNonce * fee,
+      0
+    );
+
+    // Verify that Alice's STX are really unlocked by doing a transfer
+    let response = await broadcastSTXTransfer(
+      { network, account: Accounts.WALLET_1, fee, nonce: aliceNonce++ },
+      {
+        amount: 100_000_000_000_000 - aliceNonce * fee,
+        recipient: Accounts.WALLET_3.stxAddress,
+      }
+    );
+    await asyncExpectStacksTransactionSuccess(orchestrator, response.txid);
+
+    // Check Bob's account info
+    await expectAccountToBe(
+      network,
+      Accounts.WALLET_2.stxAddress,
+      100_000_000_000_000 - bobNonce * fee,
+      0
+    );
+
+    // Verify that Bob's STX are really unlocked by doing a transfer
+    response = await broadcastSTXTransfer(
+      { network, account: Accounts.WALLET_2, fee, nonce: bobNonce++ },
+      {
+        amount: 100_000_000_000_000 - bobNonce * fee,
+        recipient: Accounts.WALLET_3.stxAddress,
+      }
+    );
+    await asyncExpectStacksTransactionSuccess(orchestrator, response.txid);
+  });
+
+  it("PoX should stay disabled indefinitely", async () => {
+    // This test should only run when running a 2.2 node
+    if (version !== "2.2") {
+      return;
+    }
+
+    const network = new StacksTestnet({ url: orchestrator.getStacksNodeUrl() });
+    let poxInfo = await getPoxInfo(network);
+    await waitForNextRewardPhase(
+      network,
+      orchestrator,
+      poxInfo.current_cycle.id + 1
+    );
+
+    poxInfo = await getPoxInfo(network);
+    expect(poxInfo.current_cycle.is_pox_active).toBeFalsy();
   });
 });
