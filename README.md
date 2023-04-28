@@ -96,7 +96,8 @@ As an alternative, you can build this image locally, or update the image URL in 
    export const DEVNET_DEFAULT_POX_2_UNLOCK_HEIGHT = 123;
    export const BITCOIN_BLOCK_TIME = 10_000;
 
--  export const PROPOSED_2_2_STACKS_NODE_IMAGE_URL = "blockstack/stacks-blockchain:sip-022-pox-disable-devnet";
-+  export const PROPOSED_2_2_STACKS_NODE_IMAGE_URL = "stacksbrice/staks-node:2.2.0.0.1";
+   export const PROPOSED_2_2_STACKS_NODE_IMAGE_URL =
+-    "blockstack/stacks-blockchain:fix-epoch-gate";
++    "stacksbrice/stacks-node:2.2.0.0.1";
  }
 ```
