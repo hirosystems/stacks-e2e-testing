@@ -106,6 +106,8 @@ describe("trait parameter", () => {
     expect(response.error).toBeUndefined();
     await asyncExpectStacksTransactionSuccess(orchestrator, transaction.txid());
 
+    await orchestrator.waitForNextStacksBlock();
+
     // Call the readonly function
     let output = await callReadOnlyFunction({
       contractName: "test-trait",
