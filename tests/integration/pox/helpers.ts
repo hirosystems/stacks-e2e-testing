@@ -19,6 +19,8 @@ import {
   ClarityValue,
   PrincipalCV,
   OptionalCV,
+  responseErrorCV,
+  stringAsciiCV,
 } from "@stacks/transactions";
 
 import { expect } from "vitest";
@@ -189,6 +191,11 @@ export const expectNoError = (response: TxBroadcastResult) => {
       JSON.stringify(response.reason_data)
   ).toBeUndefined();
 };
+
+// represents a JS error as Clarity value
+export const errorToCV = (e: Error) => {
+  return responseErrorCV(stringAsciiCV(e.message))
+}
 
 export const readRewardCyclePoxAddressList = async (
   network: StacksNetwork,

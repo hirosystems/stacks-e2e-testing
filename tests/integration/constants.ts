@@ -5,12 +5,14 @@ export namespace Constants {
   export const DEVNET_DEFAULT_POX_2_ACTIVATION = 110;
   export const DEVNET_DEFAULT_EPOCH_2_2 = 122;
   export const DEVNET_DEFAULT_POX_2_UNLOCK_HEIGHT = 123;
+  export const DEVNET_DEFAULT_EPOCH_2_3 = 128;
   export const BITCOIN_BLOCK_TIME = 10_000;
 
   export const PROPOSED_2_2_STACKS_NODE_IMAGE_URL =
-    "blockstack/stacks-blockchain:fix-epoch-gate";
+    "blockstack/stacks-blockchain:2.3.0.0.0-devnet";
 }
 
+export const DEFAULT_FEE = 2000;
 export namespace Contracts {
   export const POX_1 = {
     address: "ST000000000000000000002AMW42H",

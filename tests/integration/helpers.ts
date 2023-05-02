@@ -6,12 +6,14 @@ import {
   getIsolatedNetworkConfigUsingNetworkId,
 } from "@hirosystems/stacks-devnet-js";
 import { StacksNetwork } from "@stacks/network";
-import { Constants } from "./constants";
+import { Constants, DEFAULT_FEE } from "./constants";
 import {
   AnchorMode,
+  PostConditionMode,
   TxBroadcastResult,
   broadcastTransaction,
   makeContractCall,
+  makeContractDeploy,
   makeSTXTokenTransfer,
 } from "@stacks/transactions";
 const fetch = require("node-fetch");
@@ -32,6 +34,7 @@ export const DEFAULT_EPOCH_TIMELINE = {
   pox_2_activation: Constants.DEVNET_DEFAULT_POX_2_ACTIVATION,
   epoch_2_2: Constants.DEVNET_DEFAULT_EPOCH_2_2,
   pox_2_unlock_height: Constants.DEVNET_DEFAULT_POX_2_UNLOCK_HEIGHT,
+  epoch_2_3: Constants.DEVNET_DEFAULT_EPOCH_2_3,
 };
 
 export function buildDevnetNetworkOrchestrator(
@@ -46,7 +49,7 @@ export function buildDevnetNetworkOrchestrator(
   // Set the stacks-node image URL to the default image for the version if it's
   // not explicitly set
   if (stacks_node_image_url === undefined) {
-    if (stacksVersion === "2.2") {
+    if (stacksVersion === "2.2" || stacksVersion === "2.3") {
       stacks_node_image_url = Constants.PROPOSED_2_2_STACKS_NODE_IMAGE_URL;
     }
   }
@@ -172,3 +175,29 @@ export const broadcastSTXTransfer = async (
   const result = await broadcastTransaction(tx, network);
   return result;
 };
+
+export async function deployContract(
+  network: StacksNetwork,
+  sender: Account,
+  nonce: number,
+  contractName: string,
+  codeBody: string
+) {
+  // Build the transaction to deploy the contract
+  let deployTxOptions = {
+    senderKey: sender.secretKey,
+    contractName,
+    codeBody,
+    fee: DEFAULT_FEE,
+    network,
+    anchorMode: AnchorMode.OnChainOnly,
+    postConditionMode: PostConditionMode.Allow,
+    nonce,
+    clarityVersion: undefined,
+  };
+
+  let transaction = await makeContractDeploy(deployTxOptions);
+  let response = await broadcastTransaction(transaction, network);
+  expect(response.error).toBeUndefined();
+  return { transaction, response };
+}
