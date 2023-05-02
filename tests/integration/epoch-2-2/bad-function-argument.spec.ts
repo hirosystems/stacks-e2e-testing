@@ -159,7 +159,7 @@ describe("trait parameter", () => {
 
     // Wait for the 2.2 activation, then check again
     await orchestrator.waitForStacksBlockAnchoredOnBitcoinBlockOfHeight(
-      timeline.epoch_2_2 + 2
+      timeline.epoch_2_3 + 2
     );
 
     // deploy wrapper

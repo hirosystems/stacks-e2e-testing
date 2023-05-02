@@ -32,6 +32,7 @@ export const DEFAULT_EPOCH_TIMELINE = {
   pox_2_activation: Constants.DEVNET_DEFAULT_POX_2_ACTIVATION,
   epoch_2_2: Constants.DEVNET_DEFAULT_EPOCH_2_2,
   pox_2_unlock_height: Constants.DEVNET_DEFAULT_POX_2_UNLOCK_HEIGHT,
+  epoch_2_3: Constants.DEVNET_DEFAULT_EPOCH_2_3,
 };
 
 export function buildDevnetNetworkOrchestrator(
@@ -46,7 +47,7 @@ export function buildDevnetNetworkOrchestrator(
   // Set the stacks-node image URL to the default image for the version if it's
   // not explicitly set
   if (stacks_node_image_url === undefined) {
-    if (stacksVersion === "2.2") {
+    if (stacksVersion === "2.2" || stacksVersion === "2.3") {
       stacks_node_image_url = Constants.PROPOSED_2_2_STACKS_NODE_IMAGE_URL;
     }
   }
