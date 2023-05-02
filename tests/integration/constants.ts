@@ -12,6 +12,7 @@ export namespace Constants {
     "blockstack/stacks-blockchain:2.3.0.0.0-devnet";
 }
 
+export const DEFAULT_FEE = 2000;
 export namespace Contracts {
   export const POX_1 = {
     address: "ST000000000000000000002AMW42H",

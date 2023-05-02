@@ -170,7 +170,7 @@ describe("trait parameter", () => {
     );
 
     // call public function as readonly
-    output = await callReadOnlyTestTraitCallFo(network, 1);
+    output = await callReadOnlyTestTraitCallFo(network, { a: 1 });
     expect(output, cvToString(output)).toEqual(responseOkCV(uintCV(1)));
 
     // Call the public function
