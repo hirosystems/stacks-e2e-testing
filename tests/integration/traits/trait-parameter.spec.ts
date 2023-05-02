@@ -26,6 +26,7 @@ import {
   DEFAULT_EPOCH_TIMELINE,
   asyncExpectStacksTransactionSuccess,
   buildDevnetNetworkOrchestrator,
+  deployContract,
   getNetworkIdFromEnv,
   waitForStacksTransaction,
 } from "../helpers";
@@ -136,29 +137,30 @@ describe("trait parameter", () => {
 
     await orchestrator.waitForNextStacksBlock();
 
-    let deployResponse = await deployContract(
+    let {response, transaction} = await deployContract(
       network,
       Accounts.DEPLOYER,
       0,
       "test-trait",
       codeBodyTestTrait
     );
+    expect(response.error).toBeUndefined();
     await asyncExpectStacksTransactionSuccess(
       orchestrator,
-      deployResponse.transaction.txid()
+      transaction.txid()
     );
 
-    deployResponse = await deployContract(
+    ({response, transaction} = await deployContract(
       network,
       Accounts.DEPLOYER,
       1,
       "impl-trait",
       codeBodyImplTrait
-    );
-
+    ));
+    expect(response.error).toBeUndefined();
     await asyncExpectStacksTransactionSuccess(
       orchestrator,
-      deployResponse.transaction.txid()
+      transaction.txid()
     );
 
     await orchestrator.waitForNextStacksBlock();
@@ -174,12 +176,13 @@ describe("trait parameter", () => {
     expect(output, cvToString(output)).toEqual(responseOkCV(uintCV(1)));
 
     // Call the public function
-    let { transaction } = await broadcastTestImplCallFoo(
+    ({ response, transaction } = await broadcastTestImplCallFoo(
       network,
       Accounts.WALLET_1,
       0,
       { a: 1 }
-    );
+    ));
+    expect(response.error).toBeUndefined();
     let [_, tx] = await asyncExpectStacksTransactionSuccess(
       orchestrator,
       transaction.txid()
@@ -243,13 +246,13 @@ describe("trait parameter", () => {
     expect(output).toEqual(responseOkCV(uintCV(3)));
 
     // Call the public function
-    let { transaction } = await broadcastTestImplCallFoo(
+    let { response, transaction } = await broadcastTestImplCallFoo(
       network,
       Accounts.WALLET_1,
       1, // use nonce again
       { a: 3 }
     );
-
+    expect(response.error).toBeUndefined();
     let [_, tx] = await waitForStacksTransaction(
       orchestrator,
       transaction.txid()
@@ -257,29 +260,3 @@ describe("trait parameter", () => {
     expect(tx.result).toEqual("(ok u3)");
   });
 });
-
-async function deployContract(
-  network: StacksTestnet,
-  sender: Account,
-  nonce: number,
-  contractName: string,
-  codeBody: string
-) {
-  // Build the transaction to deploy the contract
-  let deployTxOptions = {
-    senderKey: sender.secretKey,
-    contractName,
-    codeBody,
-    fee,
-    network,
-    anchorMode: AnchorMode.OnChainOnly,
-    postConditionMode: PostConditionMode.Allow,
-    nonce,
-    clarityVersion: undefined,
-  };
-
-  let transaction = await makeContractDeploy(deployTxOptions);
-  let response = await broadcastTransaction(transaction, network);
-  expect(response.error).toBeUndefined();
-  return { transaction, response };
-}

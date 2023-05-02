@@ -6,12 +6,14 @@ import {
   getIsolatedNetworkConfigUsingNetworkId,
 } from "@hirosystems/stacks-devnet-js";
 import { StacksNetwork } from "@stacks/network";
-import { Constants } from "./constants";
+import { Constants, DEFAULT_FEE } from "./constants";
 import {
   AnchorMode,
+  PostConditionMode,
   TxBroadcastResult,
   broadcastTransaction,
   makeContractCall,
+  makeContractDeploy,
   makeSTXTokenTransfer,
 } from "@stacks/transactions";
 const fetch = require("node-fetch");
@@ -173,3 +175,29 @@ export const broadcastSTXTransfer = async (
   const result = await broadcastTransaction(tx, network);
   return result;
 };
+
+export async function deployContract(
+  network: StacksNetwork,
+  sender: Account,
+  nonce: number,
+  contractName: string,
+  codeBody: string
+) {
+  // Build the transaction to deploy the contract
+  let deployTxOptions = {
+    senderKey: sender.secretKey,
+    contractName,
+    codeBody,
+    fee: DEFAULT_FEE,
+    network,
+    anchorMode: AnchorMode.OnChainOnly,
+    postConditionMode: PostConditionMode.Allow,
+    nonce,
+    clarityVersion: undefined,
+  };
+
+  let transaction = await makeContractDeploy(deployTxOptions);
+  let response = await broadcastTransaction(transaction, network);
+  expect(response.error).toBeUndefined();
+  return { transaction, response };
+}
