@@ -1,6 +1,5 @@
 import {
   DevnetNetworkOrchestrator,
-  StacksTransactionMetadata,
   stacksNodeVersion,
 } from "@hirosystems/stacks-devnet-js";
 import { StacksNetwork, StacksTestnet } from "@stacks/network";
@@ -11,13 +10,8 @@ import {
   broadcastTransaction,
   callReadOnlyFunction,
   contractPrincipalCV,
-  cvToString,
   makeContractCall,
-  makeContractDeploy,
-  responseErrorCV,
   responseOkCV,
-  stringAsciiCV,
-  stringCV,
   uintCV,
 } from "@stacks/transactions";
 import { Accounts } from "../constants";
@@ -34,7 +28,7 @@ import { errorToCV } from "../pox/helpers";
 
 const fee = 2000;
 
-describe("trait parameter", () => {
+describe("trait implementer and trait user both deployed in 2.2", () => {
   let orchestrator: DevnetNetworkOrchestrator;
   let version: string;
   if (typeof stacksNodeVersion === "function") {
@@ -76,7 +70,7 @@ describe("trait parameter", () => {
     });
   };
 
-  const callReadOnlyTestTraitCallFo = (
+  const callReadOnlyTestTraitCallFoo = (
     network: StacksNetwork,
     { a }: { a: number }
   ) => {
@@ -132,100 +126,57 @@ describe("trait parameter", () => {
     orchestrator.terminate();
   });
 
-  it("passing a trait parameter should work in Stacks 2.1", async () => {
+  it("passing a trait parameter should work in Stacks 2.2", async () => {
     const network = new StacksTestnet({ url: orchestrator.getStacksNodeUrl() });
 
-    await orchestrator.waitForNextStacksBlock();
+    // Wait for the 2.1 activation
+    await orchestrator.waitForStacksBlockAnchoredOnBitcoinBlockOfHeight(
+      timeline.epoch_2_2
+    );
 
-    let {response, transaction} = await deployContract(
+    let { response, transaction } = await deployContract(
       network,
       Accounts.DEPLOYER,
       0,
-      "test-trait",
-      codeBodyTestTrait
+      "impl-trait",
+      codeBodyImplTrait
     );
     expect(response.error).toBeUndefined();
-    await asyncExpectStacksTransactionSuccess(
-      orchestrator,
-      transaction.txid()
-    );
+    await asyncExpectStacksTransactionSuccess(orchestrator, transaction.txid());
 
-    ({response, transaction} = await deployContract(
+    ({ response, transaction } = await deployContract(
       network,
       Accounts.DEPLOYER,
       1,
-      "impl-trait",
-      codeBodyImplTrait
+      "test-trait",
+      codeBodyTestTrait
     ));
     expect(response.error).toBeUndefined();
-    await asyncExpectStacksTransactionSuccess(
-      orchestrator,
-      transaction.txid()
-    );
+    await asyncExpectStacksTransactionSuccess(orchestrator, transaction.txid());
 
     await orchestrator.waitForNextStacksBlock();
 
     // Call the readonly function
     let output = await callReadOnlyTestTraitFooArg(network);
-    expect(output, cvToString(output)).toEqual(
-      contractPrincipalCV(contractAddress, "impl-trait")
-    );
+    expect(output).toEqual(contractPrincipalCV(contractAddress, "impl-trait"));
 
     // call public function as readonly
-    output = await callReadOnlyTestTraitCallFo(network, { a: 1 });
-    expect(output, cvToString(output)).toEqual(responseOkCV(uintCV(1)));
+    output = await callReadOnlyTestTraitCallFoo(network, { a: 2 });
+    expect(output).toEqual(responseOkCV(uintCV(2)));
 
     // Call the public function
     ({ response, transaction } = await broadcastTestImplCallFoo(
       network,
       Accounts.WALLET_1,
       0,
-      { a: 1 }
+      { a: 2 }
     ));
     expect(response.error).toBeUndefined();
-    let [_, tx] = await asyncExpectStacksTransactionSuccess(
+    let [_, tx] = await waitForStacksTransaction(
       orchestrator,
       transaction.txid()
     );
-    expect((tx as StacksTransactionMetadata).result).toEqual("(ok u1)");
-  });
-
-  it("passing a trait parameter should not work in Stacks 2.2", async () => {
-    const network = new StacksTestnet({
-      url: orchestrator.getStacksNodeUrl(),
-    });
-
-    // Wait for the 2.2 activation, then check again
-    await orchestrator.waitForStacksBlockAnchoredOnBitcoinBlockOfHeight(
-      timeline.epoch_2_2 + 2
-    );
-
-    // Call the readonly function
-    let output = await callReadOnlyTestTraitFooArg(network).catch((e: Error) =>
-      errorToCV(e)
-    );
-
-    expect(cvToString(output), cvToString(output)).toContain(
-      "Unchecked(TypeValueError(TraitReferenceType"
-    );
-
-    // call public function as readonly
-    output = await callReadOnlyTestTraitCallFo(network, { a: 2 }).catch(
-      (e: Error) => errorToCV(e)
-    );
-
-    expect(cvToString(output), cvToString(output)).toContain(
-      "Unchecked(TypeValueError(TraitReferenceType"
-    );
-
-    // Call the public function
-    let { response } = await broadcastTestImplCallFoo(
-      network,
-      Accounts.WALLET_1,
-      1,
-      { a: 2 }
-    );
-    expect(response.error).toEqual("transaction rejected");
+    expect(tx.result).toEqual("(ok u2)");
   });
 
   it("passing a trait parameter should work in Stacks 2.3", async () => {
@@ -242,14 +193,14 @@ describe("trait parameter", () => {
     expect(output).toEqual(contractPrincipalCV(contractAddress, "impl-trait"));
 
     // call public function as readonly
-    output = await callReadOnlyTestTraitCallFo(network, { a: 3 });
+    output = await callReadOnlyTestTraitCallFoo(network, { a: 3 });
     expect(output).toEqual(responseOkCV(uintCV(3)));
 
     // Call the public function
     let { response, transaction } = await broadcastTestImplCallFoo(
       network,
       Accounts.WALLET_1,
-      1, // use nonce again
+      1,
       { a: 3 }
     );
     expect(response.error).toBeUndefined();
