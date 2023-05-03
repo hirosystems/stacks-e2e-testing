@@ -130,7 +130,10 @@ describe("trait implementer and trait user both deployed in 2.1", () => {
   it("passing a trait parameter should work in Stacks 2.1", async () => {
     const network = new StacksTestnet({ url: orchestrator.getStacksNodeUrl() });
 
-    await orchestrator.waitForNextStacksBlock();
+    // Wait for the 2.1 activation
+    await orchestrator.waitForStacksBlockAnchoredOnBitcoinBlockOfHeight(
+      timeline.epoch_2_1
+    );
 
     let { response, transaction } = await deployContract(
       network,
@@ -141,11 +144,6 @@ describe("trait implementer and trait user both deployed in 2.1", () => {
     );
     expect(response.error).toBeUndefined();
     await asyncExpectStacksTransactionSuccess(orchestrator, transaction.txid());
-
-    // Wait for the 2.1 activation
-    await orchestrator.waitForStacksBlockAnchoredOnBitcoinBlockOfHeight(
-      timeline.epoch_2_1
-    );
 
     ({ response, transaction } = await deployContract(
       network,
