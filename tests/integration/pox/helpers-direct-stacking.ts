@@ -13,11 +13,12 @@ import { Contracts } from "../constants";
 
 import { toBytes } from "@stacks/common";
 import { decodeBtcAddress } from "@stacks/stacking";
-import { Account, BroadcastOptions, BroadcastOptionsPox2 } from "./helpers";
+import { BroadcastOptionsPox } from "./helpers";
+import { BroadcastOptions } from "../helpers";
 const fetch = require("node-fetch");
 
 export const broadcastStackSTX = async (
-  { poxVersion, network, account, fee, nonce }: BroadcastOptions,
+  { poxVersion, network, account, fee, nonce }: BroadcastOptionsPox,
   {
     amount,
     blockHeight,
@@ -54,7 +55,7 @@ export const broadcastStackSTX = async (
 };
 
 export const broadcastStackIncrease = async (
-  { network, account, fee, nonce }: BroadcastOptionsPox2,
+  { network, account, fee, nonce }: BroadcastOptions,
   { amount }: { amount: number }
 ): Promise<TxBroadcastResult> => {
   const txOptions = {
@@ -76,7 +77,7 @@ export const broadcastStackIncrease = async (
 };
 
 export const broadcastStackExtend = async (
-  { network, account, fee, nonce }: BroadcastOptionsPox2,
+  { network, account, fee, nonce }: BroadcastOptions,
   { cycles }: { cycles: number }
 ): Promise<TxBroadcastResult> => {
   const { version, data } = decodeBtcAddress(account.btcAddress);

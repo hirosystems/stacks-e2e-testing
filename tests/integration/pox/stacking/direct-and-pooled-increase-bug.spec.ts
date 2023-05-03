@@ -1,8 +1,14 @@
-import { DevnetNetworkOrchestrator } from "@hirosystems/stacks-devnet-js";
+import {
+  DevnetNetworkOrchestrator,
+  stacksNodeVersion,
+} from "@hirosystems/stacks-devnet-js";
 import { StacksTestnet } from "@stacks/network";
 import { uintCV } from "@stacks/transactions";
 import { Accounts, Constants } from "../../constants";
 import {
+  DEFAULT_EPOCH_TIMELINE,
+  asyncExpectStacksTransactionSuccess,
+  broadcastSTXTransfer,
   buildDevnetNetworkOrchestrator,
   getNetworkIdFromEnv,
   waitForStacksTransaction,
@@ -22,10 +28,27 @@ import {
 
 describe("testing mixed direct and pooled stacking under epoch 2.1", () => {
   let orchestrator: DevnetNetworkOrchestrator;
+  let version: string;
+  if (typeof stacksNodeVersion === "function") {
+    version = stacksNodeVersion();
+  } else {
+    version = "2.1";
+  }
+  const timeline = {
+    ...DEFAULT_EPOCH_TIMELINE,
+    epoch_2_2: 126,
+    pox_2_unlock_height: 127,
+  };
   const fee = 1000;
+  let bobNonce = 0;
+  let faucetNonce = 0;
 
   beforeAll(() => {
-    orchestrator = buildDevnetNetworkOrchestrator(getNetworkIdFromEnv());
+    orchestrator = buildDevnetNetworkOrchestrator(
+      getNetworkIdFromEnv(),
+      version,
+      timeline
+    );
     orchestrator.start();
   });
 
@@ -46,14 +69,26 @@ describe("testing mixed direct and pooled stacking under epoch 2.1", () => {
 
     // Faucet stacks 75m STX
     let response = await broadcastStackSTX(
-      { poxVersion: 2, network, account: Accounts.FAUCET, fee, nonce: 0 },
+      {
+        poxVersion: 2,
+        network,
+        account: Accounts.FAUCET,
+        fee,
+        nonce: faucetNonce++,
+      },
       { amount: 75_000_000_000_000, blockHeight, cycles }
     );
     expect(response.error).toBeUndefined();
 
     // Faucet delegates 1_100m to Bob
     response = await broadcastDelegateSTX(
-      { poxVersion: 2, network, account: Accounts.FAUCET, fee, nonce: 1 },
+      {
+        poxVersion: 2,
+        network,
+        account: Accounts.FAUCET,
+        fee,
+        nonce: faucetNonce++,
+      },
       { amount: 1_100_000_000_000_000, poolAddress: Accounts.WALLET_2 }
     );
     expect(response.error).toBeUndefined();
@@ -65,7 +100,13 @@ describe("testing mixed direct and pooled stacking under epoch 2.1", () => {
 
     // Bob increase delegation by 920m
     response = await broadcastDelegateStackIncrease(
-      { poxVersion: 2, network, account: Accounts.WALLET_2, fee, nonce: 0 },
+      {
+        poxVersion: 2,
+        network,
+        account: Accounts.WALLET_2,
+        fee,
+        nonce: bobNonce++,
+      },
       {
         stacker: Accounts.FAUCET,
         poolRewardAccount: Accounts.WALLET_2,
@@ -79,7 +120,13 @@ describe("testing mixed direct and pooled stacking under epoch 2.1", () => {
 
     // Bob commits 920m
     response = await broadcastStackAggregationCommitIndexed(
-      { poxVersion: 2, network, account: Accounts.WALLET_2, fee, nonce: 1 },
+      {
+        poxVersion: 2,
+        network,
+        account: Accounts.WALLET_2,
+        fee,
+        nonce: bobNonce++,
+      },
       { poolRewardAccount: Accounts.WALLET_2, cycleId: 2 }
     );
     expect(response.error).toBeUndefined();
@@ -148,8 +195,75 @@ describe("testing mixed direct and pooled stacking under epoch 2.1", () => {
     await expectAccountToBe(
       network,
       Accounts.FAUCET.stxAddress,
-      1_000_000_000_000_000 - fee * 2,
+      1_000_000_000_000_000 - faucetNonce * fee,
       0
     );
+  });
+
+  it("everything unlocks as expected upon v2 unlock height", async () => {
+    // This test should only run when running a 2.2 node
+    if (version !== "2.2") {
+      return;
+    }
+    const network = new StacksTestnet({ url: orchestrator.getStacksNodeUrl() });
+
+    // Wait for 2.2 activation and unlock
+    await orchestrator.waitForStacksBlockAnchoredOnBitcoinBlockOfHeight(
+      timeline.pox_2_unlock_height + 1
+    );
+
+    // Check Bob's account info
+    await expectAccountToBe(
+      network,
+      Accounts.WALLET_2.stxAddress,
+      100_000_000_000_000 - bobNonce * fee,
+      0
+    );
+
+    // Verify that Bob's STX are really unlocked by doing a transfer
+    let response = await broadcastSTXTransfer(
+      { network, account: Accounts.WALLET_2, fee, nonce: bobNonce++ },
+      {
+        amount: 100_000_000_000_000 - bobNonce * fee,
+        recipient: Accounts.WALLET_3.stxAddress,
+      }
+    );
+    await asyncExpectStacksTransactionSuccess(orchestrator, response.txid);
+
+    // Check Faucet's account info
+    await expectAccountToBe(
+      network,
+      Accounts.FAUCET.stxAddress,
+      1_000_000_000_000_000 - faucetNonce * fee,
+      0
+    );
+
+    // Verify that Faucet's STX are really unlocked by doing a transfer
+    response = await broadcastSTXTransfer(
+      { network, account: Accounts.FAUCET, fee, nonce: faucetNonce++ },
+      {
+        amount: 1_000_000_000_000_000 - faucetNonce * fee,
+        recipient: Accounts.WALLET_3.stxAddress,
+      }
+    );
+    await asyncExpectStacksTransactionSuccess(orchestrator, response.txid);
+  });
+
+  it("PoX should stay disabled indefinitely", async () => {
+    // This test should only run when running a 2.2 node
+    if (version !== "2.2") {
+      return;
+    }
+
+    const network = new StacksTestnet({ url: orchestrator.getStacksNodeUrl() });
+    let poxInfo = await getPoxInfo(network);
+    await waitForNextRewardPhase(
+      network,
+      orchestrator,
+      poxInfo.current_cycle.id + 1
+    );
+
+    poxInfo = await getPoxInfo(network);
+    expect(poxInfo.current_cycle.is_pox_active).toBeFalsy();
   });
 });

@@ -3,10 +3,20 @@ import {
   stacksNodeVersion,
 } from "@hirosystems/stacks-devnet-js";
 import { StacksTestnet } from "@stacks/network";
-import { uintCV } from "@stacks/transactions";
+import {
+  AnchorMode,
+  PostConditionMode,
+  broadcastTransaction,
+  callReadOnlyFunction,
+  cvToString,
+  makeContractDeploy,
+  standardPrincipalCV,
+  uintCV,
+} from "@stacks/transactions";
 import { Accounts, Constants } from "../../constants";
 import {
   DEFAULT_EPOCH_TIMELINE,
+  asyncExpectStacksTransactionSuccess,
   buildDevnetNetworkOrchestrator,
   getNetworkIdFromEnv,
   waitForStacksTransaction,
@@ -22,6 +32,7 @@ import {
   broadcastStackIncrease,
   broadcastStackSTX,
 } from "../helpers-direct-stacking";
+import { time } from "console";
 
 describe("testing solo stacker increase with bug", () => {
   let orchestrator: DevnetNetworkOrchestrator;
@@ -31,13 +42,13 @@ describe("testing solo stacker increase with bug", () => {
   } else {
     version = "2.1";
   }
+  const timeline = {
+    ...DEFAULT_EPOCH_TIMELINE,
+    epoch_2_2: 118,
+    pox_2_unlock_height: 119,
+  };
 
   beforeAll(() => {
-    const timeline = {
-      ...DEFAULT_EPOCH_TIMELINE,
-      epoch_2_2: 118,
-      pox_2_unlock_height: 119,
-    };
     orchestrator = buildDevnetNetworkOrchestrator(
       getNetworkIdFromEnv(),
       version,
@@ -50,20 +61,40 @@ describe("testing solo stacker increase with bug", () => {
     orchestrator.terminate();
   });
 
-  it("using stacks-increase in the same cycle should result in increased rewards", async () => {
+  it("epoch gating in clarity should work", async () => {
     const network = new StacksTestnet({ url: orchestrator.getStacksNodeUrl() });
 
-    // Wait for Stacks genesis block
-    await orchestrator.waitForNextStacksBlock();
-    // Wait for block N+1 where N is the height of the next reward phase
-    await waitForNextRewardPhase(network, orchestrator, 1);
+    await orchestrator.waitForStacksBlockAnchoredOnBitcoinBlockOfHeight(
+      timeline.pox_2_activation + 1
+    );
+
+    const codeBody = `(define-read-only (check-unlock-height (address principal))
+    (get unlock-height (stx-account address))
+)`;
+
+    // Build the transaction to deploy the contract
+    let deployTxOptions = {
+      senderKey: Accounts.DEPLOYER.secretKey,
+      contractName: "test-2-2",
+      codeBody,
+      fee: 2000,
+      network,
+      anchorMode: AnchorMode.OnChainOnly,
+      postConditionMode: PostConditionMode.Allow,
+      nonce: 0,
+    };
+
+    let transaction = await makeContractDeploy(deployTxOptions);
+    let response = await broadcastTransaction(transaction, network);
+    expect(response.error).toBeUndefined();
+    await asyncExpectStacksTransactionSuccess(orchestrator, transaction.txid());
 
     const blockHeight = Constants.DEVNET_DEFAULT_POX_2_ACTIVATION + 1;
     const fee = 1000;
-    const cycles = 1;
+    const cycles = 4;
 
     // Faucet stacks 900m (1/4 of liquid suply)
-    let response = await broadcastStackSTX(
+    response = await broadcastStackSTX(
       { poxVersion: 2, network, account: Accounts.FAUCET, fee, nonce: 0 },
       { amount: 900_000_000_000_001, blockHeight, cycles }
     );
@@ -146,38 +177,53 @@ describe("testing solo stacker increase with bug", () => {
     // expect(poxAddrInfo2["total-ustx"]).toEqual(uintCV(90_000_000_011_000));
     expect(poxAddrInfo2?.["total-ustx"]).toEqual(uintCV(1080_000_000_011_111));
 
-    // advance to block 120, the last one before chain halt
-    let coreInfo = await getCoreInfo(network);
-    const mineUntilHalt = 120 - coreInfo.burn_block_height;
-    const potentialCrashHeight = coreInfo.stacks_tip_height + mineUntilHalt;
-    let lastIndices;
-    for (let i = 0; i < mineUntilHalt; i++) {
-      lastIndices = await mineBitcoinBlockAndHopeForStacksBlock(orchestrator);
-    }
-    expect(lastIndices).toStrictEqual({
-      btcIndex: 120,
-      stxIndex: coreInfo.stacks_tip_height + mineUntilHalt,
+    // Verify that calling the clarity contract gives the same incorrect result
+    // before the 2.2 actiavtion.
+    let output = await callReadOnlyFunction({
+      contractName: "test-2-2",
+      contractAddress: Accounts.DEPLOYER.stxAddress,
+      functionName: "check-unlock-height",
+      functionArgs: [standardPrincipalCV(Accounts.WALLET_2.stxAddress)],
+      network,
+      senderAddress: Accounts.WALLET_1.stxAddress,
     });
+    expect(output).toEqual(uintCV(160));
 
-    if (version === "2.2") {
-      // Mine a couple more blocks and verify that the chain is still advancing
-      await orchestrator.mineBitcoinBlockAndHopeForStacksBlock();
-      await orchestrator.mineBitcoinBlockAndHopeForStacksBlock();
-      coreInfo = await getCoreInfo(network);
-      expect(coreInfo.burn_block_height).toBeGreaterThan(120);
-      expect(coreInfo.stacks_tip_height).toBeGreaterThan(potentialCrashHeight);
-    } else {
-      // try two bitcoin blocks and assert that no more stacks blocks are mined
-      lastIndices = await mineBitcoinBlockAndHopeForStacksBlock(orchestrator);
-      expect(lastIndices).toStrictEqual({
-        stxIndex: undefined,
-        btcIndex: undefined,
-      });
-      lastIndices = await mineBitcoinBlockAndHopeForStacksBlock(orchestrator);
-      expect(lastIndices).toStrictEqual({
-        stxIndex: undefined,
-        btcIndex: undefined,
-      });
-    }
+    output = await callReadOnlyFunction({
+      contractName: "test-2-2",
+      contractAddress: Accounts.DEPLOYER.stxAddress,
+      functionName: "check-unlock-height",
+      functionArgs: [standardPrincipalCV(Accounts.WALLET_3.stxAddress)],
+      network,
+      senderAddress: Accounts.WALLET_1.stxAddress,
+    });
+    expect(output).toEqual(uintCV(160));
+
+    // Wait for the 2.2 activation, then check again
+    await orchestrator.waitForStacksBlockAnchoredOnBitcoinBlockOfHeight(
+      timeline.epoch_2_2
+    );
+
+    // Verify that calling the clarity contract gives the same incorrect result
+    // before the 2.2 actiavtion.
+    output = await callReadOnlyFunction({
+      contractName: "test-2-2",
+      contractAddress: Accounts.DEPLOYER.stxAddress,
+      functionName: "check-unlock-height",
+      functionArgs: [standardPrincipalCV(Accounts.WALLET_2.stxAddress)],
+      network,
+      senderAddress: Accounts.WALLET_1.stxAddress,
+    });
+    expect(output).toEqual(uintCV(timeline.pox_2_unlock_height));
+
+    output = await callReadOnlyFunction({
+      contractName: "test-2-2",
+      contractAddress: Accounts.DEPLOYER.stxAddress,
+      functionName: "check-unlock-height",
+      functionArgs: [standardPrincipalCV(Accounts.WALLET_3.stxAddress)],
+      network,
+      senderAddress: Accounts.WALLET_1.stxAddress,
+    });
+    expect(output).toEqual(uintCV(timeline.pox_2_unlock_height));
   });
 });
