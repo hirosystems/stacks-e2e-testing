@@ -3,7 +3,7 @@ import {
   StacksChainUpdate,
 } from "@hirosystems/stacks-devnet-js";
 import { StacksNetwork } from "@stacks/network";
-import { CoreInfo } from "@stacks/stacking";
+import { CoreInfo, PoxInfo } from "@stacks/stacking";
 import {
   tupleCV,
   uintCV,
@@ -64,7 +64,12 @@ export const getCoreInfo = async (
 export const getPoxInfo = async (
   network: StacksNetwork,
   retry?: number
-): Promise<any> => {
+): Promise<
+  PoxInfo & {
+    total_liquid_supply_ustx: number;
+    pox_activation_threshold_ustx: number;
+  }
+> => {
   let retryCountdown = retry ? retry : 20;
   if (retryCountdown == 0) return Promise.reject();
   try {
@@ -194,8 +199,8 @@ export const expectNoError = (response: TxBroadcastResult) => {
 
 // represents a JS error as Clarity value
 export const errorToCV = (e: Error) => {
-  return responseErrorCV(stringAsciiCV(e.message))
-}
+  return responseErrorCV(stringAsciiCV(e.message));
+};
 
 export const readRewardCyclePoxAddressList = async (
   network: StacksNetwork,

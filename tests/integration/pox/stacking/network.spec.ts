@@ -4,6 +4,7 @@ import {
 } from "@hirosystems/stacks-devnet-js";
 import { StacksTestnet } from "@stacks/network";
 import {
+  DEFAULT_EPOCH_TIMELINE,
   buildDevnetNetworkOrchestrator,
   getNetworkIdFromEnv,
 } from "../../helpers";
@@ -21,7 +22,8 @@ describe("testing devnet settings", () => {
   beforeAll(() => {
     orchestrator = buildDevnetNetworkOrchestrator(
       getNetworkIdFromEnv(),
-      version
+      version,
+      DEFAULT_EPOCH_TIMELINE,
     );
     orchestrator.start();
   });
@@ -45,5 +47,11 @@ describe("testing devnet settings", () => {
     expect(poxInfo.pox_activation_threshold_ustx).toBe(70_286_942_145_278);
     expect(poxInfo.current_cycle.id).toBe(1);
     expect(poxInfo.current_cycle.min_threshold_ustx).toBe(29_290_000_000_000);
+    expect(poxInfo.prepare_phase_block_length).toBe(4);
+    expect(poxInfo.reward_phase_block_length).toBe(6);
+    expect(poxInfo.first_burnchain_block_height).toBe(100);
+    expect(poxInfo.current_burnchain_block_height).toBe(112);
+    expect(poxInfo.next_reward_cycle_in).toBe(8);
+    expect(poxInfo.next_cycle.reward_phase_start_block_height).toBe(120);
   });
 });
