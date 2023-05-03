@@ -14,28 +14,41 @@ import {
   getBitcoinBlockHeight,
   getNetworkIdFromEnv,
   getChainInfo,
+  DEFAULT_EPOCH_TIMELINE,
 } from "../../helpers";
 import {
   DevnetNetworkOrchestrator,
   StacksTransactionMetadata,
+  stacksNodeVersion,
 } from "@hirosystems/stacks-devnet-js";
 
 describe("use and define trait with same name", () => {
   let orchestrator: DevnetNetworkOrchestrator;
+  let version: string;
+  if (typeof stacksNodeVersion === "function") {
+    version = stacksNodeVersion();
+  } else {
+    version = "2.1";
+  }
+  const timeline = {
+    ...DEFAULT_EPOCH_TIMELINE,
+    epoch_2_1: 112,
+    pox_2_activation: 120,
+    epoch_2_2: 128,
+    pox_2_unlock_height: 129,
+  };
   let network: StacksNetwork;
-  const STACKS_2_1_EPOCH = 112;
 
   let networkId: number;
 
   beforeAll(() => {
     networkId = getNetworkIdFromEnv();
     console.log(`network #${networkId}`);
-    orchestrator = buildDevnetNetworkOrchestrator(networkId, {
-      epoch_2_0: 100,
-      epoch_2_05: 102,
-      epoch_2_1: STACKS_2_1_EPOCH,
-      pox_2_activation: 120,
-    });
+    orchestrator = buildDevnetNetworkOrchestrator(
+      getNetworkIdFromEnv(),
+      version,
+      timeline
+    );
     orchestrator.start();
     network = new StacksTestnet({ url: orchestrator.getStacksNodeUrl() });
   });
@@ -68,6 +81,7 @@ describe("use and define trait with same name", () => {
       anchorMode: AnchorMode.OnChainOnly,
       postConditionMode: PostConditionMode.Allow,
       nonce: 0,
+      clarityVersion: undefined,
     };
 
     let tx = await makeContractDeploy(deployTxOptions);
@@ -92,6 +106,7 @@ describe("use and define trait with same name", () => {
       anchorMode: AnchorMode.OnChainOnly,
       postConditionMode: PostConditionMode.Allow,
       nonce: 1,
+      clarityVersion: undefined,
     };
 
     tx = await makeContractDeploy(deployTxOptions);
@@ -110,14 +125,14 @@ describe("use and define trait with same name", () => {
     expect(metadata.success).toBeFalsy();
 
     // Make sure we stayed in 2.05
-    expect(getBitcoinBlockHeight(chainUpdate)).toBeLessThan(STACKS_2_1_EPOCH);
+    expect(getBitcoinBlockHeight(chainUpdate)).toBeLessThan(timeline.epoch_2_1);
   });
 
   describe("in 2.1", () => {
     beforeAll(async () => {
       // Wait for 2.1 to go live
       await orchestrator.waitForStacksBlockAnchoredOnBitcoinBlockOfHeight(
-        STACKS_2_1_EPOCH + 1
+        timeline.epoch_2_1 + 1
       );
     });
 
