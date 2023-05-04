@@ -4,6 +4,7 @@ import {
   StacksChainUpdate,
   StacksTransactionMetadata,
   getIsolatedNetworkConfigUsingNetworkId,
+  stacksNodeVersion,
 } from "@hirosystems/stacks-devnet-js";
 import { StacksNetwork } from "@stacks/network";
 import { Constants, DEFAULT_FEE } from "./constants";
@@ -107,6 +108,16 @@ export const getNetworkIdFromEnv = (): number => {
     ? parseInt(process.env.VITEST_WORKER_ID!)
     : 1;
   return networkId;
+};
+
+export const getStacksNodeVersion = () => {
+  let version: string;
+  if (typeof stacksNodeVersion === "function") {
+    version = stacksNodeVersion();
+  } else {
+    version = "2.1";
+  }
+  return version;
 };
 
 const delay = () => new Promise((resolve) => setTimeout(resolve, 2000));
