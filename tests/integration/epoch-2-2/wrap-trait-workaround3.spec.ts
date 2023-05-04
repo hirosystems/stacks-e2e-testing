@@ -110,7 +110,7 @@ describe("concrete trait parameter used in a wrapper", () => {
     orchestrator.terminate();
   });
 
-  it("using a concrete trait parameter should work in Stacks 2.2", async () => {
+  it("using a concrete trait parameter should not work in Stacks 2.2", async () => {
     const network = new StacksTestnet({ url: orchestrator.getStacksNodeUrl() });
 
     await orchestrator.waitForNextStacksBlock();
@@ -138,10 +138,10 @@ describe("concrete trait parameter used in a wrapper", () => {
     await orchestrator.waitForNextStacksBlock();
 
     //
-    // Wait for the 2.3 activation, then check again
+    // Wait for the 2.2 activation, then check
     //
     await orchestrator.waitForStacksBlockAnchoredOnBitcoinBlockOfHeight(
-      timeline.epoch_2_3 + 2
+      timeline.epoch_2_2 + 2
     );
 
     ({ response, transaction } = await deployContract(
@@ -156,17 +156,38 @@ describe("concrete trait parameter used in a wrapper", () => {
 
     await orchestrator.waitForNextStacksBlock();
 
-    // call public function as readonly
-    let output = await callReadOnlyTestTraitWrapperCallFo(network, { a: 3 });
-    expect(output).toEqual(responseOkCV(uintCV(3)));
-
     // Call the public function
     ({ response, transaction } = await broadcastTestTraitWrapperCallFoo(
       network,
       Accounts.WALLET_1,
-      0, // use nonce again
+      0,
       { a: 3 }
     ));
+    expect(response.error).toBeUndefined();
+    let [_, tx] = await waitForStacksTransaction(
+      orchestrator,
+      transaction.txid()
+    );
+    expect(tx.result).toEqual("(err none)");
+
+  });
+
+  it("using a concrete trait parameter should work in Stacks 2.3", async () => {
+    const network = new StacksTestnet({ url: orchestrator.getStacksNodeUrl() });
+    //
+    // Wait for the 2.3 activation, then check again
+    //
+    await orchestrator.waitForStacksBlockAnchoredOnBitcoinBlockOfHeight(
+      timeline.epoch_2_3 + 2
+    );
+
+    // Call the public function
+    let { response, transaction } = await broadcastTestTraitWrapperCallFoo(
+      network,
+      Accounts.WALLET_1,
+      1,
+      { a: 3 }
+    );
     expect(response.error).toBeUndefined();
     let [_, tx] = await waitForStacksTransaction(
       orchestrator,
