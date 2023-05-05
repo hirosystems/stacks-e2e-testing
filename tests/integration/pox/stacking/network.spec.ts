@@ -12,19 +12,9 @@ import { getPoxInfo, waitForNextRewardPhase } from "../helpers";
 
 describe("testing devnet settings", () => {
   let orchestrator: DevnetNetworkOrchestrator;
-  let version: string;
-  if (typeof stacksNodeVersion === "function") {
-    version = stacksNodeVersion();
-  } else {
-    version = "2.1";
-  }
 
   beforeAll(() => {
-    orchestrator = buildDevnetNetworkOrchestrator(
-      getNetworkIdFromEnv(),
-      version,
-      DEFAULT_EPOCH_TIMELINE,
-    );
+    orchestrator = buildDevnetNetworkOrchestrator(getNetworkIdFromEnv());
     orchestrator.start();
   });
 

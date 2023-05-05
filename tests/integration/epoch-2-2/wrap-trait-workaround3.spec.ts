@@ -26,12 +26,6 @@ import {
 
 describe("concrete trait parameter used in a wrapper", () => {
   let orchestrator: DevnetNetworkOrchestrator;
-  let version: string;
-  if (typeof stacksNodeVersion === "function") {
-    version = stacksNodeVersion();
-  } else {
-    version = "2.1";
-  }
   const timeline = {
     ...DEFAULT_EPOCH_TIMELINE,
     epoch_2_2: 118,
@@ -99,7 +93,6 @@ describe("concrete trait parameter used in a wrapper", () => {
   beforeAll(() => {
     orchestrator = buildDevnetNetworkOrchestrator(
       getNetworkIdFromEnv(),
-      version,
       timeline
     );
     orchestrator.start();
@@ -168,7 +161,6 @@ describe("concrete trait parameter used in a wrapper", () => {
       transaction.txid()
     );
     expect(tx.result).toEqual("(err none)");
-
   });
 
   it("using a concrete trait parameter should work in Stacks 2.3", async () => {

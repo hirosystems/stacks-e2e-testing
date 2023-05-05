@@ -28,12 +28,6 @@ import {
 
 describe("testing solo stacker increase with bug", () => {
   let orchestrator: DevnetNetworkOrchestrator;
-  let version: string;
-  if (typeof stacksNodeVersion === "function") {
-    version = stacksNodeVersion();
-  } else {
-    version = "2.1";
-  }
   const timeline = {
     ...DEFAULT_EPOCH_TIMELINE,
     epoch_2_2: 118,
@@ -42,7 +36,6 @@ describe("testing solo stacker increase with bug", () => {
   beforeAll(() => {
     orchestrator = buildDevnetNetworkOrchestrator(
       getNetworkIdFromEnv(),
-      version,
       timeline
     );
     orchestrator.start();

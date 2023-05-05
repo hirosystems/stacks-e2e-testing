@@ -49,7 +49,6 @@ describe("testing mixed direct and pooled stacking with extend under epoch 2.1",
   beforeAll(() => {
     orchestrator = buildDevnetNetworkOrchestrator(
       getNetworkIdFromEnv(),
-      version,
       timeline
     );
     orchestrator.start();

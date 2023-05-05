@@ -36,10 +36,7 @@ describe("testing solo stacker increase without bug", () => {
   let bobNonce = 0;
 
   beforeAll(() => {
-    orchestrator = buildDevnetNetworkOrchestrator(
-      getNetworkIdFromEnv(),
-      version
-    );
+    orchestrator = buildDevnetNetworkOrchestrator(getNetworkIdFromEnv());
     orchestrator.start();
   });
 

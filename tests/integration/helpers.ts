@@ -40,7 +40,6 @@ export const DEFAULT_EPOCH_TIMELINE = {
 
 export function buildDevnetNetworkOrchestrator(
   networkId: number,
-  stacksVersion: string,
   timeline: EpochTimeline = DEFAULT_EPOCH_TIMELINE,
   logs = false,
   stacks_node_image_url?: string
@@ -50,9 +49,7 @@ export function buildDevnetNetworkOrchestrator(
   // Set the stacks-node image URL to the default image for the version if it's
   // not explicitly set
   if (stacks_node_image_url === undefined) {
-    if (Number(stacksVersion) >= 2.2) {
-      stacks_node_image_url = Constants.CUSTOM_STACKS_NODE_IMAGE_URL;
-    }
+    stacks_node_image_url = process.env.CUSTOM_STACKS_NODE;
   }
   let config = {
     logs,

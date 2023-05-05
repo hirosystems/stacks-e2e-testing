@@ -44,7 +44,6 @@ describe("testing stack-extend functionality", () => {
   beforeAll(() => {
     orchestrator = buildDevnetNetworkOrchestrator(
       getNetworkIdFromEnv(),
-      version,
       timeline
     );
     orchestrator.start();

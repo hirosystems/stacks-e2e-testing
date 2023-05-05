@@ -15,12 +15,6 @@ import { broadcastStackSTX } from "../helpers-direct-stacking";
 
 describe("testing stacking under epoch 2.0", () => {
   let orchestrator: DevnetNetworkOrchestrator;
-  let version: string;
-  if (typeof stacksNodeVersion === "function") {
-    version = stacksNodeVersion();
-  } else {
-    version = "2.1";
-  }
   const timeline = {
     ...DEFAULT_EPOCH_TIMELINE,
     epoch_2_1: 126,
@@ -33,7 +27,6 @@ describe("testing stacking under epoch 2.0", () => {
   beforeAll(() => {
     orchestrator = buildDevnetNetworkOrchestrator(
       getNetworkIdFromEnv(),
-      version,
       timeline
     );
     orchestrator.start();

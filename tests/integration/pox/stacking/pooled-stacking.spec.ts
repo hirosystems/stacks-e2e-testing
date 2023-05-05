@@ -53,7 +53,6 @@ describe("testing pooled stacking under epoch 2.1", () => {
   beforeAll(() => {
     orchestrator = buildDevnetNetworkOrchestrator(
       getNetworkIdFromEnv(),
-      version,
       timeline
     );
     orchestrator.start();

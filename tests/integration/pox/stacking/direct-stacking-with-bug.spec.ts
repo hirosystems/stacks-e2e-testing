@@ -39,7 +39,6 @@ describe("testing solo stacker increase with bug", () => {
     };
     orchestrator = buildDevnetNetworkOrchestrator(
       getNetworkIdFromEnv(),
-      version,
       timeline
     );
     orchestrator.start();

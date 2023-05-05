@@ -47,7 +47,6 @@ describe("testing direct stacker as pool operator without auto-unlock under epoc
   beforeAll(() => {
     orchestrator = buildDevnetNetworkOrchestrator(
       getNetworkIdFromEnv(),
-      version,
       timeline
     );
     orchestrator.start();
