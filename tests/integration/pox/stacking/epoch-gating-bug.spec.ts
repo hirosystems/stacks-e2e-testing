@@ -8,7 +8,6 @@ import {
   PostConditionMode,
   broadcastTransaction,
   callReadOnlyFunction,
-  cvToString,
   makeContractDeploy,
   standardPrincipalCV,
   uintCV,
@@ -21,18 +20,11 @@ import {
   getNetworkIdFromEnv,
   waitForStacksTransaction,
 } from "../../helpers";
-import {
-  getCoreInfo,
-  getPoxInfo,
-  mineBtcBlock as mineBitcoinBlockAndHopeForStacksBlock,
-  readRewardCyclePoxAddressForAddress,
-  waitForNextRewardPhase,
-} from "../helpers";
+import { getPoxInfo, readRewardCyclePoxAddressForAddress } from "../helpers";
 import {
   broadcastStackIncrease,
   broadcastStackSTX,
 } from "../helpers-direct-stacking";
-import { time } from "console";
 
 describe("testing solo stacker increase with bug", () => {
   let orchestrator: DevnetNetworkOrchestrator;
@@ -45,7 +37,6 @@ describe("testing solo stacker increase with bug", () => {
   const timeline = {
     ...DEFAULT_EPOCH_TIMELINE,
     epoch_2_2: 118,
-    pox_2_unlock_height: 119,
   };
 
   beforeAll(() => {
@@ -112,7 +103,7 @@ describe("testing solo stacker increase with bug", () => {
 
     // Bob increases by 10m
     response = await broadcastStackIncrease(
-      { network, account: Accounts.WALLET_2, fee, nonce: 1 },
+      { poxVersion: 2, network, account: Accounts.WALLET_2, fee, nonce: 1 },
       { amount: 10000000000100 }
     );
     expect(response.error).toBeUndefined();
@@ -128,12 +119,7 @@ describe("testing solo stacker increase with bug", () => {
 
     // Cloe increases by 10m
     response = await broadcastStackIncrease(
-      {
-        network,
-        account: Accounts.WALLET_3,
-        fee,
-        nonce: 1,
-      },
+      { poxVersion: 2, network, account: Accounts.WALLET_3, fee, nonce: 1 },
       { amount: 10_000_000_010_000 }
     );
     expect(response.error).toBeUndefined();
@@ -214,7 +200,7 @@ describe("testing solo stacker increase with bug", () => {
       network,
       senderAddress: Accounts.WALLET_1.stxAddress,
     });
-    expect(output).toEqual(uintCV(timeline.pox_2_unlock_height));
+    expect(output).toEqual(uintCV(timeline.epoch_2_2 + 1));
 
     output = await callReadOnlyFunction({
       contractName: "test-2-2",
@@ -224,6 +210,6 @@ describe("testing solo stacker increase with bug", () => {
       network,
       senderAddress: Accounts.WALLET_1.stxAddress,
     });
-    expect(output).toEqual(uintCV(timeline.pox_2_unlock_height));
+    expect(output).toEqual(uintCV(timeline.epoch_2_2 + 1));
   });
 });

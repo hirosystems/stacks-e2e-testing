@@ -26,7 +26,8 @@ describe("testing stacking under epoch 2.0", () => {
     epoch_2_1: 126,
     pox_2_activation: 130,
     epoch_2_2: 2000,
-    pox_2_unlock_height: 2001,
+    epoch_2_3: 2001,
+    epoch_2_4: 2002,
   };
 
   beforeAll(() => {

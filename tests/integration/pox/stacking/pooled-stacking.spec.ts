@@ -43,7 +43,8 @@ describe("testing pooled stacking under epoch 2.1", () => {
   const timeline = {
     ...DEFAULT_EPOCH_TIMELINE,
     epoch_2_2: 144,
-    pox_2_unlock_height: 145,
+    epoch_2_3: 147,
+    epoch_2_4: 149,
   };
   let aliceNonce = 0;
   let bobNonce = 0;
@@ -427,7 +428,7 @@ describe("testing pooled stacking under epoch 2.1", () => {
 
     // Wait for 2.2 activation and unlock
     await orchestrator.waitForStacksBlockAnchoredOnBitcoinBlockOfHeight(
-      timeline.pox_2_unlock_height + 1
+      timeline.epoch_2_2 + 2
     );
 
     // Check Bob's account info

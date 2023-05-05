@@ -38,7 +38,8 @@ describe("testing direct stacker as pool operator without auto-unlock under epoc
   const timeline = {
     ...DEFAULT_EPOCH_TIMELINE,
     epoch_2_2: 127,
-    pox_2_unlock_height: 128,
+    epoch_2_3: 132,
+    epoch_2_4: 134,
   };
   let aliceNonce = 0;
   let faucetNonce = 0;
@@ -201,7 +202,7 @@ describe("testing direct stacker as pool operator without auto-unlock under epoc
 
     // Wait for 2.2 activation and unlock
     await orchestrator.waitForStacksBlockAnchoredOnBitcoinBlockOfHeight(
-      timeline.pox_2_unlock_height + 1
+      timeline.epoch_2_2 + 2
     );
 
     // Check Alice's account info

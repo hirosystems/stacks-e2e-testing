@@ -35,7 +35,8 @@ describe("testing stack-extend functionality", () => {
   const timeline = {
     ...DEFAULT_EPOCH_TIMELINE,
     epoch_2_2: 143,
-    pox_2_unlock_height: 144,
+    epoch_2_3: 145,
+    epoch_2_4: 147,
   };
   const fee = 1000;
   let aliceNonce = 0;
@@ -88,7 +89,13 @@ describe("testing stack-extend functionality", () => {
 
     // Alice extends stacking for another 2 cycles
     response = await broadcastStackExtend(
-      { network, account: Accounts.WALLET_1, fee, nonce: aliceNonce++ },
+      {
+        poxVersion: 2,
+        network,
+        account: Accounts.WALLET_1,
+        fee,
+        nonce: aliceNonce++,
+      },
       { cycles: 2 }
     );
     expect(response.error).toBeUndefined();
@@ -124,7 +131,7 @@ describe("testing stack-extend functionality", () => {
 
     // Wait for 2.2 activation and unlock
     await orchestrator.waitForStacksBlockAnchoredOnBitcoinBlockOfHeight(
-      timeline.pox_2_unlock_height + 1
+      timeline.epoch_2_2 + 2
     );
 
     // Check Alice's account info
