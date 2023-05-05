@@ -27,7 +27,7 @@ When running multiple tests, you'll want to limit it to one test at a time becau
 yarn vitest --run tests/integration/pox/stacking/ --threads false
 ```
 
-#### Using 2.2 node
+#### Using 2.4 `stacks-node`
 
 To run tests using the 2.2 node (the tests in the _pox-disabled/_ directory), you'll need to use a currently unpublished version of the `stacks-devnet-js` package which has support for the new settings. To build this locally:
 
@@ -72,9 +72,15 @@ npm unlink @hirosystems/stacks-devnet-js --no-save
 yarn install
 ```
 
-#### 2.2 Node Image
+#### 2.4 `stacks-node` Image
 
-On a Mac with Apple Silicon, the published stacks-node image, `blockstack/stacks-blockchain:fix-epoch-gate` does not seem to work correctly. You will know you have run into this problem if your tests fail with:
+To run with the latest node, you'll need to specify the docker image URL to use via an environment variable:
+
+```sh
+export CUSTOM_STACKS_NODE="blockstack/stacks-blockchain:devnet-2.4.0.0.0a"
+```
+
+On a Mac with Apple Silicon, the published stacks-node image, `blockstack/stacks-blockchain:devnet-2.4.0.0.0a` does not seem to work correctly. You will know you have run into this problem if your tests fail with:
 
 ```
 Unknown Error: waitForNextStacksBlock maxErrors reached
@@ -87,17 +93,10 @@ Apr 26 15:56:09.987721 INFO Anchor block selected for cycle 1: 58cae3b5f5ae5c0cd
 Apr 26 15:56:09.991729 ERRO Relayer: Failure fetching recipient set: ChainstateError(ClarityError(Interpreter(Unchecked(NoSuchContract("ST000000000000000000002AMW42H.pox-2")))))
 ```
 
-As an alternative, you can build this image locally, or update the image URL in \_tests/integration/constants.ts:
+As an alternative, you can build this image locally, or update the image URL in the environment variable to use:
 
-```patch
---- a/tests/integration/constants.ts
-+++ b/tests/integration/constants.ts
-@@ -7,7 +7,7 @@ export namespace Constants {
-   export const DEVNET_DEFAULT_POX_2_UNLOCK_HEIGHT = 123;
-   export const BITCOIN_BLOCK_TIME = 10_000;
-
-   export const PROPOSED_2_2_STACKS_NODE_IMAGE_URL =
--    "blockstack/stacks-blockchain:fix-epoch-gate";
-+    "stacksbrice/stacks-node:2.2.0.0.1";
- }
+```sh
+export CUSTOM_STACKS_NODE="stacksbrice/stacks-node:devnet-2.4.0.0.0a"
 ```
+
+If this environment variable is not defined, `stacks-devnet-js` will default to an older version of the `stacks-node`.
