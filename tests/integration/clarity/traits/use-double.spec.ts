@@ -76,6 +76,7 @@ describe("use", () => {
         anchorMode: AnchorMode.OnChainOnly,
         postConditionMode: PostConditionMode.Allow,
         nonce: 0,
+        clarityVersion: undefined,
       };
 
       let transaction = await makeContractDeploy(deployTxOptions);
@@ -100,6 +101,7 @@ describe("use", () => {
         anchorMode: AnchorMode.OnChainOnly,
         postConditionMode: PostConditionMode.Allow,
         nonce: 1,
+        clarityVersion: undefined,
       };
 
       transaction = await makeContractDeploy(deployTxOptions);
@@ -121,6 +123,7 @@ describe("use", () => {
         anchorMode: AnchorMode.OnChainOnly,
         postConditionMode: PostConditionMode.Allow,
         nonce: 2,
+        clarityVersion: undefined,
       };
 
       transaction = await makeContractDeploy(deployTxOptions);

@@ -34,7 +34,9 @@ describe("stx-account", () => {
   beforeAll(() => {
     networkId = getNetworkIdFromEnv();
     console.log(`network #${networkId}`);
-    orchestrator = buildDevnetNetworkOrchestrator(networkId);
+    orchestrator = buildDevnetNetworkOrchestrator(networkId, {
+      epoch_2_2: 300,
+    });
     orchestrator.start();
     network = new StacksTestnet({ url: orchestrator.getStacksNodeUrl() });
   });
@@ -62,6 +64,7 @@ describe("stx-account", () => {
       anchorMode: AnchorMode.OnChainOnly,
       postConditionMode: PostConditionMode.Allow,
       nonce: 0,
+      clarityVersion: undefined,
     };
 
     let transaction = await makeContractDeploy(deployTxOptions);
@@ -89,10 +92,11 @@ describe("stx-account", () => {
 
   describe("in 2.1", () => {
     beforeAll(async () => {
-      // Wait for 2.1 to go live
+      // Wait for pox-2 activation
       await orchestrator.waitForStacksBlockAnchoredOnBitcoinBlockOfHeight(
         Constants.DEVNET_DEFAULT_POX_2_ACTIVATION
       );
+      await orchestrator.waitForNextStacksBlock();
     });
 
     it("is valid", async () => {
@@ -342,17 +346,16 @@ describe("stx-account", () => {
           network,
           account: Accounts.WALLET_1,
           fee: 1000,
-          nonce: 1,
+          nonce: 5,
         },
-        { amount: 25_000_000_000_000, blockHeight, cycles: 5 }
+        { amount: 25_000_000_000_000, blockHeight, cycles }
       );
       expect(response.error).toBeUndefined();
 
       // Compute the unlockHeight to avoid flakiness
       let poxInfo = await getPoxInfo(network);
       let unlockHeight =
-        poxInfo.first_burnchain_block_height +
-        (1 + poxInfo.current_cycle.id) * poxInfo.reward_cycle_length +
+        poxInfo.next_cycle.reward_phase_start_block_height +
         cycles * poxInfo.reward_cycle_length;
 
       // Wait for block N+1 where N is the height of the next reward phase

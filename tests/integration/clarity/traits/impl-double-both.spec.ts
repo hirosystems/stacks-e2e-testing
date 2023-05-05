@@ -69,6 +69,7 @@ describe("use", () => {
         anchorMode: AnchorMode.OnChainOnly,
         postConditionMode: PostConditionMode.Allow,
         nonce: 0,
+        clarityVersion: undefined,
       };
 
       let transaction = await makeContractDeploy(deployTxOptions);
@@ -93,6 +94,7 @@ describe("use", () => {
         anchorMode: AnchorMode.OnChainOnly,
         postConditionMode: PostConditionMode.Allow,
         nonce: 1,
+        clarityVersion: undefined,
       };
 
       transaction = await makeContractDeploy(deployTxOptions);
@@ -111,7 +113,7 @@ describe("use", () => {
     });
   });
 
-  describe.skip("in 2.1", () => {
+  describe("in 2.1", () => {
     beforeAll(async () => {
       // Wait for 2.1 to go live
       await orchestrator.waitForStacksBlockAnchoredOnBitcoinBlockOfHeight(
@@ -131,7 +133,7 @@ describe("use", () => {
           network,
           anchorMode: AnchorMode.OnChainOnly,
           postConditionMode: PostConditionMode.Allow,
-          nonce: 2,
+          nonce: 1, // Reuse nonce 1 since the previous tx was rejected
         };
 
         let transaction = await makeContractDeploy(deployTxOptions);
@@ -156,7 +158,7 @@ describe("use", () => {
           network,
           anchorMode: AnchorMode.OnChainOnly,
           postConditionMode: PostConditionMode.Allow,
-          nonce: 3,
+          nonce: 2,
         };
 
         transaction = await makeContractDeploy(deployTxOptions);
@@ -190,7 +192,7 @@ describe("use", () => {
           network,
           anchorMode: AnchorMode.OnChainOnly,
           postConditionMode: PostConditionMode.Allow,
-          nonce: 4,
+          nonce: 3,
         };
 
         let transaction = await makeContractDeploy(deployTxOptions);

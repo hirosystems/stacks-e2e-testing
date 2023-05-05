@@ -67,6 +67,7 @@ describe("define a trait with duplicate identical methods", () => {
         anchorMode: AnchorMode.OnChainOnly,
         postConditionMode: PostConditionMode.Allow,
         nonce: 0,
+        clarityVersion: undefined,
       };
 
       let transaction = await makeContractDeploy(deployTxOptions);
@@ -91,6 +92,7 @@ describe("define a trait with duplicate identical methods", () => {
         anchorMode: AnchorMode.OnChainOnly,
         postConditionMode: PostConditionMode.Allow,
         nonce: 1,
+        clarityVersion: undefined,
       };
 
       transaction = await makeContractDeploy(deployTxOptions);
@@ -99,10 +101,15 @@ describe("define a trait with duplicate identical methods", () => {
       result = await broadcastTransaction(transaction, network);
       expect((<TxBroadcastResultOk>result).error).toBeUndefined();
 
-      // Wait a block and verify that the transaction was not included.
-      // In 2.05, this transaction is just silently ignored by the miner.
-      let chainUpdate = await orchestrator.waitForNextStacksBlock();
-      expect(chainUpdate.new_blocks[0].block.transactions.length).toBe(1);
+      // Wait for the transaction to be processed
+      let [block, tx] = await waitForStacksTransaction(
+        orchestrator,
+        transaction.txid()
+      );
+      expect(tx.description).toBe(
+        `deployed: ${Accounts.DEPLOYER.stxAddress}.impl-identical-double-trait`
+      );
+      expect(tx.success).toBeTruthy();
     });
   });
 
