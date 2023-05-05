@@ -44,14 +44,15 @@ export const broadcastDelegateSTX = async (
   } else {
     poxAddressCV = noneCV();
   }
+  let poxContract = Contracts.POX[poxVersion] || Contracts.DEFAULT;
 
   const untilBurnHeightCV = untilBurnHeight
     ? someCV(uintCV(untilBurnHeight))
     : noneCV();
 
   const txOptions = {
-    contractAddress: Contracts.POX_1.address,
-    contractName: poxVersion == 1 ? Contracts.POX_1.name : Contracts.POX_2.name,
+    contractAddress: poxContract.address,
+    contractName: poxContract.name,
     functionName: "delegate-stx",
     functionArgs: [
       uintCV(amount),
@@ -79,9 +80,10 @@ export const broadcastRevokeDelegateStx = async ({
   fee,
   nonce,
 }: BroadcastOptionsPox): Promise<TxBroadcastResult> => {
+  let poxContract = Contracts.POX[poxVersion] || Contracts.DEFAULT;
   const txOptions = {
-    contractAddress: Contracts.POX_1.address,
-    contractName: poxVersion == 1 ? Contracts.POX_1.name : Contracts.POX_2.name,
+    contractAddress: poxContract.address,
+    contractName: poxContract.name,
     functionName: "revoke-delegate-stx",
     functionArgs: [],
     fee,
@@ -118,10 +120,11 @@ export const broadcastDelegateStackSTX = async (
     version: bufferCV(toBytes(new Uint8Array([version.valueOf()]))),
     hashbytes: bufferCV(data),
   };
+  let poxContract = Contracts.POX[poxVersion] || Contracts.DEFAULT;
 
   const txOptions = {
-    contractAddress: Contracts.POX_1.address,
-    contractName: poxVersion == 1 ? Contracts.POX_1.name : Contracts.POX_2.name,
+    contractAddress: poxContract.address,
+    contractName: poxContract.name,
     functionName: "delegate-stack-stx",
     functionArgs: [
       principalCV(stacker.stxAddress),
@@ -156,10 +159,11 @@ export const broadcastDelegateStackExtend = async (
     version: bufferCV(toBytes(new Uint8Array([version.valueOf()]))),
     hashbytes: bufferCV(data),
   };
+  let poxContract = Contracts.POX[poxVersion] || Contracts.DEFAULT;
 
   const txOptions = {
-    contractAddress: Contracts.POX_1.address,
-    contractName: poxVersion == 1 ? Contracts.POX_1.name : Contracts.POX_2.name,
+    contractAddress: poxContract.address,
+    contractName: poxContract.name,
     functionName: "delegate-stack-extend",
     functionArgs: [
       principalCV(stacker.stxAddress),
@@ -196,10 +200,11 @@ export const broadcastDelegateStackIncrease = async (
     version: bufferCV(toBytes(new Uint8Array([version.valueOf()]))),
     hashbytes: bufferCV(data),
   };
+  let poxContract = Contracts.POX[poxVersion] || Contracts.DEFAULT;
 
   const txOptions = {
-    contractAddress: Contracts.POX_1.address,
-    contractName: poxVersion == 1 ? Contracts.POX_1.name : Contracts.POX_2.name,
+    contractAddress: poxContract.address,
+    contractName: poxContract.name,
     functionName: "delegate-stack-increase",
     functionArgs: [
       principalCV(stacker.stxAddress),
@@ -243,10 +248,11 @@ export const broadcastStackAggregationCommitIndexed = async (
     version: bufferCV(toBytes(new Uint8Array([version.valueOf()]))),
     hashbytes: bufferCV(data),
   };
+  let poxContract = Contracts.POX[poxVersion] || Contracts.DEFAULT;
 
   const txOptions = {
-    contractAddress: Contracts.POX_1.address,
-    contractName: poxVersion == 1 ? Contracts.POX_1.name : Contracts.POX_2.name,
+    contractAddress: poxContract.address,
+    contractName: poxContract.name,
     functionName:
       poxVersion == 1
         ? "stack-aggregation-commit"

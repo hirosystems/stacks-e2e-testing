@@ -41,7 +41,6 @@ describe("trait user deployed in 2.0, trait implementer deployed in 2.1", () => 
   const timeline = {
     ...DEFAULT_EPOCH_TIMELINE,
     epoch_2_2: 118,
-    pox_2_unlock_height: 119,
   };
 
   const contractAddress = Accounts.DEPLOYER.stxAddress;
@@ -133,7 +132,7 @@ describe("trait user deployed in 2.0, trait implementer deployed in 2.1", () => 
 
     await orchestrator.waitForNextStacksBlock();
 
-    let {response, transaction} = await deployContract(
+    let { response, transaction } = await deployContract(
       network,
       Accounts.DEPLOYER,
       0,
@@ -141,17 +140,14 @@ describe("trait user deployed in 2.0, trait implementer deployed in 2.1", () => 
       codeBodyTestTrait
     );
     expect(response.error).toBeUndefined();
-    await asyncExpectStacksTransactionSuccess(
-      orchestrator,
-      transaction.txid()
-    );
+    await asyncExpectStacksTransactionSuccess(orchestrator, transaction.txid());
 
     // Wait for the 2.1 activation
     await orchestrator.waitForStacksBlockAnchoredOnBitcoinBlockOfHeight(
       timeline.epoch_2_1
     );
 
-    ({response, transaction} = await deployContract(
+    ({ response, transaction } = await deployContract(
       network,
       Accounts.DEPLOYER,
       1,
@@ -159,10 +155,7 @@ describe("trait user deployed in 2.0, trait implementer deployed in 2.1", () => 
       codeBodyImplTrait
     ));
     expect(response.error).toBeUndefined();
-    await asyncExpectStacksTransactionSuccess(
-      orchestrator,
-      transaction.txid()
-    );
+    await asyncExpectStacksTransactionSuccess(orchestrator, transaction.txid());
 
     await orchestrator.waitForNextStacksBlock();
 

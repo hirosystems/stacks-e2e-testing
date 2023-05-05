@@ -38,7 +38,8 @@ describe("testing mixed direct and pooled stacking with extend under epoch 2.1",
   const timeline = {
     ...DEFAULT_EPOCH_TIMELINE,
     epoch_2_2: 138,
-    pox_2_unlock_height: 139,
+    epoch_2_3: 142,
+    epoch_2_4: 146,
   };
   let aliceNonce = 0;
   let bobNonce = 0;
@@ -324,7 +325,7 @@ describe("testing mixed direct and pooled stacking with extend under epoch 2.1",
 
     // Wait for 2.2 activation and unlock
     await orchestrator.waitForStacksBlockAnchoredOnBitcoinBlockOfHeight(
-      timeline.pox_2_unlock_height + 1
+      timeline.epoch_2_2 + 2
     );
 
     // Check Alice's account info

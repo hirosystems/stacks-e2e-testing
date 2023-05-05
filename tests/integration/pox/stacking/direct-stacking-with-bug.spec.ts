@@ -36,7 +36,6 @@ describe("testing solo stacker increase with bug", () => {
     const timeline = {
       ...DEFAULT_EPOCH_TIMELINE,
       epoch_2_2: 118,
-      pox_2_unlock_height: 119,
     };
     orchestrator = buildDevnetNetworkOrchestrator(
       getNetworkIdFromEnv(),
@@ -81,7 +80,7 @@ describe("testing solo stacker increase with bug", () => {
 
     // Bob increases by 10m
     response = await broadcastStackIncrease(
-      { network, account: Accounts.WALLET_2, fee, nonce: 1 },
+      { poxVersion: 2, network, account: Accounts.WALLET_2, fee, nonce: 1 },
       { amount: 10000000000100 }
     );
     expect(response.error).toBeUndefined();
@@ -97,12 +96,7 @@ describe("testing solo stacker increase with bug", () => {
 
     // Cloe increases by 10m
     response = await broadcastStackIncrease(
-      {
-        network,
-        account: Accounts.WALLET_3,
-        fee,
-        nonce: 1,
-      },
+      { poxVersion: 2, network, account: Accounts.WALLET_3, fee, nonce: 1 },
       { amount: 10_000_000_010_000 }
     );
     expect(response.error).toBeUndefined();
@@ -159,7 +153,7 @@ describe("testing solo stacker increase with bug", () => {
       stxIndex: coreInfo.stacks_tip_height + mineUntilHalt,
     });
 
-    if (version === "2.2") {
+    if (Number(version) >= 2.2) {
       // Mine a couple more blocks and verify that the chain is still advancing
       await orchestrator.mineBitcoinBlockAndHopeForStacksBlock();
       await orchestrator.mineBitcoinBlockAndHopeForStacksBlock();

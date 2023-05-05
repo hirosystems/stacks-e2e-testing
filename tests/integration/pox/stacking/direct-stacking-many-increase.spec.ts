@@ -6,7 +6,6 @@ import { StacksTestnet } from "@stacks/network";
 import { cvToString } from "@stacks/transactions";
 import { Accounts, Constants } from "../../constants";
 import {
-  DEFAULT_EPOCH_TIMELINE,
   asyncExpectStacksTransactionSuccess,
   broadcastSTXTransfer,
   buildDevnetNetworkOrchestrator,
@@ -106,12 +105,19 @@ describe("testing multiple stack-stx and stack-increase calls in the same block"
     // Alice and Bob both increase their stacks by 10m STX in the same block
     const increaseAmount = 10_000_000_000_000;
     const aliceIncrease = broadcastStackIncrease(
-      { network, account: Accounts.WALLET_1, fee, nonce: aliceNonce++ },
+      {
+        poxVersion: 2,
+        network,
+        account: Accounts.WALLET_1,
+        fee,
+        nonce: aliceNonce++,
+      },
       { amount: increaseAmount }
     );
 
     const bobIncrease = broadcastStackIncrease(
       {
+        poxVersion: 2,
         network,
         account: Accounts.WALLET_2,
         fee,
@@ -167,7 +173,7 @@ describe("testing multiple stack-stx and stack-increase calls in the same block"
 
     // Wait for 2.2 activation and unlock
     await orchestrator.waitForStacksBlockAnchoredOnBitcoinBlockOfHeight(
-      Constants.DEVNET_DEFAULT_POX_2_UNLOCK_HEIGHT + 1
+      Constants.DEVNET_DEFAULT_EPOCH_2_2 + 2
     );
 
     // Check Alice's account info

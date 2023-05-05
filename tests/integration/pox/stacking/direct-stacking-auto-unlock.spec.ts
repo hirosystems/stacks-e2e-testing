@@ -32,7 +32,8 @@ describe("testing solo stacker below minimum", () => {
   const timeline = {
     ...DEFAULT_EPOCH_TIMELINE,
     epoch_2_2: 127,
-    pox_2_unlock_height: 128,
+    epoch_2_3: 131,
+    epoch_2_4: 133,
   };
   const fee = 1000;
   let aliceNonce = 0;
@@ -171,7 +172,7 @@ describe("testing solo stacker below minimum", () => {
 
     // Wait for 2.2 activation and unlock
     await orchestrator.waitForStacksBlockAnchoredOnBitcoinBlockOfHeight(
-      timeline.pox_2_unlock_height + 1
+      timeline.epoch_2_2 + 2
     );
 
     // Check Alice's account info

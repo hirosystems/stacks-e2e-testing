@@ -45,7 +45,6 @@ describe("traits across contracts", () => {
   const timeline = {
     ...DEFAULT_EPOCH_TIMELINE,
     epoch_2_2: 118,
-    pox_2_unlock_height: 119,
   };
 
   const contractAddress = Accounts.DEPLOYER.stxAddress;

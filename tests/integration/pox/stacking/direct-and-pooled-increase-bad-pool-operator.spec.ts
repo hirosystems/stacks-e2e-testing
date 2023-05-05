@@ -123,7 +123,7 @@ describe("testing stacker who is a bad pool operator under epoch 2.1", () => {
 
     // Wait for 2.2 activation and unlock
     await orchestrator.waitForStacksBlockAnchoredOnBitcoinBlockOfHeight(
-      Constants.DEVNET_DEFAULT_POX_2_UNLOCK_HEIGHT + 1
+      Constants.DEVNET_DEFAULT_EPOCH_2_2 + 2
     );
 
     // Check Alice's account info

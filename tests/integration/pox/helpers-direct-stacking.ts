@@ -1,4 +1,3 @@
-import { StacksNetwork } from "@stacks/network";
 import {
   AnchorMode,
   PostConditionMode,
@@ -14,7 +13,6 @@ import { Contracts } from "../constants";
 import { toBytes } from "@stacks/common";
 import { decodeBtcAddress } from "@stacks/stacking";
 import { BroadcastOptionsPox } from "./helpers";
-import { BroadcastOptions } from "../helpers";
 const fetch = require("node-fetch");
 
 export const broadcastStackSTX = async (
@@ -31,9 +29,10 @@ export const broadcastStackSTX = async (
     hashbytes: bufferCV(data),
   };
 
+  let poxContract = Contracts.POX[poxVersion] || Contracts.DEFAULT;
   const txOptions = {
-    contractAddress: Contracts.POX_1.address,
-    contractName: poxVersion == 1 ? Contracts.POX_1.name : Contracts.POX_2.name,
+    contractAddress: poxContract.address,
+    contractName: poxContract.name,
     functionName: "stack-stx",
     functionArgs: [
       uintCV(amount),
@@ -55,12 +54,13 @@ export const broadcastStackSTX = async (
 };
 
 export const broadcastStackIncrease = async (
-  { network, account, fee, nonce }: BroadcastOptions,
+  { poxVersion, network, account, fee, nonce }: BroadcastOptionsPox,
   { amount }: { amount: number }
 ): Promise<TxBroadcastResult> => {
+  let poxContract = Contracts.POX[poxVersion] || Contracts.DEFAULT;
   const txOptions = {
-    contractAddress: Contracts.POX_2.address,
-    contractName: Contracts.POX_2.name,
+    contractAddress: poxContract.address,
+    contractName: poxContract.name,
     functionName: "stack-increase",
     functionArgs: [uintCV(amount)],
     fee,
@@ -77,7 +77,7 @@ export const broadcastStackIncrease = async (
 };
 
 export const broadcastStackExtend = async (
-  { network, account, fee, nonce }: BroadcastOptions,
+  { poxVersion, network, account, fee, nonce }: BroadcastOptionsPox,
   { cycles }: { cycles: number }
 ): Promise<TxBroadcastResult> => {
   const { version, data } = decodeBtcAddress(account.btcAddress);
@@ -86,9 +86,10 @@ export const broadcastStackExtend = async (
     hashbytes: bufferCV(data),
   };
 
+  let poxContract = Contracts.POX[poxVersion] || Contracts.DEFAULT;
   const txOptions = {
-    contractAddress: Contracts.POX_2.address,
-    contractName: Contracts.POX_2.name,
+    contractAddress: poxContract.address,
+    contractName: poxContract.name,
     functionName: "stack-extend",
     functionArgs: [uintCV(cycles), tupleCV(address)],
     fee,

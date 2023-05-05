@@ -70,7 +70,13 @@ describe("testing solo stacker increase without bug", () => {
 
     // Bob increases by 20m
     response = await broadcastStackIncrease(
-      { network, account: Accounts.WALLET_2, fee, nonce: bobNonce++ },
+      {
+        poxVersion: 2,
+        network,
+        account: Accounts.WALLET_2,
+        fee,
+        nonce: bobNonce++,
+      },
       { amount: 20_000_000_000_100 }
     );
     expect(response.error).toBeUndefined();
@@ -78,6 +84,7 @@ describe("testing solo stacker increase without bug", () => {
     // Bob increases by another 5m
     response = await broadcastStackIncrease(
       {
+        poxVersion: 2,
         network,
         account: Accounts.WALLET_2,
         fee,
@@ -111,7 +118,7 @@ describe("testing solo stacker increase without bug", () => {
 
     // Wait for 2.2 activation and unlock
     await orchestrator.waitForStacksBlockAnchoredOnBitcoinBlockOfHeight(
-      Constants.DEVNET_DEFAULT_POX_2_UNLOCK_HEIGHT + 1
+      Constants.DEVNET_DEFAULT_EPOCH_2_2 + 2
     );
 
     // Check Bob's account info

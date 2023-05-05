@@ -1,7 +1,7 @@
 import {
   DevnetNetworkOrchestrator,
   StacksTransactionMetadata,
-  stacksNodeVersion
+  stacksNodeVersion,
 } from "@hirosystems/stacks-devnet-js";
 import { StacksTestnet } from "@stacks/network";
 import {
@@ -10,7 +10,7 @@ import {
   broadcastTransaction,
   contractPrincipalCV,
   makeContractCall,
-  uintCV
+  uintCV,
 } from "@stacks/transactions";
 import { Accounts } from "../constants";
 import {
@@ -33,7 +33,6 @@ describe("trait parameter with wrapped caller in Stacks 2.2", () => {
   const timeline = {
     ...DEFAULT_EPOCH_TIMELINE,
     epoch_2_2: 118,
-    pox_2_unlock_height: 119,
   };
 
   const contractAddress = Accounts.DEPLOYER.stxAddress;
@@ -143,7 +142,10 @@ describe("trait parameter with wrapped caller in Stacks 2.2", () => {
     };
     transaction = await makeContractCall(callTxOptions);
     response = await broadcastTransaction(transaction, network);
-    [block, tx] = await waitForStacksTransaction(orchestrator, transaction.txid())
+    [block, tx] = await waitForStacksTransaction(
+      orchestrator,
+      transaction.txid()
+    );
     expect((tx as StacksTransactionMetadata).result).toEqual("(err none)");
   });
 });
