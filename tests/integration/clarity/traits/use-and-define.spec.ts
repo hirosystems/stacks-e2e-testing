@@ -24,12 +24,6 @@ import {
 
 describe("use and define trait with same name", () => {
   let orchestrator: DevnetNetworkOrchestrator;
-  let version: string;
-  if (typeof stacksNodeVersion === "function") {
-    version = stacksNodeVersion();
-  } else {
-    version = "2.1";
-  }
   const timeline = {
     ...DEFAULT_EPOCH_TIMELINE,
     epoch_2_1: 112,
@@ -46,7 +40,6 @@ describe("use and define trait with same name", () => {
     console.log(`network #${networkId}`);
     orchestrator = buildDevnetNetworkOrchestrator(
       getNetworkIdFromEnv(),
-      version,
       timeline
     );
     orchestrator.start();

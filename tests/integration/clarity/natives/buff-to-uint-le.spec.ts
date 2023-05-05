@@ -52,6 +52,7 @@ describe("buff-to-uint-le", () => {
       anchorMode: AnchorMode.OnChainOnly,
       postConditionMode: PostConditionMode.Allow,
       nonce: 0,
+      clarityVersion: undefined,
     };
 
     let transaction = await makeContractDeploy(deployTxOptions);
@@ -81,8 +82,9 @@ describe("buff-to-uint-le", () => {
     beforeAll(async () => {
       // Wait for 2.1 to go live
       await orchestrator.waitForStacksBlockAnchoredOnBitcoinBlockOfHeight(
-        Constants.DEVNET_DEFAULT_EPOCH_2_1 + 1
+        Constants.DEVNET_DEFAULT_EPOCH_2_1
       );
+      await orchestrator.waitForNextStacksBlock();
     });
 
     it("is valid", async () => {

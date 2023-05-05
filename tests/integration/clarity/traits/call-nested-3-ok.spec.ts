@@ -79,7 +79,7 @@ describe("call functions with nested traits", () => {
     expect(chainInfo.burn_block_height).toBeLessThanOrEqual(STACKS_2_1_EPOCH);
   });
 
-  describe.skip("in 2.1", () => {
+  describe("in 2.1", () => {
     beforeAll(async () => {
       // Wait for 2.1 to go live
       await orchestrator.waitForStacksBlockAnchoredOnBitcoinBlockOfHeight(
@@ -91,14 +91,14 @@ describe("call functions with nested traits", () => {
       await load_versioned(
         Accounts.WALLET_1,
         "empty",
-        1,
+        0, // Reuse nonce 0 since previous tx was rejected
         network,
         orchestrator
       );
       await load_versioned(
         Accounts.WALLET_1,
         "empty-trait",
-        2,
+        1,
         network,
         orchestrator,
         1
@@ -106,7 +106,7 @@ describe("call functions with nested traits", () => {
       await load_versioned(
         Accounts.WALLET_1,
         "math-trait",
-        3,
+        2,
         network,
         orchestrator,
         1
@@ -114,7 +114,7 @@ describe("call functions with nested traits", () => {
       await load_versioned(
         Accounts.WALLET_1,
         "nested-trait-3",
-        4,
+        3,
         network,
         orchestrator,
         1
@@ -140,14 +140,14 @@ describe("call functions with nested traits", () => {
       await load_versioned(
         Accounts.WALLET_2,
         "empty",
-        1,
+        0, // Reuse nonce 0 since previous tx was rejected
         network,
         orchestrator
       );
       await load_versioned(
         Accounts.WALLET_2,
         "empty-trait",
-        2,
+        1,
         network,
         orchestrator,
         2
@@ -155,7 +155,7 @@ describe("call functions with nested traits", () => {
       await load_versioned(
         Accounts.WALLET_2,
         "math-trait",
-        3,
+        2,
         network,
         orchestrator,
         2
@@ -163,7 +163,7 @@ describe("call functions with nested traits", () => {
       await load_versioned(
         Accounts.WALLET_2,
         "nested-trait-3",
-        4,
+        3,
         network,
         orchestrator,
         2
