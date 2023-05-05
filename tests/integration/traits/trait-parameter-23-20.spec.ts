@@ -31,12 +31,6 @@ const fee = 2000;
 
 describe("trait implementer deployed in 2.0, trait user deployed in 2.3", () => {
   let orchestrator: DevnetNetworkOrchestrator;
-  let version: string;
-  if (typeof stacksNodeVersion === "function") {
-    version = stacksNodeVersion();
-  } else {
-    version = "2.1";
-  }
   const timeline = {
     ...DEFAULT_EPOCH_TIMELINE,
     epoch_2_2: 118,
@@ -116,7 +110,6 @@ describe("trait implementer deployed in 2.0, trait user deployed in 2.3", () => 
   beforeAll(() => {
     orchestrator = buildDevnetNetworkOrchestrator(
       getNetworkIdFromEnv(),
-      version,
       timeline
     );
     orchestrator.start();
@@ -129,7 +122,6 @@ describe("trait implementer deployed in 2.0, trait user deployed in 2.3", () => 
   it("passing a trait parameter should work in Stacks 2.3", async () => {
     const network = new StacksTestnet({ url: orchestrator.getStacksNodeUrl() });
 
-    console.log("1");
     await orchestrator.waitForNextStacksBlock();
 
     let { response, transaction } = await deployContract(
@@ -140,11 +132,9 @@ describe("trait implementer deployed in 2.0, trait user deployed in 2.3", () => 
       codeBodyImplTrait
     );
     expect(response.error).toBeUndefined();
-    console.log("2");
     await asyncExpectStacksTransactionSuccess(orchestrator, transaction.txid());
 
     // Wait for the 2.3 activation
-    console.log("3");
     await orchestrator.waitForStacksBlockAnchoredOnBitcoinBlockOfHeight(
       timeline.epoch_2_3
     );
@@ -157,10 +147,8 @@ describe("trait implementer deployed in 2.0, trait user deployed in 2.3", () => 
       codeBodyTestTrait
     ));
     expect(response.error).toBeUndefined();
-    console.log("4");
     await asyncExpectStacksTransactionSuccess(orchestrator, transaction.txid());
 
-    console.log("5");
     await orchestrator.waitForNextStacksBlock();
 
     // Call the readonly function
@@ -181,7 +169,6 @@ describe("trait implementer deployed in 2.0, trait user deployed in 2.3", () => 
       { a: 1 }
     ));
     expect(response.error).toBeUndefined();
-    console.log("6");
     let [_, tx] = await asyncExpectStacksTransactionSuccess(
       orchestrator,
       transaction.txid()

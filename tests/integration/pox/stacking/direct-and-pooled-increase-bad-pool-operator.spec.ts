@@ -35,10 +35,7 @@ describe("testing stacker who is a bad pool operator under epoch 2.1", () => {
   let bobNonce = 0;
 
   beforeAll(() => {
-    orchestrator = buildDevnetNetworkOrchestrator(
-      getNetworkIdFromEnv(),
-      version
-    );
+    orchestrator = buildDevnetNetworkOrchestrator(getNetworkIdFromEnv());
     orchestrator.start();
   });
 

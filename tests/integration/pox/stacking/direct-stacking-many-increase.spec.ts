@@ -36,10 +36,7 @@ describe("testing multiple stack-stx and stack-increase calls in the same block"
   let bobNonce = 0;
 
   beforeAll(() => {
-    orchestrator = buildDevnetNetworkOrchestrator(
-      getNetworkIdFromEnv(),
-      version
-    );
+    orchestrator = buildDevnetNetworkOrchestrator(getNetworkIdFromEnv());
     orchestrator.start();
   });
 

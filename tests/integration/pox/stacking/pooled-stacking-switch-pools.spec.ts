@@ -30,7 +30,6 @@ import { getCoreInfo } from "../helpers";
 
 describe("testing pooled stacking under epoch 2.1", () => {
   let orchestrator: DevnetNetworkOrchestrator;
-  const version = getStacksNodeVersion();
 
   const timeline = {
     ...DEFAULT_EPOCH_TIMELINE,
@@ -42,7 +41,6 @@ describe("testing pooled stacking under epoch 2.1", () => {
   beforeAll(() => {
     orchestrator = buildDevnetNetworkOrchestrator(
       getNetworkIdFromEnv(),
-      version,
       timeline
     );
     orchestrator.start();
