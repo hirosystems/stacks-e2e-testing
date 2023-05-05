@@ -1,9 +1,6 @@
-import {
-  DevnetNetworkOrchestrator,
-  stacksNodeVersion,
-} from "@hirosystems/stacks-devnet-js";
+import { DevnetNetworkOrchestrator } from "@hirosystems/stacks-devnet-js";
 import { StacksTestnet } from "@stacks/network";
-import { Accounts, Constants } from "../../constants";
+import { Accounts } from "../../constants";
 import {
   DEFAULT_EPOCH_TIMELINE,
   buildDevnetNetworkOrchestrator,

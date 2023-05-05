@@ -1,7 +1,4 @@
-import {
-  DevnetNetworkOrchestrator,
-  stacksNodeVersion,
-} from "@hirosystems/stacks-devnet-js";
+import { DevnetNetworkOrchestrator } from "@hirosystems/stacks-devnet-js";
 import { StacksTestnet } from "@stacks/network";
 import { uintCV } from "@stacks/transactions";
 import { Accounts, Constants } from "../../constants";
@@ -11,6 +8,7 @@ import {
   broadcastSTXTransfer,
   buildDevnetNetworkOrchestrator,
   getNetworkIdFromEnv,
+  getStacksNodeVersion,
   waitForStacksTransaction,
 } from "../../helpers";
 import {
@@ -23,12 +21,7 @@ import { broadcastStackSTX } from "../helpers-direct-stacking";
 
 describe("testing solo stacker below minimum", () => {
   let orchestrator: DevnetNetworkOrchestrator;
-  let version: string;
-  if (typeof stacksNodeVersion === "function") {
-    version = stacksNodeVersion();
-  } else {
-    version = "2.1";
-  }
+  const version = getStacksNodeVersion();
   const timeline = {
     ...DEFAULT_EPOCH_TIMELINE,
     epoch_2_2: 127,

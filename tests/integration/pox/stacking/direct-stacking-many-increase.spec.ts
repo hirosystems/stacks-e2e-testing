@@ -1,7 +1,4 @@
-import {
-  DevnetNetworkOrchestrator,
-  stacksNodeVersion,
-} from "@hirosystems/stacks-devnet-js";
+import { DevnetNetworkOrchestrator } from "@hirosystems/stacks-devnet-js";
 import { StacksTestnet } from "@stacks/network";
 import { cvToString } from "@stacks/transactions";
 import { Accounts, Constants } from "../../constants";
@@ -10,6 +7,7 @@ import {
   broadcastSTXTransfer,
   buildDevnetNetworkOrchestrator,
   getNetworkIdFromEnv,
+  getStacksNodeVersion,
   waitForStacksTransaction,
 } from "../../helpers";
 import {
@@ -25,12 +23,7 @@ import {
 
 describe("testing multiple stack-stx and stack-increase calls in the same block", () => {
   let orchestrator: DevnetNetworkOrchestrator;
-  let version: string;
-  if (typeof stacksNodeVersion === "function") {
-    version = stacksNodeVersion();
-  } else {
-    version = "2.1";
-  }
+  const version = getStacksNodeVersion();
   const fee = 1000;
   let aliceNonce = 0;
   let bobNonce = 0;

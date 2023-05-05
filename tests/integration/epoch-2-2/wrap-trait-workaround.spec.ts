@@ -1,7 +1,6 @@
 import {
   DevnetNetworkOrchestrator,
   StacksTransactionMetadata,
-  stacksNodeVersion,
 } from "@hirosystems/stacks-devnet-js";
 import { StacksTestnet } from "@stacks/network";
 import {

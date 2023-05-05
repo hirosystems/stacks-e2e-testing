@@ -4,22 +4,18 @@ import {
   AnchorMode,
   PostConditionMode,
   TxBroadcastResultOk,
-  makeContractCall,
-  SignedContractCallOptions,
 } from "@stacks/transactions";
 import { StacksNetwork, StacksTestnet } from "@stacks/network";
-import { Accounts, Constants } from "../../constants";
+import { Accounts } from "../../constants";
 import {
   buildDevnetNetworkOrchestrator,
   getBitcoinBlockHeight,
   getNetworkIdFromEnv,
-  getChainInfo,
   DEFAULT_EPOCH_TIMELINE,
 } from "../../helpers";
 import {
   DevnetNetworkOrchestrator,
   StacksTransactionMetadata,
-  stacksNodeVersion,
 } from "@hirosystems/stacks-devnet-js";
 
 describe("use and define trait with same name", () => {

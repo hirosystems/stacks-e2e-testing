@@ -1,7 +1,4 @@
-import {
-  DevnetNetworkOrchestrator,
-  stacksNodeVersion,
-} from "@hirosystems/stacks-devnet-js";
+import { DevnetNetworkOrchestrator } from "@hirosystems/stacks-devnet-js";
 import { StacksTestnet } from "@stacks/network";
 import { uintCV } from "@stacks/transactions";
 import { Accounts, Constants } from "../../constants";
@@ -9,6 +6,7 @@ import {
   DEFAULT_EPOCH_TIMELINE,
   buildDevnetNetworkOrchestrator,
   getNetworkIdFromEnv,
+  getStacksNodeVersion,
   waitForStacksTransaction,
 } from "../../helpers";
 import {
@@ -25,12 +23,7 @@ import {
 
 describe("testing solo stacker increase with bug", () => {
   let orchestrator: DevnetNetworkOrchestrator;
-  let version: string;
-  if (typeof stacksNodeVersion === "function") {
-    version = stacksNodeVersion();
-  } else {
-    version = "2.1";
-  }
+  const version = getStacksNodeVersion();
 
   beforeAll(() => {
     const timeline = {

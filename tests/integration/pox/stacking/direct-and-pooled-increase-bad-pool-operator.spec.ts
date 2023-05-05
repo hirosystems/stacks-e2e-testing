@@ -1,7 +1,4 @@
-import {
-  DevnetNetworkOrchestrator,
-  stacksNodeVersion,
-} from "@hirosystems/stacks-devnet-js";
+import { DevnetNetworkOrchestrator } from "@hirosystems/stacks-devnet-js";
 import { StacksTestnet } from "@stacks/network";
 import { Accounts, Constants } from "../../constants";
 import {
@@ -9,6 +6,7 @@ import {
   broadcastSTXTransfer,
   buildDevnetNetworkOrchestrator,
   getNetworkIdFromEnv,
+  getStacksNodeVersion,
   waitForStacksTransaction,
 } from "../../helpers";
 import {
@@ -24,12 +22,7 @@ import {
 
 describe("testing stacker who is a bad pool operator under epoch 2.1", () => {
   let orchestrator: DevnetNetworkOrchestrator;
-  let version: string;
-  if (typeof stacksNodeVersion === "function") {
-    version = stacksNodeVersion();
-  } else {
-    version = "2.1";
-  }
+  const version = getStacksNodeVersion();
   const fee = 1000;
   let aliceNonce = 0;
   let bobNonce = 0;
