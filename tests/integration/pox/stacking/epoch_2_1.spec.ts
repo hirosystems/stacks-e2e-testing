@@ -14,10 +14,7 @@ describe("testing stacking under epoch 2.1", () => {
 
   beforeAll(() => {
     const timeline = {
-      ...DEFAULT_EPOCH_TIMELINE,
       epoch_2_2: 2000,
-      epoch_2_3: 2001,
-      epoch_2_4: 2002,
     };
     orchestrator = buildDevnetNetworkOrchestrator(
       getNetworkIdFromEnv(),

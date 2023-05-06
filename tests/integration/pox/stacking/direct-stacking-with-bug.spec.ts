@@ -27,7 +27,6 @@ describe("testing solo stacker increase with bug", () => {
 
   beforeAll(() => {
     const timeline = {
-      ...DEFAULT_EPOCH_TIMELINE,
       epoch_2_2: 118,
     };
     orchestrator = buildDevnetNetworkOrchestrator(

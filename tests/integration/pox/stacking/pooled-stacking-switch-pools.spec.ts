@@ -10,13 +10,11 @@ import {
   asyncExpectStacksTransactionSuccess,
   buildDevnetNetworkOrchestrator,
   getNetworkIdFromEnv,
-  getStacksNodeVersion,
 } from "../../helpers";
 import {
   getPoxInfo,
   readRewardCyclePoxAddressForAddress,
   readRewardCyclePoxAddressListAtIndex,
-  waitForNextPreparePhase,
   waitForNextRewardPhase,
 } from "../helpers";
 import {
@@ -32,7 +30,6 @@ describe("testing pooled stacking under epoch 2.1", () => {
   let orchestrator: DevnetNetworkOrchestrator;
 
   const timeline = {
-    ...DEFAULT_EPOCH_TIMELINE,
     epoch_2_2: 128,
     pox_2_unlock_height: 129,
     epoch_2_3: 138,
@@ -55,7 +52,7 @@ describe("testing pooled stacking under epoch 2.1", () => {
 
     // Wait for the pox-2 activation
     await orchestrator.waitForStacksBlockAnchoredOnBitcoinBlockOfHeight(
-      timeline.pox_2_activation
+      Constants.DEVNET_DEFAULT_POX_2_ACTIVATION
     );
 
     // Alice delegates 95m STX to Cloe

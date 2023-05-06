@@ -13,12 +13,9 @@ import { broadcastStackSTX } from "../helpers-direct-stacking";
 describe("testing stacking under epoch 2.0", () => {
   let orchestrator: DevnetNetworkOrchestrator;
   const timeline = {
-    ...DEFAULT_EPOCH_TIMELINE,
     epoch_2_1: 126,
     pox_2_activation: 130,
     epoch_2_2: 2000,
-    epoch_2_3: 2001,
-    epoch_2_4: 2002,
   };
 
   beforeAll(() => {

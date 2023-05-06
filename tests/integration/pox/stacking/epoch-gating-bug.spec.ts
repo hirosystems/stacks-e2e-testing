@@ -26,7 +26,6 @@ import {
 describe("testing solo stacker increase with bug", () => {
   let orchestrator: DevnetNetworkOrchestrator;
   const timeline = {
-    ...DEFAULT_EPOCH_TIMELINE,
     epoch_2_2: 118,
   };
 
@@ -46,7 +45,7 @@ describe("testing solo stacker increase with bug", () => {
     const network = new StacksTestnet({ url: orchestrator.getStacksNodeUrl() });
 
     await orchestrator.waitForStacksBlockAnchoredOnBitcoinBlockOfHeight(
-      timeline.pox_2_activation + 1
+      Constants.DEVNET_DEFAULT_POX_2_ACTIVATION + 1
     );
 
     const codeBody = `(define-read-only (check-unlock-height (address principal))

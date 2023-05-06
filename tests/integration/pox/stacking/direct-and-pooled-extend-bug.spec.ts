@@ -29,7 +29,6 @@ describe("testing mixed direct and pooled stacking with extend under epoch 2.1",
   const version = getStacksNodeVersion();
   const fee = 1000;
   const timeline = {
-    ...DEFAULT_EPOCH_TIMELINE,
     epoch_2_2: 138,
     epoch_2_3: 142,
     epoch_2_4: 146,
@@ -310,7 +309,7 @@ describe("testing mixed direct and pooled stacking with extend under epoch 2.1",
 
   it("everything unlocks as expected upon v2 unlock height", async () => {
     // This test should only run when running a 2.2 node
-    if (version !== "2.2") {
+    if (Number(version) < 2.2) {
       return;
     }
     const network = new StacksTestnet({ url: orchestrator.getStacksNodeUrl() });
@@ -357,21 +356,20 @@ describe("testing mixed direct and pooled stacking with extend under epoch 2.1",
     await asyncExpectStacksTransactionSuccess(orchestrator, response.txid);
   });
 
-  it("PoX should stay disabled indefinitely", async () => {
-    // This test should only run when running a 2.2 node
-    if (version !== "2.2") {
-      return;
+  it("PoX should stay disabled indefinitely in 2.2 and 2.3", async () => {
+    if (version === "2.2" || version === "2.3") {
+      const network = new StacksTestnet({
+        url: orchestrator.getStacksNodeUrl(),
+      });
+      let poxInfo = await getPoxInfo(network);
+      await waitForNextRewardPhase(
+        network,
+        orchestrator,
+        poxInfo.current_cycle.id + 1
+      );
+
+      poxInfo = await getPoxInfo(network);
+      expect(poxInfo.current_cycle.is_pox_active).toBeFalsy();
     }
-
-    const network = new StacksTestnet({ url: orchestrator.getStacksNodeUrl() });
-    let poxInfo = await getPoxInfo(network);
-    await waitForNextRewardPhase(
-      network,
-      orchestrator,
-      poxInfo.current_cycle.id + 1
-    );
-
-    poxInfo = await getPoxInfo(network);
-    expect(poxInfo.current_cycle.is_pox_active).toBeFalsy();
   });
 });
