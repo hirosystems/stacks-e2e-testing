@@ -1,7 +1,4 @@
-import {
-  DevnetNetworkOrchestrator,
-  stacksNodeVersion,
-} from "@hirosystems/stacks-devnet-js";
+import { DevnetNetworkOrchestrator } from "@hirosystems/stacks-devnet-js";
 import { StacksNetwork, StacksTestnet } from "@stacks/network";
 import {
   AnchorMode,

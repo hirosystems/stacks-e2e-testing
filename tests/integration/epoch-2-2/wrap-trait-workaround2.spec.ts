@@ -1,8 +1,4 @@
-import {
-  DevnetNetworkOrchestrator,
-  StacksTransactionMetadata,
-  stacksNodeVersion,
-} from "@hirosystems/stacks-devnet-js";
+import { DevnetNetworkOrchestrator } from "@hirosystems/stacks-devnet-js";
 import { StacksTestnet } from "@stacks/network";
 import {
   AnchorMode,
@@ -19,7 +15,6 @@ import {
   buildDevnetNetworkOrchestrator,
   deployContract,
   getNetworkIdFromEnv,
-  waitForStacksTransaction,
 } from "../helpers";
 
 describe("trait parameter with wrapped implementation in Stacks 2.2", () => {

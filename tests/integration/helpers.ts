@@ -4,7 +4,6 @@ import {
   StacksChainUpdate,
   StacksTransactionMetadata,
   getIsolatedNetworkConfigUsingNetworkId,
-  stacksNodeVersion,
 } from "@hirosystems/stacks-devnet-js";
 import { StacksNetwork } from "@stacks/network";
 import { Constants, DEFAULT_FEE } from "./constants";
@@ -155,13 +154,15 @@ export const getNetworkIdFromEnv = (): number => {
 };
 
 export const getStacksNodeVersion = () => {
-  let version: string;
-  if (typeof stacksNodeVersion === "function") {
-    version = stacksNodeVersion();
-  } else {
-    version = "2.1";
+  let nodeVersion: string | undefined;
+  // Try to import the stacksNodeVersion export
+  try {
+    const { stacksNodeVersion } = require("@hirosystems/stacks-devnet-js");
+    nodeVersion = stacksNodeVersion();
+  } catch (e) {
+    nodeVersion = "2.1";
   }
-  return version;
+  return nodeVersion;
 };
 
 const delay = () => new Promise((resolve) => setTimeout(resolve, 2000));
