@@ -113,6 +113,7 @@ describe("testing pooled stacking under epoch 2.1", () => {
     const poxAddrInfo0 = await readRewardCyclePoxAddressForAddress(
       network,
       2,
+      2,
       Accounts.WALLET_1.stxAddress
     );
     expect(poxAddrInfo0).toBeNull();
@@ -120,6 +121,7 @@ describe("testing pooled stacking under epoch 2.1", () => {
     // Check Pool operators/Cloe's table entry
     const poxAddrInfo1 = await readRewardCyclePoxAddressListAtIndex(
       network,
+      2,
       2,
       0
     );
@@ -205,6 +207,7 @@ describe("testing pooled stacking under epoch 2.1", () => {
     const poxAddrInfo0 = await readRewardCyclePoxAddressListAtIndex(
       network,
       2,
+      2,
       0
     );
 
@@ -234,6 +237,7 @@ describe("testing pooled stacking under epoch 2.1", () => {
     // Only Bob has an entry
     const poxAddrInfo0 = await readRewardCyclePoxAddressListAtIndex(
       network,
+      2,
       3,
       0
     );
@@ -241,6 +245,7 @@ describe("testing pooled stacking under epoch 2.1", () => {
 
     const poxAddrInfo1 = await readRewardCyclePoxAddressListAtIndex(
       network,
+      2,
       3,
       1
     );

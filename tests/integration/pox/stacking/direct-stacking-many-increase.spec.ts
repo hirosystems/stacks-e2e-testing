@@ -134,11 +134,13 @@ describe("testing multiple stack-stx and stack-increase calls in the same block"
     // Read Alice and Bob's total-ustx values after the stack-increase transactions
     const alicePoxAddressInfo = await readRewardCyclePoxAddressForAddress(
       network,
+      2,
       2, // the next cycle
       Accounts.WALLET_1.stxAddress
     );
     const bobPoxAddressInfo = await readRewardCyclePoxAddressForAddress(
       network,
+      2,
       2, // the next cycle
       Accounts.WALLET_2.stxAddress
     );

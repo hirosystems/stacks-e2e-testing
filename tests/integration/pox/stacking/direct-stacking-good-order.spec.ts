@@ -106,6 +106,7 @@ describe("testing solo stacker increase without bug", () => {
     const poxAddrInfo0 = (await readRewardCyclePoxAddressForAddress(
       network,
       2,
+      2,
       Accounts.WALLET_2.stxAddress
     )) as Record<string, ClarityValue>;
     // There is no bug here because total stack was equal to Bob's stacked amount when Bob called stack-increase.
@@ -116,6 +117,7 @@ describe("testing solo stacker increase without bug", () => {
 
     const poxAddrInfo1 = (await readRewardCyclePoxAddressForAddress(
       network,
+      2,
       2,
       Accounts.WALLET_1.stxAddress
     )) as Record<string, ClarityValue>;

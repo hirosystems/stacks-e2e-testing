@@ -140,6 +140,7 @@ describe("testing mixed direct and pooled stacking with extend under epoch 2.1",
     let poxAddrInfo0 = await readRewardCyclePoxAddressListAtIndex(
       network,
       2,
+      2,
       0
     );
     expect(poxAddrInfo0?.["total-ustx"]).toEqual(uintCV(75_000_000_000_000));
@@ -147,6 +148,7 @@ describe("testing mixed direct and pooled stacking with extend under epoch 2.1",
     // Check Bob's table entry
     let poxAddrInfo1 = await readRewardCyclePoxAddressListAtIndex(
       network,
+      2,
       2,
       1
     );
@@ -206,6 +208,7 @@ describe("testing mixed direct and pooled stacking with extend under epoch 2.1",
     let poxAddrInfo0 = await readRewardCyclePoxAddressListAtIndex(
       network,
       2,
+      2,
       0
     );
     expect(poxAddrInfo0?.["total-ustx"]).toEqual(uintCV(75_000_000_000_000));
@@ -214,6 +217,7 @@ describe("testing mixed direct and pooled stacking with extend under epoch 2.1",
     let poxAddrInfo1 = await readRewardCyclePoxAddressListAtIndex(
       network,
       2,
+      2,
       1
     );
     expect(poxAddrInfo1?.["total-ustx"]).toEqual(uintCV(900_000_000_000_000));
@@ -221,11 +225,11 @@ describe("testing mixed direct and pooled stacking with extend under epoch 2.1",
       Accounts.FAUCET.stxAddress
     );
     // Check Alice's table entry for cycle 3
-    poxAddrInfo0 = await readRewardCyclePoxAddressListAtIndex(network, 3, 0);
+    poxAddrInfo0 = await readRewardCyclePoxAddressListAtIndex(network, 2, 3, 0);
     expect(poxAddrInfo0?.["total-ustx"]).toEqual(uintCV(75_000_000_000_000));
 
     // Check Bob's table entry
-    poxAddrInfo1 = await readRewardCyclePoxAddressListAtIndex(network, 3, 1);
+    poxAddrInfo1 = await readRewardCyclePoxAddressListAtIndex(network, 2, 3, 1);
     expect(poxAddrInfo1?.["total-ustx"]).toBeUndefined();
 
     await expectAccountToBe(
@@ -281,6 +285,7 @@ describe("testing mixed direct and pooled stacking with extend under epoch 2.1",
     // Check Alice's table entry for cycle 2
     let poxAddrInfo0 = await readRewardCyclePoxAddressListAtIndex(
       network,
+      2,
       3,
       0
     );
@@ -289,6 +294,7 @@ describe("testing mixed direct and pooled stacking with extend under epoch 2.1",
     // Check Faucets's table entry for cycle 2
     let poxAddrInfo1 = await readRewardCyclePoxAddressListAtIndex(
       network,
+      2,
       3,
       1
     );

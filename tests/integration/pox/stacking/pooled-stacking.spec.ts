@@ -138,6 +138,7 @@ describe("testing pooled stacking under epoch 2.1", () => {
     const poxAddrInfo0 = await readRewardCyclePoxAddressForAddress(
       network,
       2,
+      2,
       Accounts.WALLET_1.stxAddress
     );
     expect(poxAddrInfo0).toBeNull();
@@ -145,6 +146,7 @@ describe("testing pooled stacking under epoch 2.1", () => {
     // Check Pool operators/Cloe's table entry
     const poxAddrInfo1 = await readRewardCyclePoxAddressListAtIndex(
       network,
+      2,
       2,
       0
     );
@@ -177,6 +179,7 @@ describe("testing pooled stacking under epoch 2.1", () => {
     response = await broadcastStackAggregationIncrease(
       {
         network,
+        poxVersion: 2,
         account: Accounts.WALLET_3,
         fee,
         nonce: chloeNonce++,
@@ -206,6 +209,7 @@ describe("testing pooled stacking under epoch 2.1", () => {
     // Check Pool operators/Cloe's table entry
     const poxAddrInfo0 = await readRewardCyclePoxAddressListAtIndex(
       network,
+      2,
       2,
       0
     );
@@ -314,9 +318,10 @@ describe("testing pooled stacking under epoch 2.1", () => {
 
     // Assert reward slots
     // Check Pool operators/Cloe's table entry
-    console.log(await readRewardCyclePoxAddressList(network, 3));
+    console.log(await readRewardCyclePoxAddressList(network, 2, 3));
     const poxAddrInfo0 = await readRewardCyclePoxAddressListAtIndex(
       network,
+      2,
       3,
       0
     );
@@ -378,6 +383,7 @@ describe("testing pooled stacking under epoch 2.1", () => {
     // Check Pool operators/Cloe's table entry
     const poxAddrInfo0 = await readRewardCyclePoxAddressListAtIndex(
       network,
+      2,
       3,
       0
     );

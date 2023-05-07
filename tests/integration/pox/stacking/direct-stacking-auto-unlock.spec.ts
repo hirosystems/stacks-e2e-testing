@@ -106,6 +106,7 @@ describe("testing solo stacker below minimum", () => {
     const poxAddrInfo0 = await readRewardCyclePoxAddressForAddress(
       network,
       2,
+      2,
       Accounts.WALLET_1.stxAddress
     );
     expect(poxAddrInfo0?.["total-ustx"]).toEqual(uintCV(80_000_000_000_000));
@@ -113,6 +114,7 @@ describe("testing solo stacker below minimum", () => {
     // Check Faucets's table entry
     const poxAddrInfo1 = await readRewardCyclePoxAddressForAddress(
       network,
+      2,
       2,
       Accounts.FAUCET.stxAddress
     );
@@ -141,6 +143,7 @@ describe("testing solo stacker below minimum", () => {
     const poxAddrInfo0 = await readRewardCyclePoxAddressForAddress(
       network,
       2,
+      2,
       Accounts.WALLET_1.stxAddress
     );
     expect(poxAddrInfo0?.["total-ustx"]).toBeUndefined();
@@ -148,6 +151,7 @@ describe("testing solo stacker below minimum", () => {
     // Check Faucet's table entry
     const poxAddrInfo1 = await readRewardCyclePoxAddressForAddress(
       network,
+      2,
       2,
       Accounts.FAUCET.stxAddress
     );

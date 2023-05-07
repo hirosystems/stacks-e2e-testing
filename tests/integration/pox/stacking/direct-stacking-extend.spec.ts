@@ -103,6 +103,7 @@ describe("testing stack-extend functionality", () => {
 
       const poxAddrInfo = (await readRewardCyclePoxAddressForAddress(
         network,
+        2,
         cycle + 1, // cycle + 1 because we are checking the next cycle, including rewards
         Accounts.WALLET_1.stxAddress
       )) as Record<string, ClarityValue>;

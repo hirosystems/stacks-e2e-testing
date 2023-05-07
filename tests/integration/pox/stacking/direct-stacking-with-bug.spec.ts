@@ -105,6 +105,7 @@ describe("testing solo stacker increase with bug", () => {
     const poxAddrInfo0 = await readRewardCyclePoxAddressForAddress(
       network,
       2,
+      2,
       Accounts.FAUCET.stxAddress
     );
     expect(poxAddrInfo0?.["total-ustx"]).toEqual(uintCV(900_000_000_000_001));
@@ -112,6 +113,7 @@ describe("testing solo stacker increase with bug", () => {
     // Check Bob's table entry
     const poxAddrInfo1 = await readRewardCyclePoxAddressForAddress(
       network,
+      2,
       2,
       Accounts.WALLET_2.stxAddress
     );
@@ -124,6 +126,7 @@ describe("testing solo stacker increase with bug", () => {
     // Check Cloe's table entry
     const poxAddrInfo2 = await readRewardCyclePoxAddressForAddress(
       network,
+      2,
       2,
       Accounts.WALLET_3.stxAddress
     );
