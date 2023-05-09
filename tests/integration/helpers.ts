@@ -37,6 +37,16 @@ export const DEFAULT_EPOCH_TIMELINE = {
   epoch_2_4: Constants.DEVNET_DEFAULT_EPOCH_2_4,
 };
 
+export const FAST_FORWARD_TO_EPOCH_2_4 = {
+  epoch_2_0: 100,
+  epoch_2_05: 102,
+  epoch_2_1: 104,
+  pox_2_activation: 105,
+  epoch_2_2: 106,
+  epoch_2_3: 108,
+  epoch_2_4: 112,
+};
+
 export const POX_CYCLE_LENGTH = 10;
 
 /// This function will fill in any missing epoch values in the timeline

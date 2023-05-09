@@ -2,6 +2,7 @@ import { DevnetNetworkOrchestrator } from "@hirosystems/stacks-devnet-js";
 import { StacksTestnet } from "@stacks/network";
 import { Accounts, Constants } from "../../constants";
 import {
+  FAST_FORWARD_TO_EPOCH_2_4,
   buildDevnetNetworkOrchestrator,
   getNetworkIdFromEnv,
   getStacksNodeVersion,
@@ -27,17 +28,8 @@ import { uintCV } from "@stacks/transactions";
 
 describe("testing pooled stacking under epoch 2.1", () => {
   let orchestrator: DevnetNetworkOrchestrator;
-  const version = getStacksNodeVersion();
   const fee = 1000;
-  let timeline = {
-    epoch_2_0: 100,
-    epoch_2_05: 102,
-    epoch_2_1: 104,
-    pox_2_activation: 105,
-    epoch_2_2: 106,
-    epoch_2_3: 108,
-    epoch_2_4: 112,
-  };
+  const timeline = FAST_FORWARD_TO_EPOCH_2_4;
   let aliceNonce = 0;
   let bobNonce = 0;
   let chloeNonce = 0;

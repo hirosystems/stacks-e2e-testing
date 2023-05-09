@@ -3,6 +3,7 @@ import { StacksTestnet } from "@stacks/network";
 import { uintCV } from "@stacks/transactions";
 import { Accounts } from "../../constants";
 import {
+  FAST_FORWARD_TO_EPOCH_2_4,
   buildDevnetNetworkOrchestrator,
   getChainInfo,
   getNetworkIdFromEnv,
@@ -20,15 +21,7 @@ import { broadcastStackSTX } from "../helpers-direct-stacking";
 describe("testing solo stacker below minimum", () => {
   let orchestrator: DevnetNetworkOrchestrator;
   const version = getStacksNodeVersion();
-  let timeline = {
-    epoch_2_0: 100,
-    epoch_2_05: 102,
-    epoch_2_1: 104,
-    pox_2_activation: 105,
-    epoch_2_2: 106,
-    epoch_2_3: 108,
-    epoch_2_4: 112,
-  };
+  const timeline = FAST_FORWARD_TO_EPOCH_2_4;
   const fee = 1000;
   let aliceNonce = 0;
   let faucetNonce = 0;

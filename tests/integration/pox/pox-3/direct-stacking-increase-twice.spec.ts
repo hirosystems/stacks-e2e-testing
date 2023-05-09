@@ -2,6 +2,7 @@ import { DevnetNetworkOrchestrator } from "@hirosystems/stacks-devnet-js";
 import { StacksTestnet } from "@stacks/network";
 import { Accounts } from "../../constants";
 import {
+  FAST_FORWARD_TO_EPOCH_2_4,
   buildDevnetNetworkOrchestrator,
   getChainInfo,
   getNetworkIdFromEnv,
@@ -15,15 +16,7 @@ import {
 
 describe("testing solo stacker increase without bug", () => {
   let orchestrator: DevnetNetworkOrchestrator;
-  let timeline = {
-    epoch_2_0: 100,
-    epoch_2_05: 102,
-    epoch_2_1: 104,
-    pox_2_activation: 105,
-    epoch_2_2: 106,
-    epoch_2_3: 108,
-    epoch_2_4: 112,
-  };
+  const timeline = FAST_FORWARD_TO_EPOCH_2_4;
   const fee = 1000;
   let bobNonce = 0;
 

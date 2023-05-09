@@ -6,6 +6,7 @@ import { StacksTestnet } from "@stacks/network";
 import { uintCV } from "@stacks/transactions";
 import { Accounts } from "../../constants";
 import {
+  FAST_FORWARD_TO_EPOCH_2_4,
   asyncExpectStacksTransactionSuccess,
   buildDevnetNetworkOrchestrator,
   getChainInfo,
@@ -29,15 +30,7 @@ describe("testing mixed direct and pooled stacking in pox-3", () => {
   let orchestrator: DevnetNetworkOrchestrator;
   const version = getStacksNodeVersion();
   const fee = 1000;
-  let timeline = {
-    epoch_2_0: 100,
-    epoch_2_05: 102,
-    epoch_2_1: 104,
-    pox_2_activation: 105,
-    epoch_2_2: 106,
-    epoch_2_3: 108,
-    epoch_2_4: 112,
-  };
+  const timeline = FAST_FORWARD_TO_EPOCH_2_4;
   let blockHeight = 0;
   let aliceNonce = 0;
   let bobNonce = 0;

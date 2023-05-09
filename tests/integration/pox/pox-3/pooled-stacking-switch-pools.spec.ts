@@ -3,6 +3,7 @@ import { StacksTestnet } from "@stacks/network";
 import { uintCV } from "@stacks/transactions";
 import { Accounts, Constants, DEFAULT_FEE } from "../../constants";
 import {
+  FAST_FORWARD_TO_EPOCH_2_4,
   asyncExpectStacksTransactionSuccess,
   buildDevnetNetworkOrchestrator,
   getChainInfo,
@@ -27,15 +28,8 @@ import { getCoreInfo } from "../helpers";
 
 describe("testing pooled stacking under epoch 2.1", () => {
   let orchestrator: DevnetNetworkOrchestrator;
-  let timeline = {
-    epoch_2_0: 100,
-    epoch_2_05: 102,
-    epoch_2_1: 104,
-    pox_2_activation: 105,
-    epoch_2_2: 106,
-    epoch_2_3: 108,
-    epoch_2_4: 112,
-  };
+  let timeline = FAST_FORWARD_TO_EPOCH_2_4;
+
   let aliceNonce = 0;
   let bobNonce = 0;
   let chloeNonce = 0;
