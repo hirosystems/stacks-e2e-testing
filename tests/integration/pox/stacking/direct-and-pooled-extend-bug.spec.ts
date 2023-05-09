@@ -245,7 +245,7 @@ describe("testing mixed direct and pooled stacking with extend under epoch 2.1",
     const blockHeight = Constants.DEVNET_DEFAULT_POX_2_ACTIVATION + 11;
     const cycles = 1;
 
-    // Cloe stacks 80m
+    // Chloe stacks 80m
     let response = await broadcastStackSTX(
       {
         poxVersion: 2,

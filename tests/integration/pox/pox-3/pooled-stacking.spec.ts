@@ -9,6 +9,7 @@ import {
   waitForStacksTransaction,
 } from "../../helpers";
 import {
+  callReadOnlystackerInfo,
   expectAccountToBe,
   getPoxInfo,
   readRewardCyclePoxAddressForAddress,
@@ -24,9 +25,14 @@ import {
   broadcastStackAggregationCommitIndexed,
   broadcastStackAggregationIncrease,
 } from "../helpers-pooled-stacking";
-import { uintCV } from "@stacks/transactions";
+import {
+  callReadOnlyFunction,
+  cvToString,
+  noneCV,
+  uintCV,
+} from "@stacks/transactions";
 
-describe("testing pooled stacking under epoch 2.1", () => {
+describe("testing pooled stacking under epoch 2.4", () => {
   let orchestrator: DevnetNetworkOrchestrator;
   const fee = 1000;
   const timeline = FAST_FORWARD_TO_EPOCH_2_4;
@@ -55,7 +61,7 @@ describe("testing pooled stacking under epoch 2.1", () => {
     );
     await orchestrator.waitForNextStacksBlock();
 
-    // Alice delegates 90m STX
+    // Alice delegates 90m STX to Chloe
     let response = await broadcastDelegateSTX(
       {
         poxVersion: 3,
@@ -81,7 +87,7 @@ describe("testing pooled stacking under epoch 2.1", () => {
     );
     expect(response.error).toBeUndefined();
 
-    // Cloe locks 80m for Alice
+    // Chloe locks 80m for Alice
     response = await broadcastDelegateStackSTX(
       {
         poxVersion: 3,
@@ -106,7 +112,7 @@ describe("testing pooled stacking under epoch 2.1", () => {
     );
     expect(tx.success).toBeTruthy();
 
-    // Cloe commits 80m
+    // Chloe commits 80m
     response = await broadcastStackAggregationCommitIndexed(
       {
         poxVersion: 3,
@@ -136,7 +142,7 @@ describe("testing pooled stacking under epoch 2.1", () => {
     );
     expect(poxAddrInfo0).toBeNull();
 
-    // Check Pool operators/Cloe's table entry
+    // Check Pool operators/Chloe's table entry
     const poxAddrInfo1 = await readRewardCyclePoxAddressListAtIndex(
       network,
       3,
@@ -149,7 +155,7 @@ describe("testing pooled stacking under epoch 2.1", () => {
   it("pool operator can add small amounts (cycle #1)", async () => {
     const network = new StacksTestnet({ url: orchestrator.getStacksNodeUrl() });
 
-    // Cloe locks 50m for Bob (below minimum for normal stack aggregation commit)
+    // Chloe locks 50m for Bob (below minimum for normal stack aggregation commit)
     let response = await broadcastDelegateStackSTX(
       {
         poxVersion: 3,
@@ -168,7 +174,7 @@ describe("testing pooled stacking under epoch 2.1", () => {
     );
     expect(response.error).toBeUndefined();
 
-    // Cloe increases the commits by 50m
+    // Chloe increases the commits by 50m
     response = await broadcastStackAggregationIncrease(
       {
         network,
@@ -199,7 +205,7 @@ describe("testing pooled stacking under epoch 2.1", () => {
     expect(poxInfo.next_cycle.stacked_ustx).toBe(130_000_000_000_000);
 
     // Assert reward slots
-    // Check Pool operators/Cloe's table entry
+    // Check Pool operators/Chloe's table entry
     const poxAddrInfo0 = await readRewardCyclePoxAddressListAtIndex(
       network,
       3,
@@ -247,7 +253,7 @@ describe("testing pooled stacking under epoch 2.1", () => {
   it("pool operator can't use delegate-stack-stx for already stacked users (cycle #2)", async () => {
     const network = new StacksTestnet({ url: orchestrator.getStacksNodeUrl() });
 
-    // Cloe tries to stack 80m for Alice
+    // Chloe tries to stack 80m for Alice
     let response = await broadcastDelegateStackSTX(
       {
         poxVersion: 3,
@@ -258,7 +264,7 @@ describe("testing pooled stacking under epoch 2.1", () => {
       },
       {
         stacker: Accounts.WALLET_1,
-        amount: 80000000000000,
+        amount: 80_000_000_000_000,
         poolRewardAccount: Accounts.WALLET_3,
         startBurnHeight: Constants.DEVNET_DEFAULT_POX_2_ACTIVATION + 16,
         lockPeriodCycles: 1,
@@ -270,14 +276,14 @@ describe("testing pooled stacking under epoch 2.1", () => {
       orchestrator,
       response.txid
     );
-    expect(tx.result).toBe("(err 3)");
+    expect(tx.result).toBe("(err 3)"); // ERR_STACKING_ALREADY_STACKED
     expect(tx.success).toBeFalsy();
   });
 
-  it("pool operators can lock user's locked stx for longer (cycle #2)", async () => {
+  it("pool operators can extend/lock user's locked stx for longer (cycle #2)", async () => {
     const network = new StacksTestnet({ url: orchestrator.getStacksNodeUrl() });
 
-    // Cloe locks extends Alice's locking (90m) for 1 cycle
+    // Chloe extends/locks Alice's locking (90m) for 1 cycle
     // until #3
     let response = await broadcastDelegateStackExtend(
       {
@@ -310,7 +316,7 @@ describe("testing pooled stacking under epoch 2.1", () => {
     expect(poxInfo.next_cycle.stacked_ustx).toBe(0);
 
     // Assert reward slots
-    // Check Pool operators/Cloe's table entry
+    // Check Pool operators/Chloe's table entry
     const poxAddrInfo0 = await readRewardCyclePoxAddressListAtIndex(
       network,
       3,
@@ -324,7 +330,7 @@ describe("testing pooled stacking under epoch 2.1", () => {
   it("pool operator can increase stacking amount for already stacked users (cycle #2)", async () => {
     const network = new StacksTestnet({ url: orchestrator.getStacksNodeUrl() });
 
-    // Cloe increases Alice stacking by 10m
+    // Chloe increases Alice stacking by 10m
     let response = await broadcastDelegateStackIncrease(
       {
         poxVersion: 3,
@@ -341,7 +347,7 @@ describe("testing pooled stacking under epoch 2.1", () => {
     );
     expect(response.error).toBeUndefined();
 
-    // Cloe commits 80m
+    // Chloe commits 80m
     response = await broadcastStackAggregationCommitIndexed(
       {
         poxVersion: 3,
@@ -372,7 +378,7 @@ describe("testing pooled stacking under epoch 2.1", () => {
     expect(poxInfo.next_cycle.stacked_ustx).toBe(90_000_000_000_000);
 
     // Assert reward slots
-    // Check Pool operators/Cloe's table entry
+    // Check Pool operators/Chloe's table entry
     const poxAddrInfo0 = await readRewardCyclePoxAddressListAtIndex(
       network,
       3,
@@ -383,13 +389,13 @@ describe("testing pooled stacking under epoch 2.1", () => {
     expect(poxAddrInfo0?.["total-ustx"]).toEqual(uintCV(90_000_000_000_000));
   });
 
-  it("without action from pool operator, stack unlocks (cycle #3)", async () => {
+  it("without action from pool operator, STXs unlock (cycle #3)", async () => {
     const network = new StacksTestnet({ url: orchestrator.getStacksNodeUrl() });
 
     // move on to the nexte cycle
     await waitForNextRewardPhase(network, orchestrator, 1);
 
-    // we are in cycle #4
+    // we are in cycle #3
     let poxInfo = await getPoxInfo(network);
     // Assert that the current cycle has 90m STX locked and earning
     expect(poxInfo.current_cycle.id).toBe(3);
@@ -400,11 +406,62 @@ describe("testing pooled stacking under epoch 2.1", () => {
     // move on to the nexte cycle
     await waitForNextRewardPhase(network, orchestrator, 1);
 
-    // we are in cycle #5
+    // we are in cycle #4
     poxInfo = await getPoxInfo(network);
     // Assert that the current cycle has 90m STX locked and earning
     expect(poxInfo.current_cycle.id).toBe(4);
     expect(poxInfo.current_cycle.stacked_ustx).toBe(0);
     expect(poxInfo.current_cycle.is_pox_active).toBe(false);
+  });
+
+  it("pool operator can't extend unlocked stx (cycle #4)", async () => {
+    const network = new StacksTestnet({ url: orchestrator.getStacksNodeUrl() });
+
+    const stackerInfo = await callReadOnlystackerInfo(
+      network,
+      3,
+      Accounts.WALLET_1
+    );
+    expect(stackerInfo).toBe(cvToString(noneCV()));
+
+    // Chloe tries to extend Alice 90m by 1 cycle
+    let response = await broadcastDelegateStackExtend(
+      {
+        poxVersion: 3,
+        network,
+        account: Accounts.WALLET_3,
+        fee,
+        nonce: chloeNonce++,
+      },
+      {
+        stacker: Accounts.WALLET_1,
+        poolRewardAccount: Accounts.WALLET_3,
+        extendByCount: 1,
+      }
+    );
+    expect(response.error).toBeUndefined();
+    let [block, tx] = await waitForStacksTransaction(
+      orchestrator,
+      response.txid
+    );
+    expect(tx.success).toBeFalsy();
+    // FIXME: expected ERR_STACKING_NOT_DELEGATED
+    expect(tx.result).toBe("(err 9)"); // ERR_STACKING_PERMISSION_DENIED
+
+    // Chloe commits 90m for cycle 5
+    response = await broadcastStackAggregationCommitIndexed(
+      {
+        poxVersion: 3,
+        network,
+        account: Accounts.WALLET_3,
+        fee,
+        nonce: chloeNonce++,
+      },
+      { poolRewardAccount: Accounts.WALLET_3, cycleId: 5 }
+    );
+    expect(response.error).toBeUndefined();
+    [block, tx] = await waitForStacksTransaction(orchestrator, response.txid);
+    expect(tx.success).toBeFalsy();
+    expect(tx.result).toBe("(err 4)");
   });
 });

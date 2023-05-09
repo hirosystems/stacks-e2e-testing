@@ -21,6 +21,8 @@ import {
   OptionalCV,
   responseErrorCV,
   stringAsciiCV,
+  callReadOnlyFunction,
+  principalCV,
 } from "@stacks/transactions";
 
 import { expect } from "vitest";
@@ -185,6 +187,22 @@ export const expectAccountToBe = async (
   const wallet = await getAccount(network, address);
   expect(wallet.balance).toBe(BigInt(account));
   expect(wallet.locked).toBe(BigInt(locked));
+};
+
+export const callReadOnlystackerInfo = (
+  network: StacksNetwork,
+  poxVersion: number,
+  user: Account
+) => {
+  let poxContract = Contracts.POX[poxVersion] || Contracts.DEFAULT;
+  return callReadOnlyFunction({
+    contractName: poxContract.name,
+    contractAddress: poxContract.address,
+    functionName: "get-stacker-info",
+    functionArgs: [principalCV(user.stxAddress)],
+    network,
+    senderAddress: poxContract.address,
+  });
 };
 
 export const expectNoError = (response: TxBroadcastResult) => {

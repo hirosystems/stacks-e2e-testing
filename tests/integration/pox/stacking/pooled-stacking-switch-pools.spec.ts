@@ -55,7 +55,7 @@ describe("testing pooled stacking under epoch 2.1", () => {
       Constants.DEVNET_DEFAULT_POX_2_ACTIVATION
     );
 
-    // Alice delegates 95m STX to Cloe
+    // Alice delegates 95m STX to Chloe
     let response = await broadcastDelegateSTX(
       {
         poxVersion: 2,
@@ -68,7 +68,7 @@ describe("testing pooled stacking under epoch 2.1", () => {
     );
     expect(response.error).toBeUndefined();
 
-    // Cloe locks 90m for Alice
+    // Chloe locks 90m for Alice
     response = await broadcastDelegateStackSTX(
       {
         poxVersion: 2,
@@ -87,7 +87,7 @@ describe("testing pooled stacking under epoch 2.1", () => {
     );
     expect(response.error).toBeUndefined();
 
-    // Cloe commits 90m
+    // Chloe commits 90m
     response = await broadcastStackAggregationCommitIndexed(
       {
         poxVersion: 2,
@@ -118,7 +118,7 @@ describe("testing pooled stacking under epoch 2.1", () => {
     );
     expect(poxAddrInfo0).toBeNull();
 
-    // Check Pool operators/Cloe's table entry
+    // Check Pool operators/Chloe's table entry
     const poxAddrInfo1 = await readRewardCyclePoxAddressListAtIndex(
       network,
       2,
@@ -203,7 +203,7 @@ describe("testing pooled stacking under epoch 2.1", () => {
     expect(poxInfo.next_cycle.stacked_ustx).toBe(90_000_000_000_000);
 
     // Assert reward slots
-    // Check Pool operators/Cloe's table entry
+    // Check Pool operators/Chloe's table entry
     const poxAddrInfo0 = await readRewardCyclePoxAddressListAtIndex(
       network,
       2,
@@ -233,7 +233,7 @@ describe("testing pooled stacking under epoch 2.1", () => {
     expect(poxInfo.next_cycle.stacked_ustx).toBe(90_000_000_000_000);
 
     // Assert reward slots for cycle #3
-    // Check Pool operators (Cloe's and Bob's) table entry
+    // Check Pool operators (Chloe's and Bob's) table entry
     // Only Bob has an entry
     const poxAddrInfo0 = await readRewardCyclePoxAddressListAtIndex(
       network,

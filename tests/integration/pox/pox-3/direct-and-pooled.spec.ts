@@ -138,12 +138,12 @@ describe("testing mixed direct and pooled stacking in pox-3", () => {
           break;
         case delegateTxid:
           expect(metadata.success).toBeFalsy();
-          expect(metadata.result).toBe("(err 3)");
+          expect(metadata.result).toBe("(err 3)"); // ERR_STACKING_ALREADY_STACKED
           txCount++;
           break;
         case delegateStackTxid:
           expect(metadata.success).toBeFalsy();
-          expect(metadata.result).toBe("(err 9)");
+          expect(metadata.result).toBe("(err 9)"); // ERR_STACKING_PERMISSION_DENIED
           txCount++;
           break;
         case commitTxid:
@@ -212,8 +212,9 @@ describe("testing mixed direct and pooled stacking in pox-3", () => {
     // Wait for Stacks genesis block
     await orchestrator.waitForNextStacksBlock();
 
-    // Move on to the next cycle after unlock (N+2)
-    await waitForNextRewardPhase(network, orchestrator, 2);
+    // Move on to the next cycle after unlock (N+3)
+    // when locked STXs are available again.
+    await waitForNextRewardPhase(network, orchestrator, 3);
 
     // Assert that the current cycle has 900m STX locked from direct stacking
     let poxInfo = await getPoxInfo(network);
@@ -253,10 +254,6 @@ describe("testing mixed direct and pooled stacking in pox-3", () => {
     );
     expect(poxAddrInfo0).toBeNull();
 
-    // FIXME: Why is this needed? Without this, the check below will fail
-    //        because it reports that Alice's 75M are still locked.
-    await orchestrator.waitForNextStacksBlock();
-
     // Alice's STX should be unlocked
     await expectAccountToBe(
       network,
@@ -272,7 +269,7 @@ describe("testing mixed direct and pooled stacking in pox-3", () => {
     blockHeight = chainInfo.burn_block_height;
     const cycles = 1;
 
-    // Cloe stacks 80m
+    // Chloe stacks 80m
     let response = await broadcastStackSTX(
       {
         poxVersion: 3,
@@ -307,6 +304,7 @@ describe("testing mixed direct and pooled stacking in pox-3", () => {
     // and no STX locked for next cycle
     let poxInfo = await getPoxInfo(network);
     expect(poxInfo.current_cycle.id).toBe(4);
+    expect(poxInfo.pox_activation_threshold_ustx).toBe(70_286_942_145_278);
     expect(poxInfo.current_cycle.stacked_ustx).toBe(80_000_000_000_000);
     expect(poxInfo.current_cycle.min_threshold_ustx).toBe(29_290_000_000_000);
     // FIXME: Why does this fail?
