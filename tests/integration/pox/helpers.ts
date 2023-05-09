@@ -21,6 +21,7 @@ import {
   OptionalCV,
   responseErrorCV,
   stringAsciiCV,
+  BufferCV,
 } from "@stacks/transactions";
 
 import { expect } from "vitest";
@@ -308,6 +309,7 @@ export const readRewardCyclePoxAddressForAddress = async (
 export type RewardCyclePoxAddressMapEntry = {
   "total-ustx": UIntCV;
   stacker: OptionalCV<PrincipalCV>;
+  "pox-addr": TupleCV<{ hashbytes: BufferCV; version: BufferCV }>;
 };
 
 export const readRewardCyclePoxAddressListAtIndex = async (

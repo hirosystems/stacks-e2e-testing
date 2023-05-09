@@ -3,7 +3,7 @@ import {
   StacksBlockMetadata,
 } from "@hirosystems/stacks-devnet-js";
 import { StacksTestnet } from "@stacks/network";
-import { uintCV } from "@stacks/transactions";
+import { cvToString, noneCV, uintCV } from "@stacks/transactions";
 import { Accounts, Constants, DEFAULT_FEE } from "../../constants";
 import {
   DEFAULT_EPOCH_TIMELINE,
@@ -27,6 +27,7 @@ import {
   broadcastStackAggregationCommitIndexed,
 } from "../helpers-pooled-stacking";
 import { getCoreInfo } from "../helpers";
+import { decodeBtcAddress, poxAddressToTuple } from "@stacks/stacking";
 
 describe("testing pooled stacking under epoch 2.1", () => {
   let orchestrator: DevnetNetworkOrchestrator;
@@ -37,6 +38,7 @@ describe("testing pooled stacking under epoch 2.1", () => {
     epoch_2_2: 128,
     pox_2_unlock_height: 129,
     epoch_2_3: 138,
+    epoch_2_4: 148,
   };
 
   beforeAll(() => {
@@ -243,6 +245,9 @@ describe("testing pooled stacking under epoch 2.1", () => {
       0
     );
     expect(poxAddrInfo0?.["total-ustx"]).toEqual(uintCV(90_000_000_000_000));
+    expect(cvToString(poxAddrInfo0?.["pox-addr"] || noneCV())).toBe(
+      cvToString(poxAddressToTuple(Accounts.WALLET_2.btcAddress))
+    );
 
     const poxAddrInfo1 = await readRewardCyclePoxAddressListAtIndex(
       network,
