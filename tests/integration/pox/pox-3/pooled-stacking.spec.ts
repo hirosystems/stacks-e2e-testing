@@ -445,8 +445,7 @@ describe("testing pooled stacking under epoch 2.4", () => {
       response.txid
     );
     expect(tx.success).toBeFalsy();
-    // FIXME: expected ERR_STACKING_NOT_DELEGATED
-    expect(tx.result).toBe("(err 9)"); // ERR_STACKING_PERMISSION_DENIED
+    expect(tx.result).toBe("(err 26)"); // ERR_STACK_EXTEND_NOT_LOCKED
 
     // Chloe commits 90m for cycle 5
     response = await broadcastStackAggregationCommitIndexed(
