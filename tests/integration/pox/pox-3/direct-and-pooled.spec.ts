@@ -15,6 +15,7 @@ import {
 } from "../../helpers";
 import {
   expectAccountToBe,
+  getAccount,
   getPoxInfo,
   readRewardCyclePoxAddressForAddress,
   waitForNextRewardPhase,
@@ -214,14 +215,17 @@ describe("testing mixed direct and pooled stacking in pox-3", () => {
 
     // Move on to the next cycle after unlock (N+3)
     // when locked STXs are available again.
-    await waitForNextRewardPhase(network, orchestrator, 3);
+    await waitForNextRewardPhase(network, orchestrator, 2);
 
     // Assert that the current cycle has 900m STX locked from direct stacking
     let poxInfo = await getPoxInfo(network);
     expect(poxInfo.current_cycle.id).toBe(3);
     expect(poxInfo.current_cycle.stacked_ustx).toBe(900_000_000_000_000);
-    // FIXME: Is this right? The amount that determined who got unlocked was actually 81.25M
-    //        This is confusng. I don't think this should be recomputed after the auto-unlocks.
+    // NOTE: This is confusing, because if the min threshold was 75M, then
+    // Alice would not have been unlocked. This value is calculated based on
+    // the current chain tip, which includes the unlocks. In a future,
+    // non-consensus-breaking update, we may want to update this value to
+    // be computed at the pox anchor block instead.
     expect(poxInfo.current_cycle.min_threshold_ustx).toBe(75_000_000_000_000);
 
     // All STX are unlocked in the next cycle (because they were only stacked for 1 cycle)
@@ -253,6 +257,14 @@ describe("testing mixed direct and pooled stacking in pox-3", () => {
       Accounts.WALLET_1.stxAddress
     );
     expect(poxAddrInfo0).toBeNull();
+
+    const alice = await getAccount(network, Accounts.WALLET_1.stxAddress);
+    expect(alice.unlock_height).toBe(
+      poxInfo.current_burnchain_block_height!
+    );
+
+    // We need to wait one more block to see Alice's unlock take effect
+    await orchestrator.waitForNextStacksBlock();
 
     // Alice's STX should be unlocked
     await expectAccountToBe(
@@ -348,7 +360,7 @@ describe("testing mixed direct and pooled stacking in pox-3", () => {
     // Faucet's STX are still unlocked
     await expectAccountToBe(
       network,
-      Accounts.WALLET_3.stxAddress,
+      Accounts.FAUCET.stxAddress,
       1_000_000_000_000_000 - faucetNonce * fee,
       0
     );
