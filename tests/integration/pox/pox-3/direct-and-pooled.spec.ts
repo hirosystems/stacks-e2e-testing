@@ -259,9 +259,7 @@ describe("testing mixed direct and pooled stacking in pox-3", () => {
     expect(poxAddrInfo0).toBeNull();
 
     const alice = await getAccount(network, Accounts.WALLET_1.stxAddress);
-    expect(alice.unlock_height).toBe(
-      poxInfo.current_burnchain_block_height!
-    );
+    expect(alice.unlock_height).toBe(poxInfo.current_burnchain_block_height!);
 
     // We need to wait one more block to see Alice's unlock take effect
     await orchestrator.waitForNextStacksBlock();
@@ -281,7 +279,7 @@ describe("testing mixed direct and pooled stacking in pox-3", () => {
     blockHeight = chainInfo.burn_block_height;
     const cycles = 1;
 
-    // Chloe stacks 80m
+    // Chloe stacks 90m
     let response = await broadcastStackSTX(
       {
         poxVersion: 3,
@@ -290,7 +288,7 @@ describe("testing mixed direct and pooled stacking in pox-3", () => {
         fee,
         nonce: chloeNonce++,
       },
-      { amount: 80_000_000_000_000, blockHeight, cycles }
+      { amount: 90_000_000_000_000, blockHeight, cycles }
     );
     expect(response.error).toBeUndefined();
     await asyncExpectStacksTransactionSuccess(orchestrator, response.txid);
@@ -300,7 +298,7 @@ describe("testing mixed direct and pooled stacking in pox-3", () => {
     expect(poxInfo.current_burnchain_block_height).toBeLessThan(
       poxInfo.next_cycle.prepare_phase_start_block_height
     );
-    expect(poxInfo.next_cycle.stacked_ustx).toBe(80_000_000_000_000);
+    expect(poxInfo.next_cycle.stacked_ustx).toBe(90_000_000_000_000);
   });
 
   it("re-check locked amounts (cycle #4)", async () => {
@@ -312,14 +310,13 @@ describe("testing mixed direct and pooled stacking in pox-3", () => {
     // move on to the next cycle after unlock (N+5)
     await waitForNextRewardPhase(network, orchestrator, 5);
 
-    // Assert that the current cycle has 80m STX locked
+    // Assert that the current cycle has 90m STX locked
     // and no STX locked for next cycle
     let poxInfo = await getPoxInfo(network);
     expect(poxInfo.current_cycle.id).toBe(4);
     expect(poxInfo.pox_activation_threshold_ustx).toBe(70_286_942_145_278);
-    expect(poxInfo.current_cycle.stacked_ustx).toBe(80_000_000_000_000);
+    expect(poxInfo.current_cycle.stacked_ustx).toBe(90_000_000_000_000);
     expect(poxInfo.current_cycle.min_threshold_ustx).toBe(29_290_000_000_000);
-    // FIXME: Why does this fail?
     expect(poxInfo.current_cycle.is_pox_active).toBe(true);
     expect(poxInfo.next_cycle.stacked_ustx).toBe(0);
 
@@ -339,7 +336,7 @@ describe("testing mixed direct and pooled stacking in pox-3", () => {
       4,
       Accounts.WALLET_3.stxAddress
     );
-    expect(poxAddrInfo1?.["total-ustx"]).toEqual(uintCV(80_000_000_000_000));
+    expect(poxAddrInfo1?.["total-ustx"]).toEqual(uintCV(90_000_000_000_000));
 
     // Alice's STX are still unlocked
     await expectAccountToBe(
@@ -353,8 +350,8 @@ describe("testing mixed direct and pooled stacking in pox-3", () => {
     await expectAccountToBe(
       network,
       Accounts.WALLET_3.stxAddress,
-      20_000_000_000_000 - chloeNonce * fee,
-      80_000_000_000_000
+      10_000_000_000_000 - chloeNonce * fee,
+      90_000_000_000_000
     );
 
     // Faucet's STX are still unlocked
