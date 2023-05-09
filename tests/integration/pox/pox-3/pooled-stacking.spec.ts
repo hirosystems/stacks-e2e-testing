@@ -422,7 +422,7 @@ describe("testing pooled stacking under epoch 2.4", () => {
       3,
       Accounts.WALLET_1
     );
-    expect(stackerInfo).toBe(cvToString(noneCV()));
+    expect(cvToString(stackerInfo)).toBe(cvToString(noneCV()));
 
     // Chloe tries to extend Alice 90m by 1 cycle
     let response = await broadcastDelegateStackExtend(
