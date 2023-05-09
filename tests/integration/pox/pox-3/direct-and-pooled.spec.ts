@@ -1,14 +1,16 @@
-import { DevnetNetworkOrchestrator } from "@hirosystems/stacks-devnet-js";
+import {
+  DevnetNetworkOrchestrator,
+  StacksTransactionMetadata,
+} from "@hirosystems/stacks-devnet-js";
 import { StacksTestnet } from "@stacks/network";
-import { SomeCV, cvToString, uintCV } from "@stacks/transactions";
-import { Accounts, Constants } from "../../constants";
+import { uintCV } from "@stacks/transactions";
+import { Accounts } from "../../constants";
 import {
   asyncExpectStacksTransactionSuccess,
   buildDevnetNetworkOrchestrator,
   getChainInfo,
   getNetworkIdFromEnv,
   getStacksNodeVersion,
-  waitForStacksTransaction,
 } from "../../helpers";
 import {
   expectAccountToBe,
@@ -17,7 +19,11 @@ import {
   waitForNextRewardPhase,
 } from "../helpers";
 import { broadcastStackSTX } from "../helpers-direct-stacking";
-import { broadcastDelegateSTX } from "../helpers-pooled-stacking";
+import {
+  broadcastDelegateSTX,
+  broadcastDelegateStackSTX,
+  broadcastStackAggregationCommitIndexed,
+} from "../helpers-pooled-stacking";
 
 describe("testing mixed direct and pooled stacking in pox-3", () => {
   let orchestrator: DevnetNetworkOrchestrator;
@@ -50,14 +56,16 @@ describe("testing mixed direct and pooled stacking in pox-3", () => {
     orchestrator.terminate();
   });
 
-  it("delegating after direct stacking should fail (cycle #1)", async () => {
+  it("delegating after direct stacking should fail (cycle #2)", async () => {
     const network = new StacksTestnet({ url: orchestrator.getStacksNodeUrl() });
 
     // Wait for 2.4 to go live
     await orchestrator.waitForStacksBlockAnchoredOnBitcoinBlockOfHeight(
       timeline.epoch_2_4
     );
-    await orchestrator.waitForNextStacksBlock();
+
+    // Wait for the next reward phase (#2)
+    await waitForNextRewardPhase(network, orchestrator, 1);
 
     let chainInfo = await getChainInfo(network);
     blockHeight = chainInfo.burn_block_height;
@@ -75,6 +83,7 @@ describe("testing mixed direct and pooled stacking in pox-3", () => {
       { amount: 75_000_000_000_000, blockHeight, cycles }
     );
     expect(response.error).toBeUndefined();
+    const stackTxid = response.txid;
 
     // Alice delegates 100m to Bob, but it fails.
     response = await broadcastDelegateSTX(
@@ -88,31 +97,91 @@ describe("testing mixed direct and pooled stacking in pox-3", () => {
       { amount: 100_000_000_000_000, poolAddress: Accounts.WALLET_2 }
     );
     expect(response.error).toBeUndefined();
-    let [block, tx] = await waitForStacksTransaction(
-      orchestrator,
-      response.txid
+    const delegateTxid = response.txid;
+
+    // Bob tries to stack Alice's 90m STX
+    response = await broadcastDelegateStackSTX(
+      {
+        poxVersion: 3,
+        network,
+        account: Accounts.WALLET_2,
+        fee: fee,
+        nonce: bobNonce++,
+      },
+      {
+        stacker: Accounts.WALLET_1,
+        amount: 90_000_000_000_000,
+        poolRewardAccount: Accounts.WALLET_2,
+        startBurnHeight: blockHeight,
+        lockPeriodCycles: 1,
+      }
     );
-    expect(tx.success).toBeFalsy();
-    expect(tx.result).toBe("(err 3)");
+    expect(response.error).toBeUndefined();
+    const delegateStackTxid = response.txid;
+
+    // Bob tries to commit 90m for cycle 3
+    response = await broadcastStackAggregationCommitIndexed(
+      {
+        poxVersion: 3,
+        network,
+        account: Accounts.WALLET_2,
+        fee: fee,
+        nonce: bobNonce++,
+      },
+      { poolRewardAccount: Accounts.WALLET_2, cycleId: 3 }
+    );
+    expect(response.error).toBeUndefined();
+    const commitTxid = response.txid;
+
+    // Make sure all of those delegation transactions failed
+    let chainUpdate = await orchestrator.waitForNextStacksBlock();
+    let txCount = 0;
+    for (const tx of chainUpdate.new_blocks[0].block.transactions) {
+      let metadata = <StacksTransactionMetadata>tx.metadata;
+      switch (tx.transaction_identifier.hash.substring(2)) {
+        case stackTxid:
+          expect(metadata.success).toBeTruthy();
+          txCount++;
+          break;
+        case delegateTxid:
+          expect(metadata.success).toBeFalsy();
+          expect(metadata.result).toBe("(err 3)");
+          txCount++;
+          break;
+        case delegateStackTxid:
+          expect(metadata.success).toBeFalsy();
+          expect(metadata.result).toBe("(err 9)");
+          txCount++;
+          break;
+        case commitTxid:
+          expect(metadata.success).toBeFalsy();
+          expect(metadata.result).toBe("(err 4)");
+          txCount++;
+          break;
+        default:
+          break;
+      }
+    }
+    expect(txCount).toBe(4);
 
     let poxInfo = await getPoxInfo(network);
 
     // Assert that the next cycle has 75m STX locked
-    expect(poxInfo.current_cycle.id).toBe(1);
+    expect(poxInfo.current_cycle.id).toBe(2);
     expect(poxInfo.current_cycle.min_threshold_ustx).toBe(29_290_000_000_000);
     expect(poxInfo.next_cycle.stacked_ustx).toBe(75_000_000_000_000);
 
-    // Check Alice's table entry
+    // Check Alice's table entry for cycle 3
     let poxAddrInfo0 = await readRewardCyclePoxAddressForAddress(
       network,
       3,
-      2,
+      3,
       Accounts.WALLET_1.stxAddress
     );
     expect(poxAddrInfo0?.["total-ustx"]).toEqual(uintCV(75_000_000_000_000));
   });
 
-  it("stacking more should increase the slot price (cycle #1)", async () => {
+  it("stacking more should increase the slot price (cycle #2)", async () => {
     const network = new StacksTestnet({ url: orchestrator.getStacksNodeUrl() });
     const cycles = 1;
 
@@ -130,71 +199,81 @@ describe("testing mixed direct and pooled stacking in pox-3", () => {
     expect(response.error).toBeUndefined();
 
     await asyncExpectStacksTransactionSuccess(orchestrator, response.txid);
-
-    let poxInfo = await getPoxInfo(network);
+    await orchestrator.waitForNextStacksBlock();
 
     // Assert that the next cycle has 975m STX locked
     // and the slot price increased above Alice's stacking
-    expect(poxInfo.current_cycle.id).toBe(1);
+    let poxInfo = await getPoxInfo(network);
+    expect(poxInfo.current_cycle.id).toBe(2);
+    expect(poxInfo.current_burnchain_block_height).toBeLessThan(
+      poxInfo.next_cycle.prepare_phase_start_block_height
+    );
     expect(poxInfo.current_cycle.min_threshold_ustx).toBe(29_290_000_000_000);
     expect(poxInfo.next_cycle.stacked_ustx).toBe(975_000_000_000_000);
+    expect(poxInfo.next_cycle.min_threshold_ustx).toBe(81_250_000_000_000);
   });
 
-  it("auto-unlock unlocks directly stacked amount and total_stacked is updated (cycle #2)", async () => {
+  it("auto-unlock unlocks directly stacked amount and total_stacked is updated (cycle #3)", async () => {
     const network = new StacksTestnet({ url: orchestrator.getStacksNodeUrl() });
 
     // Wait for Stacks genesis block
     await orchestrator.waitForNextStacksBlock();
 
-    // move on to the next cycle after unlock (N+5)
-    await waitForNextRewardPhase(network, orchestrator, 5);
+    // Move on to the next cycle after unlock (N+2)
+    await waitForNextRewardPhase(network, orchestrator, 2);
 
-    let poxInfo = await getPoxInfo(network);
     // Assert that the current cycle has 900m STX locked from direct stacking
-    expect(poxInfo.current_cycle.id).toBe(2);
+    let poxInfo = await getPoxInfo(network);
+    expect(poxInfo.current_cycle.id).toBe(3);
     expect(poxInfo.current_cycle.stacked_ustx).toBe(900_000_000_000_000);
-    // FIXME: Is this right? Alice has stacked 75M and she gets unlocked
+    // FIXME: Is this right? The amount that determined who got unlocked was actually 81.25M
+    //        This is confusng. I don't think this should be recomputed after the auto-unlocks.
     expect(poxInfo.current_cycle.min_threshold_ustx).toBe(75_000_000_000_000);
 
-    // All STX are unlocked in the next cycle
+    // All STX are unlocked in the next cycle (because they were only stacked for 1 cycle)
     expect(poxInfo.next_cycle.stacked_ustx).toBe(0);
 
-    // Check Alice's table entry for cycle 2 -- should be not found
+    // Check Alice's table entry for cycle 3 -- should be not found
     let poxAddrInfo0 = await readRewardCyclePoxAddressForAddress(
       network,
       3,
-      2,
+      3,
       Accounts.WALLET_1.stxAddress
     );
     expect(poxAddrInfo0).toBeNull();
 
-    // Check Faucets's table entry for cycle 2
+    // Check Faucets's table entry for cycle 3
     let poxAddrInfo1 = await readRewardCyclePoxAddressForAddress(
       network,
       3,
-      2,
+      3,
       Accounts.FAUCET.stxAddress
     );
     expect(poxAddrInfo1?.["total-ustx"]).toEqual(uintCV(900_000_000_000_000));
 
-    // Check Alice's table entry for cycle 3 -- should be not found
+    // Check Alice's table entry for cycle 4 -- should be not found
     poxAddrInfo0 = await readRewardCyclePoxAddressForAddress(
       network,
       3,
-      3,
+      4,
       Accounts.WALLET_1.stxAddress
     );
     expect(poxAddrInfo0).toBeNull();
 
+    // FIXME: Why is this needed? Without this, the check below will fail
+    //        because it reports that Alice's 75M are still locked.
+    await orchestrator.waitForNextStacksBlock();
+
+    // Alice's STX should be unlocked
     await expectAccountToBe(
       network,
       Accounts.WALLET_1.stxAddress,
-      100_000_000_000_000 - fee * 2,
+      100_000_000_000_000 - aliceNonce * fee,
       0
     );
   });
 
-  it("stacking by other user should activate pox for cycle #3 (in cycle #2)", async () => {
+  it("stacking by other user should activate pox for cycle #4 (in cycle #3)", async () => {
     const network = new StacksTestnet({ url: orchestrator.getStacksNodeUrl() });
     let chainInfo = await getChainInfo(network);
     blockHeight = chainInfo.burn_block_height;
@@ -215,11 +294,14 @@ describe("testing mixed direct and pooled stacking in pox-3", () => {
     await asyncExpectStacksTransactionSuccess(orchestrator, response.txid);
 
     let poxInfo = await getPoxInfo(network);
-    expect(poxInfo.current_cycle.id).toBe(2);
+    expect(poxInfo.current_cycle.id).toBe(3);
+    expect(poxInfo.current_burnchain_block_height).toBeLessThan(
+      poxInfo.next_cycle.prepare_phase_start_block_height
+    );
     expect(poxInfo.next_cycle.stacked_ustx).toBe(80_000_000_000_000);
   });
 
-  it("re-check locked amounts (cycle #3)", async () => {
+  it("re-check locked amounts (cycle #4)", async () => {
     const network = new StacksTestnet({ url: orchestrator.getStacksNodeUrl() });
 
     // Wait for Stacks genesis block
@@ -228,30 +310,30 @@ describe("testing mixed direct and pooled stacking in pox-3", () => {
     // move on to the next cycle after unlock (N+5)
     await waitForNextRewardPhase(network, orchestrator, 5);
 
-    let poxInfo = await getPoxInfo(network);
-    console.log(poxInfo);
     // Assert that the current cycle has 80m STX locked
     // and no STX locked for next cycle
-    expect(poxInfo.current_cycle.id).toBe(3);
+    let poxInfo = await getPoxInfo(network);
+    expect(poxInfo.current_cycle.id).toBe(4);
     expect(poxInfo.current_cycle.stacked_ustx).toBe(80_000_000_000_000);
     expect(poxInfo.current_cycle.min_threshold_ustx).toBe(29_290_000_000_000);
-    expect(poxInfo.next_cycle.stacked_ustx).toBe(0);
+    // FIXME: Why does this fail?
     expect(poxInfo.current_cycle.is_pox_active).toBe(true);
+    expect(poxInfo.next_cycle.stacked_ustx).toBe(0);
 
-    // Check Alice's table entry for cycle 3
+    // Check Alice's table entry for cycle 4
     let poxAddrInfo0 = await readRewardCyclePoxAddressForAddress(
       network,
       3,
-      3,
+      4,
       Accounts.WALLET_1.stxAddress
     );
     expect(poxAddrInfo0).toBeNull();
 
-    // Check Chloe's table entry for cycle 3
+    // Check Chloe's table entry for cycle 4
     let poxAddrInfo1 = await readRewardCyclePoxAddressForAddress(
       network,
       3,
-      3,
+      4,
       Accounts.WALLET_3.stxAddress
     );
     expect(poxAddrInfo1?.["total-ustx"]).toEqual(uintCV(80_000_000_000_000));
@@ -269,7 +351,7 @@ describe("testing mixed direct and pooled stacking in pox-3", () => {
       network,
       Accounts.WALLET_3.stxAddress,
       20_000_000_000_000 - chloeNonce * fee,
-      0
+      80_000_000_000_000
     );
 
     // Faucet's STX are still unlocked
