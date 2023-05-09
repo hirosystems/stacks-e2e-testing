@@ -138,6 +138,7 @@ describe("testing mixed direct and pooled stacking under epoch 2.1", () => {
     let poxAddrInfo0 = await readRewardCyclePoxAddressListAtIndex(
       network,
       2,
+      2,
       0
     );
     expect(poxAddrInfo0?.["total-ustx"]).toEqual(uintCV(75_000_000_000_000));
@@ -145,6 +146,7 @@ describe("testing mixed direct and pooled stacking under epoch 2.1", () => {
     // Check Bob's table entry
     let poxAddrInfo1 = await readRewardCyclePoxAddressListAtIndex(
       network,
+      2,
       2,
       1
     );
@@ -171,12 +173,14 @@ describe("testing mixed direct and pooled stacking under epoch 2.1", () => {
     let poxAddrInfo0 = await readRewardCyclePoxAddressListAtIndex(
       network,
       2,
+      2,
       0
     );
     expect(poxAddrInfo0?.["total-ustx"]).toEqual(uintCV(920_000_000_000_000));
 
     let poxAddrInfo1 = await readRewardCyclePoxAddressListAtIndex(
       network,
+      2,
       2,
       1
     );

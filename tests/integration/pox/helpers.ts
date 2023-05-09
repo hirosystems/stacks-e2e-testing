@@ -21,10 +21,13 @@ import {
   OptionalCV,
   responseErrorCV,
   stringAsciiCV,
+  callReadOnlyFunction,
+  principalCV,
 } from "@stacks/transactions";
 
 import { expect } from "vitest";
 import { BroadcastOptions } from "../helpers";
+import { Contracts } from "../constants";
 const fetch = require("node-fetch");
 
 export interface Account {
@@ -186,6 +189,22 @@ export const expectAccountToBe = async (
   expect(wallet.locked).toBe(BigInt(locked));
 };
 
+export const callReadOnlystackerInfo = (
+  network: StacksNetwork,
+  poxVersion: number,
+  user: Account
+) => {
+  let poxContract = Contracts.POX[poxVersion] || Contracts.DEFAULT;
+  return callReadOnlyFunction({
+    contractName: poxContract.name,
+    contractAddress: poxContract.address,
+    functionName: "get-stacker-info",
+    functionArgs: [principalCV(user.stxAddress)],
+    network,
+    senderAddress: poxContract.address,
+  });
+};
+
 export const expectNoError = (response: TxBroadcastResult) => {
   expect(
     response.error,
@@ -204,11 +223,13 @@ export const errorToCV = (e: Error) => {
 
 export const readRewardCyclePoxAddressList = async (
   network: StacksNetwork,
+  poxVersion: number,
   cycleId: number
 ) => {
+  let poxContract = Contracts.POX[poxVersion] || Contracts.DEFAULT;
   const url = network.getMapEntryUrl(
-    "ST000000000000000000002AMW42H",
-    "pox-2",
+    poxContract.address,
+    poxContract.name,
     "reward-cycle-pox-address-list-len"
   );
   const cycleIdValue = uintCV(cycleId);
@@ -240,6 +261,7 @@ export const readRewardCyclePoxAddressList = async (
   for (let i = 0; i < length; i++) {
     let poxAddressInfo = (await readRewardCyclePoxAddressListAtIndex(
       network,
+      poxVersion,
       cycleId,
       i
     )) as Record<string, ClarityValue>;
@@ -251,14 +273,16 @@ export const readRewardCyclePoxAddressList = async (
 
 export const readRewardCyclePoxAddressForAddress = async (
   network: StacksNetwork,
+  poxVersion: number,
   cycleId: number,
   address: string
 ) => {
   // TODO: There might be a better way to do this using the `stacking-state`
   //       map to get the index
+  let poxContract = Contracts.POX[poxVersion] || Contracts.DEFAULT;
   const url = network.getMapEntryUrl(
-    "ST000000000000000000002AMW42H",
-    "pox-2",
+    poxContract.address,
+    poxContract.name,
     "reward-cycle-pox-address-list-len"
   );
   const cycleIdValue = uintCV(cycleId);
@@ -289,6 +313,7 @@ export const readRewardCyclePoxAddressForAddress = async (
   for (let i = 0; i < length; i++) {
     let poxAddressInfo = await readRewardCyclePoxAddressListAtIndex(
       network,
+      poxVersion,
       cycleId,
       i
     );
@@ -312,12 +337,14 @@ export type RewardCyclePoxAddressMapEntry = {
 
 export const readRewardCyclePoxAddressListAtIndex = async (
   network: StacksNetwork,
+  poxVersion: number,
   cycleId: number,
   index: number
 ): Promise<RewardCyclePoxAddressMapEntry | null | undefined> => {
+  let poxContract = Contracts.POX[poxVersion] || Contracts.DEFAULT;
   const url = network.getMapEntryUrl(
-    "ST000000000000000000002AMW42H",
-    "pox-2",
+    poxContract.address,
+    poxContract.name,
     "reward-cycle-pox-address-list"
   );
   const cycleIdValue = uintCV(cycleId);

@@ -78,14 +78,14 @@ describe("testing solo stacker increase with bug", () => {
     // let Bobx's stacking confirm to enforce reward index 1
     await waitForStacksTransaction(orchestrator, response.txid);
 
-    // Cloe stacks 80m
+    // Chloe stacks 80m
     response = await broadcastStackSTX(
       { poxVersion: 2, network, account: Accounts.WALLET_3, fee, nonce: 0 },
       { amount: 80_000_000_001_000, blockHeight, cycles }
     );
     expect(response.error).toBeUndefined();
 
-    // Cloe increases by 10m
+    // Chloe increases by 10m
     response = await broadcastStackIncrease(
       { poxVersion: 2, network, account: Accounts.WALLET_3, fee, nonce: 1 },
       { amount: 10_000_000_010_000 }
@@ -105,6 +105,7 @@ describe("testing solo stacker increase with bug", () => {
     const poxAddrInfo0 = await readRewardCyclePoxAddressForAddress(
       network,
       2,
+      2,
       Accounts.FAUCET.stxAddress
     );
     expect(poxAddrInfo0?.["total-ustx"]).toEqual(uintCV(900_000_000_000_001));
@@ -112,6 +113,7 @@ describe("testing solo stacker increase with bug", () => {
     // Check Bob's table entry
     const poxAddrInfo1 = await readRewardCyclePoxAddressForAddress(
       network,
+      2,
       2,
       Accounts.WALLET_2.stxAddress
     );
@@ -121,9 +123,10 @@ describe("testing solo stacker increase with bug", () => {
     // );
     expect(poxAddrInfo1?.["total-ustx"]).toEqual(uintCV(990_000_000_000_111));
 
-    // Check Cloe's table entry
+    // Check Chloe's table entry
     const poxAddrInfo2 = await readRewardCyclePoxAddressForAddress(
       network,
+      2,
       2,
       Accounts.WALLET_3.stxAddress
     );

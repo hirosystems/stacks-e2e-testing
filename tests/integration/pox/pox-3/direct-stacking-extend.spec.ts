@@ -1,18 +1,15 @@
 import { DevnetNetworkOrchestrator } from "@hirosystems/stacks-devnet-js";
 import { StacksTestnet } from "@stacks/network";
 import { ClarityValue, uintCV } from "@stacks/transactions";
-import { Accounts, Constants } from "../../constants";
+import { Accounts } from "../../constants";
 import {
-  DEFAULT_EPOCH_TIMELINE,
-  asyncExpectStacksTransactionSuccess,
-  broadcastSTXTransfer,
+  FAST_FORWARD_TO_EPOCH_2_4,
   buildDevnetNetworkOrchestrator,
+  getChainInfo,
   getNetworkIdFromEnv,
-  getStacksNodeVersion,
   waitForStacksTransaction,
 } from "../../helpers";
 import {
-  expectAccountToBe,
   getPoxInfo,
   readRewardCyclePoxAddressForAddress,
   waitForNextRewardPhase,
@@ -24,12 +21,7 @@ import {
 
 describe("testing stack-extend functionality", () => {
   let orchestrator: DevnetNetworkOrchestrator;
-  const version = getStacksNodeVersion();
-  const timeline = {
-    epoch_2_2: 143,
-    epoch_2_3: 145,
-    epoch_2_4: 147,
-  };
+  const timeline = FAST_FORWARD_TO_EPOCH_2_4;
   const fee = 1000;
   let aliceNonce = 0;
 
@@ -48,17 +40,19 @@ describe("testing stack-extend functionality", () => {
   it("stacking and then extending should result in rewards for 3 cycles", async () => {
     const network = new StacksTestnet({ url: orchestrator.getStacksNodeUrl() });
 
-    // Wait for Stacks genesis block
+    // Wait for 2.4 to go live
+    await orchestrator.waitForStacksBlockAnchoredOnBitcoinBlockOfHeight(
+      timeline.epoch_2_4
+    );
     await orchestrator.waitForNextStacksBlock();
-    // Wait for block N+1 where N is the height of the next reward phase
-    await waitForNextRewardPhase(network, orchestrator, 1);
 
-    const blockHeight = Constants.DEVNET_DEFAULT_POX_2_ACTIVATION + 1;
+    let chainInfo = await getChainInfo(network);
+    const blockHeight = chainInfo.burn_block_height;
 
     // Alice stacks 80m STX for 1 cycle
     let response = await broadcastStackSTX(
       {
-        poxVersion: 2,
+        poxVersion: 3,
         network,
         account: Accounts.WALLET_1,
         fee,
@@ -81,7 +75,7 @@ describe("testing stack-extend functionality", () => {
     // Alice extends stacking for another 2 cycles
     response = await broadcastStackExtend(
       {
-        poxVersion: 2,
+        poxVersion: 3,
         network,
         account: Accounts.WALLET_1,
         fee,
@@ -98,12 +92,12 @@ describe("testing stack-extend functionality", () => {
     for (let cycle = 1; cycle <= 3; cycle++) {
       let poxInfo = await getPoxInfo(network);
       // Asserts about pox info for better knowledge sharing
-      expect(poxInfo.contract_id).toBe("ST000000000000000000002AMW42H.pox-2");
+      expect(poxInfo.contract_id).toBe("ST000000000000000000002AMW42H.pox-3");
       expect(poxInfo.current_cycle.id).toBe(cycle);
 
       const poxAddrInfo = (await readRewardCyclePoxAddressForAddress(
         network,
-        2,
+        3,
         cycle + 1, // cycle + 1 because we are checking the next cycle, including rewards
         Accounts.WALLET_1.stxAddress
       )) as Record<string, ClarityValue>;
@@ -111,54 +105,6 @@ describe("testing stack-extend functionality", () => {
 
       // Wait for 1 reward cycle
       await waitForNextRewardPhase(network, orchestrator, 1);
-    }
-  });
-
-  it("everything unlocks as expected upon v2 unlock height", async () => {
-    // This test should only run when running a 2.2 node
-    if (Number(version) < 2.2) {
-      return;
-    }
-    const network = new StacksTestnet({ url: orchestrator.getStacksNodeUrl() });
-
-    // Wait for 2.2 activation and unlock
-    await orchestrator.waitForStacksBlockAnchoredOnBitcoinBlockOfHeight(
-      timeline.epoch_2_2 + 2
-    );
-
-    // Check Alice's account info
-    await expectAccountToBe(
-      network,
-      Accounts.WALLET_1.stxAddress,
-      100_000_000_000_000 - aliceNonce * fee,
-      0
-    );
-
-    // Verify that Alice's STX are really unlocked by doing a transfer
-    let response = await broadcastSTXTransfer(
-      { network, account: Accounts.WALLET_1, fee, nonce: aliceNonce++ },
-      {
-        amount: 100_000_000_000_000 - aliceNonce * fee,
-        recipient: Accounts.WALLET_3.stxAddress,
-      }
-    );
-    await asyncExpectStacksTransactionSuccess(orchestrator, response.txid);
-  });
-
-  it("PoX should stay disabled indefinitely in 2.2 and 2.3", async () => {
-    if (version === "2.2" || version === "2.3") {
-      const network = new StacksTestnet({
-        url: orchestrator.getStacksNodeUrl(),
-      });
-      let poxInfo = await getPoxInfo(network);
-      await waitForNextRewardPhase(
-        network,
-        orchestrator,
-        poxInfo.current_cycle.id + 1
-      );
-
-      poxInfo = await getPoxInfo(network);
-      expect(poxInfo.current_cycle.is_pox_active).toBeFalsy();
     }
   });
 });

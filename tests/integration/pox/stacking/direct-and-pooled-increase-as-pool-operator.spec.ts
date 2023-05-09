@@ -137,6 +137,7 @@ describe("testing direct stacker as pool operator without auto-unlock under epoc
     let poxAddrInfo0 = await readRewardCyclePoxAddressListAtIndex(
       network,
       2,
+      2,
       0
     );
     expect(poxAddrInfo0?.["total-ustx"]).toEqual(uintCV(80_000_000_000_000));
@@ -144,6 +145,7 @@ describe("testing direct stacker as pool operator without auto-unlock under epoc
     // Check Alice's second table entry
     let poxAddrInfo1 = await readRewardCyclePoxAddressListAtIndex(
       network,
+      2,
       2,
       1
     );
@@ -169,11 +171,11 @@ describe("testing direct stacker as pool operator without auto-unlock under epoc
     expect(poxInfo.current_cycle.stacked_ustx).toBe(1_079_000_000_000_000);
 
     // Check Alice's table entry
-    poxAddrInfo0 = await readRewardCyclePoxAddressListAtIndex(network, 2, 0);
+    poxAddrInfo0 = await readRewardCyclePoxAddressListAtIndex(network, 2, 2, 0);
     expect(poxAddrInfo0?.["total-ustx"]).toEqual(uintCV(80_000_000_000_000));
 
     // Check Alice's second table entry
-    poxAddrInfo1 = await readRewardCyclePoxAddressListAtIndex(network, 2, 1);
+    poxAddrInfo1 = await readRewardCyclePoxAddressListAtIndex(network, 2, 2, 1);
     expect(poxAddrInfo1?.["total-ustx"]).toEqual(uintCV(999_000_000_000_000));
 
     await expectAccountToBe(

@@ -1,12 +1,11 @@
 import { DevnetNetworkOrchestrator } from "@hirosystems/stacks-devnet-js";
 import { StacksTestnet } from "@stacks/network";
 import { uintCV } from "@stacks/transactions";
-import { Accounts, Constants } from "../../constants";
+import { Accounts } from "../../constants";
 import {
-  DEFAULT_EPOCH_TIMELINE,
-  asyncExpectStacksTransactionSuccess,
-  broadcastSTXTransfer,
+  FAST_FORWARD_TO_EPOCH_2_4,
   buildDevnetNetworkOrchestrator,
+  getChainInfo,
   getNetworkIdFromEnv,
   getStacksNodeVersion,
   waitForStacksTransaction,
@@ -22,11 +21,7 @@ import { broadcastStackSTX } from "../helpers-direct-stacking";
 describe("testing solo stacker below minimum", () => {
   let orchestrator: DevnetNetworkOrchestrator;
   const version = getStacksNodeVersion();
-  const timeline = {
-    epoch_2_2: 127,
-    epoch_2_3: 131,
-    epoch_2_4: 133,
-  };
+  const timeline = FAST_FORWARD_TO_EPOCH_2_4;
   const fee = 1000;
   let aliceNonce = 0;
   let faucetNonce = 0;
@@ -46,18 +41,20 @@ describe("testing solo stacker below minimum", () => {
   it("stacking above minimum increment should succeed", async () => {
     const network = new StacksTestnet({ url: orchestrator.getStacksNodeUrl() });
 
-    // Wait for Stacks genesis block
+    // Wait for 2.4 to go live
+    await orchestrator.waitForStacksBlockAnchoredOnBitcoinBlockOfHeight(
+      timeline.epoch_2_4
+    );
     await orchestrator.waitForNextStacksBlock();
-    // Wait for block N+1 where N is the height of the next reward phase
-    await waitForNextRewardPhase(network, orchestrator, 1);
 
-    const blockHeight = Constants.DEVNET_DEFAULT_POX_2_ACTIVATION + 1;
+    let chainInfo = await getChainInfo(network);
+    const blockHeight = chainInfo.burn_block_height;
     const cycles = 1;
 
     // Alice stacks 80m
     let response = await broadcastStackSTX(
       {
-        poxVersion: 2,
+        poxVersion: 3,
         network,
         account: Accounts.WALLET_1,
         fee,
@@ -75,7 +72,7 @@ describe("testing solo stacker below minimum", () => {
     // Faucet stacks 999m
     response = await broadcastStackSTX(
       {
-        poxVersion: 2,
+        poxVersion: 3,
         network,
         account: Accounts.FAUCET,
         fee,
@@ -105,7 +102,7 @@ describe("testing solo stacker below minimum", () => {
     // Check Alice's table entry
     const poxAddrInfo0 = await readRewardCyclePoxAddressForAddress(
       network,
-      2,
+      3,
       2,
       Accounts.WALLET_1.stxAddress
     );
@@ -114,7 +111,7 @@ describe("testing solo stacker below minimum", () => {
     // Check Faucets's table entry
     const poxAddrInfo1 = await readRewardCyclePoxAddressForAddress(
       network,
-      2,
+      3,
       2,
       Accounts.FAUCET.stxAddress
     );
@@ -142,85 +139,19 @@ describe("testing solo stacker below minimum", () => {
     // Check Alice's table entry
     const poxAddrInfo0 = await readRewardCyclePoxAddressForAddress(
       network,
-      2,
+      3,
       2,
       Accounts.WALLET_1.stxAddress
     );
-    expect(poxAddrInfo0?.["total-ustx"]).toBeUndefined();
+    expect(poxAddrInfo0).toBeNull();
 
     // Check Faucet's table entry
     const poxAddrInfo1 = await readRewardCyclePoxAddressForAddress(
       network,
-      2,
+      3,
       2,
       Accounts.FAUCET.stxAddress
     );
     expect(poxAddrInfo1?.["total-ustx"]).toEqual(uintCV(999_000_000_000_000));
-  });
-
-  it("everything unlocks as expected upon v2 unlock height", async () => {
-    // This test should only run when running a 2.2 node
-    if (Number(version) < 2.2) {
-      return;
-    }
-    const network = new StacksTestnet({ url: orchestrator.getStacksNodeUrl() });
-
-    // Wait for 2.2 activation and unlock
-    await orchestrator.waitForStacksBlockAnchoredOnBitcoinBlockOfHeight(
-      timeline.epoch_2_2 + 2
-    );
-
-    // Check Alice's account info
-    await expectAccountToBe(
-      network,
-      Accounts.WALLET_1.stxAddress,
-      100_000_000_000_000 - aliceNonce * fee,
-      0
-    );
-
-    // Verify that Alice's STX are really unlocked by doing a transfer
-    let response = await broadcastSTXTransfer(
-      { network, account: Accounts.WALLET_1, fee, nonce: aliceNonce++ },
-      {
-        amount: 100_000_000_000_000 - aliceNonce * fee,
-        recipient: Accounts.WALLET_3.stxAddress,
-      }
-    );
-    await asyncExpectStacksTransactionSuccess(orchestrator, response.txid);
-
-    // Check Faucet's account info
-    await expectAccountToBe(
-      network,
-      Accounts.FAUCET.stxAddress,
-      1_000_000_000_000_000 - faucetNonce * fee,
-      0
-    );
-
-    // Verify that Faucet's STX are really unlocked by doing a transfer
-    response = await broadcastSTXTransfer(
-      { network, account: Accounts.FAUCET, fee, nonce: faucetNonce++ },
-      {
-        amount: 1_000_000_000_000_000 - faucetNonce * fee,
-        recipient: Accounts.WALLET_3.stxAddress,
-      }
-    );
-    await asyncExpectStacksTransactionSuccess(orchestrator, response.txid);
-  });
-
-  it("PoX should stay disabled indefinitely in 2.2 and 2.3", async () => {
-    if (version === "2.2" || version === "2.3") {
-      const network = new StacksTestnet({
-        url: orchestrator.getStacksNodeUrl(),
-      });
-      let poxInfo = await getPoxInfo(network);
-      await waitForNextRewardPhase(
-        network,
-        orchestrator,
-        poxInfo.current_cycle.id + 1
-      );
-
-      poxInfo = await getPoxInfo(network);
-      expect(poxInfo.current_cycle.is_pox_active).toBeFalsy();
-    }
   });
 });

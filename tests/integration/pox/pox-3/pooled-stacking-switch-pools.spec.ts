@@ -1,17 +1,17 @@
-import {
-  DevnetNetworkOrchestrator,
-  StacksBlockMetadata,
-} from "@hirosystems/stacks-devnet-js";
+import { DevnetNetworkOrchestrator } from "@hirosystems/stacks-devnet-js";
 import { StacksTestnet } from "@stacks/network";
 import { uintCV } from "@stacks/transactions";
 import { Accounts, Constants, DEFAULT_FEE } from "../../constants";
 import {
-  DEFAULT_EPOCH_TIMELINE,
+  FAST_FORWARD_TO_EPOCH_2_4,
   asyncExpectStacksTransactionSuccess,
   buildDevnetNetworkOrchestrator,
+  getChainInfo,
   getNetworkIdFromEnv,
+  waitForStacksTransaction,
 } from "../../helpers";
 import {
+  expectAccountToBe,
   getPoxInfo,
   readRewardCyclePoxAddressForAddress,
   readRewardCyclePoxAddressListAtIndex,
@@ -28,12 +28,11 @@ import { getCoreInfo } from "../helpers";
 
 describe("testing pooled stacking under epoch 2.1", () => {
   let orchestrator: DevnetNetworkOrchestrator;
+  let timeline = FAST_FORWARD_TO_EPOCH_2_4;
 
-  const timeline = {
-    epoch_2_2: 128,
-    pox_2_unlock_height: 129,
-    epoch_2_3: 138,
-  };
+  let aliceNonce = 0;
+  let bobNonce = 0;
+  let chloeNonce = 0;
 
   beforeAll(() => {
     orchestrator = buildDevnetNetworkOrchestrator(
@@ -50,38 +49,42 @@ describe("testing pooled stacking under epoch 2.1", () => {
   it("STX delegation and locking by pool operator should register STX for rewards", async () => {
     const network = new StacksTestnet({ url: orchestrator.getStacksNodeUrl() });
 
-    // Wait for the pox-2 activation
+    // Wait for 2.4 to go live
     await orchestrator.waitForStacksBlockAnchoredOnBitcoinBlockOfHeight(
-      Constants.DEVNET_DEFAULT_POX_2_ACTIVATION
+      timeline.epoch_2_4
     );
+    await orchestrator.waitForNextStacksBlock();
 
     // Alice delegates 95m STX to Chloe
     let response = await broadcastDelegateSTX(
       {
-        poxVersion: 2,
+        poxVersion: 3,
         network,
         account: Accounts.WALLET_1,
         fee: DEFAULT_FEE,
-        nonce: 0,
+        nonce: aliceNonce++,
       },
       { amount: 95_000_000_000_000, poolAddress: Accounts.WALLET_3 }
     );
     expect(response.error).toBeUndefined();
 
+    const chainInfo = await getChainInfo(network);
+    const blockHeight = chainInfo.burn_block_height;
+
     // Chloe locks 90m for Alice
     response = await broadcastDelegateStackSTX(
       {
-        poxVersion: 2,
+        poxVersion: 3,
         network,
         account: Accounts.WALLET_3,
         fee: DEFAULT_FEE,
-        nonce: 0,
+        nonce: chloeNonce++,
       },
       {
         stacker: Accounts.WALLET_1,
         amount: 90_000_000_000_000,
         poolRewardAccount: Accounts.WALLET_3,
-        startBurnHeight: Constants.DEVNET_DEFAULT_POX_2_ACTIVATION + 6,
+        startBurnHeight: blockHeight,
         lockPeriodCycles: 1,
       }
     );
@@ -90,18 +93,16 @@ describe("testing pooled stacking under epoch 2.1", () => {
     // Chloe commits 90m
     response = await broadcastStackAggregationCommitIndexed(
       {
-        poxVersion: 2,
+        poxVersion: 3,
         network,
         account: Accounts.WALLET_3,
         fee: DEFAULT_FEE,
-        nonce: 1,
+        nonce: chloeNonce++,
       },
       { poolRewardAccount: Accounts.WALLET_3, cycleId: 2 }
     );
     expect(response.error).toBeUndefined();
     await asyncExpectStacksTransactionSuccess(orchestrator, response.txid);
-
-    // we are at block ~111
 
     let poxInfo = await getPoxInfo(network);
 
@@ -112,7 +113,7 @@ describe("testing pooled stacking under epoch 2.1", () => {
     // Check Alice's table entry
     const poxAddrInfo0 = await readRewardCyclePoxAddressForAddress(
       network,
-      2,
+      3,
       2,
       Accounts.WALLET_1.stxAddress
     );
@@ -121,82 +122,47 @@ describe("testing pooled stacking under epoch 2.1", () => {
     // Check Pool operators/Chloe's table entry
     const poxAddrInfo1 = await readRewardCyclePoxAddressListAtIndex(
       network,
-      2,
+      3,
       2,
       0
     );
     expect(poxAddrInfo1?.["total-ustx"]).toEqual(uintCV(90_000_000_000_000));
   });
 
-  it("user can switch pools and new pool operator can extend (cycle #1)", async () => {
+  it("user cannot switch pools (cycle #1)", async () => {
     const network = new StacksTestnet({ url: orchestrator.getStacksNodeUrl() });
 
     // Alice revokes, then delegates 95m STX to Bob
     let response = await broadcastRevokeDelegateStx({
-      poxVersion: 2,
+      poxVersion: 3,
       network,
       account: Accounts.WALLET_1,
       fee: DEFAULT_FEE,
-      nonce: 1,
+      nonce: aliceNonce++,
     });
     expect(response.error).toBeUndefined();
 
     response = await broadcastDelegateSTX(
       {
-        poxVersion: 2,
+        poxVersion: 3,
         network,
         account: Accounts.WALLET_1,
         fee: DEFAULT_FEE,
-        nonce: 2,
+        nonce: aliceNonce++,
       },
       { amount: 95_000_000_000_000, poolAddress: Accounts.WALLET_2 }
     );
     expect(response.error).toBeUndefined();
-    await asyncExpectStacksTransactionSuccess(orchestrator, response.txid);
-
-    // we are at block ~112
-
-    // Bob extends Alice 90m by 1 cycle
-    response = await broadcastDelegateStackExtend(
-      {
-        poxVersion: 2,
-        network,
-        account: Accounts.WALLET_2,
-        fee: DEFAULT_FEE,
-        nonce: 0,
-      },
-      {
-        stacker: Accounts.WALLET_1,
-        poolRewardAccount: Accounts.WALLET_2,
-        extendByCount: 1,
-      }
-    );
-    expect(response.error).toBeUndefined();
-
-    // Bob commits 90m for cycle 3
-    response = await broadcastStackAggregationCommitIndexed(
-      {
-        poxVersion: 2,
-        network,
-        account: Accounts.WALLET_2,
-        fee: DEFAULT_FEE,
-        nonce: 1,
-      },
-      { poolRewardAccount: Accounts.WALLET_2, cycleId: 3 }
-    );
-    expect(response.error).toBeUndefined();
-    let [block, tx] = await asyncExpectStacksTransactionSuccess(
+    let [block, tx] = await waitForStacksTransaction(
       orchestrator,
       response.txid
     );
-
-    expect(
-      (block as StacksBlockMetadata).bitcoin_anchor_block_identifier.index
-    ).toBeLessThan(timeline.epoch_2_2);
+    expect(tx.success).toBeFalsy();
+    expect(tx.result).toBe("(err 3)"); // ERR_STACKING_ALREADY_STACKED
 
     let poxInfo = await getPoxInfo(network);
 
-    // Assert that the next cycle has 90m STX locked
+    // Assert that the next cycle has still 90m STX locked
     expect(poxInfo.current_cycle.id).toBe(1);
     expect(poxInfo.current_cycle.stacked_ustx).toBe(0);
     expect(poxInfo.current_cycle.is_pox_active).toBe(false);
@@ -206,7 +172,7 @@ describe("testing pooled stacking under epoch 2.1", () => {
     // Check Pool operators/Chloe's table entry
     const poxAddrInfo0 = await readRewardCyclePoxAddressListAtIndex(
       network,
-      2,
+      3,
       2,
       0
     );
@@ -214,11 +180,10 @@ describe("testing pooled stacking under epoch 2.1", () => {
     expect(poxAddrInfo0?.["total-ustx"]).toEqual(uintCV(90_000_000_000_000));
   });
 
-  it("extended STX are locked for next cycle (cycle #2)", async () => {
+  it("STX are not locked for next cycle (cycle #2)", async () => {
     const network = new StacksTestnet({ url: orchestrator.getStacksNodeUrl() });
 
     // Wait for block N+6 where N is the height of the next reward phase
-    // block 126
     await waitForNextRewardPhase(network, orchestrator, 6);
 
     let coreInfo = await getCoreInfo(network);
@@ -226,29 +191,106 @@ describe("testing pooled stacking under epoch 2.1", () => {
 
     let poxInfo = await getPoxInfo(network);
 
-    // Assert that the next cycle has 90m STX locked
+    // Assert that this cycle has 90m STX locked
+    // Assert that 0 STX has been locked for cycle #3
     expect(poxInfo.current_cycle.id).toBe(2);
     expect(poxInfo.current_cycle.stacked_ustx).toBe(90_000_000_000_000);
     expect(poxInfo.current_cycle.is_pox_active).toBe(true);
-    expect(poxInfo.next_cycle.stacked_ustx).toBe(90_000_000_000_000);
+    expect(poxInfo.next_cycle.stacked_ustx).toBe(0);
 
     // Assert reward slots for cycle #3
     // Check Pool operators (Chloe's and Bob's) table entry
-    // Only Bob has an entry
+    // Neither should have entries
     const poxAddrInfo0 = await readRewardCyclePoxAddressListAtIndex(
       network,
-      2,
+      3,
       3,
       0
     );
-    expect(poxAddrInfo0?.["total-ustx"]).toEqual(uintCV(90_000_000_000_000));
+    expect(poxAddrInfo0?.["total-ustx"]).toBeUndefined();
 
     const poxAddrInfo1 = await readRewardCyclePoxAddressListAtIndex(
       network,
-      2,
+      3,
       3,
       1
     );
     expect(poxAddrInfo1?.["total-ustx"]).toBeUndefined();
+  });
+
+  it("user can delegate to a new pool after previous lock-up is complete (cycle #3)", async () => {
+    const network = new StacksTestnet({ url: orchestrator.getStacksNodeUrl() });
+
+    // Wait for block N+2 where N is the height of the next reward phase
+    await waitForNextRewardPhase(network, orchestrator, 2);
+
+    const chainInfo = await getChainInfo(network);
+    const blockHeight = chainInfo.burn_block_height;
+
+    // Bob locks 90m for Alice
+    let response = await broadcastDelegateStackSTX(
+      {
+        poxVersion: 3,
+        network,
+        account: Accounts.WALLET_2,
+        fee: DEFAULT_FEE,
+        nonce: bobNonce++,
+      },
+      {
+        stacker: Accounts.WALLET_1,
+        amount: 90_000_000_000_000,
+        poolRewardAccount: Accounts.WALLET_2,
+        startBurnHeight: blockHeight,
+        lockPeriodCycles: 1,
+      }
+    );
+    expect(response.error).toBeUndefined();
+    await asyncExpectStacksTransactionSuccess(orchestrator, response.txid);
+
+    // Bob commits 90m
+    response = await broadcastStackAggregationCommitIndexed(
+      {
+        poxVersion: 3,
+        network,
+        account: Accounts.WALLET_2,
+        fee: DEFAULT_FEE,
+        nonce: bobNonce++,
+      },
+      { poolRewardAccount: Accounts.WALLET_2, cycleId: 4 }
+    );
+    expect(response.error).toBeUndefined();
+    await asyncExpectStacksTransactionSuccess(orchestrator, response.txid);
+
+    let poxInfo = await getPoxInfo(network);
+
+    // Assert that the next cycle has 90m STX locked
+    expect(poxInfo.current_cycle.id).toBe(3);
+    expect(poxInfo.next_cycle.stacked_ustx).toBe(90_000_000_000_000);
+
+    // Check Alice's table entry
+    const poxAddrInfo0 = await readRewardCyclePoxAddressForAddress(
+      network,
+      3,
+      2,
+      Accounts.WALLET_1.stxAddress
+    );
+    expect(poxAddrInfo0).toBeNull();
+
+    // Check Pool operators/Bob's table entry
+    const poxAddrInfo1 = await readRewardCyclePoxAddressListAtIndex(
+      network,
+      3,
+      4,
+      0
+    );
+    expect(poxAddrInfo1?.["total-ustx"]).toEqual(uintCV(90_000_000_000_000));
+
+    // Ensure Alice's STX are locked
+    await expectAccountToBe(
+      network,
+      Accounts.WALLET_1.stxAddress,
+      100_000_000_000_000 - 90_000_000_000_000 - aliceNonce * DEFAULT_FEE,
+      90_000_000_000_000
+    );
   });
 });

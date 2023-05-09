@@ -272,13 +272,14 @@ export const broadcastStackAggregationCommitIndexed = async (
 };
 
 export const broadcastStackAggregationIncrease = async (
-  { network, account, fee, nonce }: BroadcastOptions,
+  { poxVersion, network, account, fee, nonce }: BroadcastOptionsPox,
   {
     poolRewardAccount,
     cycleId,
     rewardIndex,
   }: { poolRewardAccount: Account; cycleId: number; rewardIndex: number }
 ): Promise<TxBroadcastResult> => {
+  let poxContract = Contracts.POX[poxVersion] || Contracts.DEFAULT;
   const { version, data } = decodeBtcAddress(poolRewardAccount.btcAddress);
   const poxAddress = {
     version: bufferCV(toBytes(new Uint8Array([version.valueOf()]))),
@@ -286,8 +287,8 @@ export const broadcastStackAggregationIncrease = async (
   };
 
   const txOptions = {
-    contractAddress: Contracts.POX_2.address,
-    contractName: Contracts.POX_2.name,
+    contractAddress: poxContract.address,
+    contractName: poxContract.name,
     functionName: "stack-aggregation-increase",
     functionArgs: [tupleCV(poxAddress), uintCV(cycleId), uintCV(rewardIndex)],
     fee,
