@@ -5,29 +5,29 @@ import {
 import { StacksNetwork } from "@stacks/network";
 import { CoreInfo, PoxInfo } from "@stacks/stacking";
 import {
-  tupleCV,
-  uintCV,
-  cvToHex,
-  TxBroadcastResult,
-  hexToCV,
-  cvToString,
-  SomeCV,
-  TupleCV,
-  UIntCV,
-  NoneCV,
+  BufferCV,
   ClarityType,
   ClarityValue,
-  PrincipalCV,
   OptionalCV,
+  PrincipalCV,
+  SomeCV,
+  TupleCV,
+  TxBroadcastResult,
+  UIntCV,
+  callReadOnlyFunction,
+  cvToHex,
+  cvToString,
+  hexToCV,
+  principalCV,
   responseErrorCV,
   stringAsciiCV,
-  callReadOnlyFunction,
-  principalCV,
+  tupleCV,
+  uintCV,
 } from "@stacks/transactions";
 
 import { expect } from "vitest";
-import { BroadcastOptions } from "../helpers";
 import { Contracts } from "../constants";
+import { BroadcastOptions } from "../helpers";
 const fetch = require("node-fetch");
 
 export interface Account {
@@ -332,6 +332,7 @@ export const readRewardCyclePoxAddressForAddress = async (
 
 export type RewardCyclePoxAddressMapEntry = {
   "total-ustx": UIntCV;
+  "pox-addr": TupleCV<{ version: BufferCV; hashbytes: BufferCV }>;
   stacker: OptionalCV<PrincipalCV>;
 };
 
