@@ -17,6 +17,7 @@ import {
   readRewardCyclePoxAddressListAtIndex,
   waitForNextRewardPhase,
 } from "../helpers";
+import { getBtcBalance } from "../helpers-btc";
 import { broadcastStackSTX } from "../helpers-direct-stacking";
 import {
   broadcastDelegateSTX,
@@ -241,14 +242,13 @@ describe("testing pooled stacking with auto unlock", () => {
     await waitForNextRewardPhase(network, orchestrator, 5);
 
     // FIXME: retrieve btc balance
-    /*
+
     const balance = await getBtcBalance({
-      bitcoinRpcUrl: "http://localhost:18443",
+      bitcoinRpcUrl: orchestrator.getBitcoinNodeUrl(),
       bitcoinRpcUsername: "devnet",
       bitcoinRpcPassword: "devnet",
       btcAddress: Accounts.WALLET_3.btcAddress,
     });
     expect(JSON.stringify(balance)).toBe("0");
-    */
   });
 });
