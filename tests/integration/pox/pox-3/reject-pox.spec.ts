@@ -1,12 +1,6 @@
 import { DevnetNetworkOrchestrator } from "@hirosystems/stacks-devnet-js";
 import { StacksTestnet } from "@stacks/network";
-import {
-  ClarityValue,
-  cvToString,
-  falseCV,
-  trueCV,
-  uintCV,
-} from "@stacks/transactions";
+import { falseCV, trueCV } from "@stacks/transactions";
 import { Accounts } from "../../constants";
 import {
   FAST_FORWARD_TO_EPOCH_2_4,
@@ -133,6 +127,26 @@ describe("testing reject-pox", () => {
     expect(poxInfo.rejection_votes_left_required).toBeGreaterThan(0);
   });
 
+  it("cannot reject-pox if already stacked", async () => {
+    const network = new StacksTestnet({ url: orchestrator.getStacksNodeUrl() });
+
+    // Alice rejects pox, but has already stacked, so it fails
+    let response = await broadcastRejectPox({
+      poxVersion: 3,
+      network,
+      account: Accounts.WALLET_1,
+      fee,
+      nonce: aliceNonce++,
+    });
+    expect(response.error).toBeUndefined();
+    let [block, tx] = await waitForStacksTransaction(
+      orchestrator,
+      response.txid
+    );
+    expect(tx.success).toBeFalsy();
+    expect(tx.result).toBe("(err 3)");
+  });
+
   it("pox should be disabled if enough STX reject", async () => {
     const network = new StacksTestnet({ url: orchestrator.getStacksNodeUrl() });
 
@@ -169,10 +183,11 @@ describe("testing reject-pox", () => {
     );
     expect(isPoxActive).toEqual(falseCV());
 
-    await waitForNextRewardPhase(network, orchestrator);
+    await waitForNextRewardPhase(network, orchestrator, 1);
 
     poxInfo = await getPoxInfo(network);
-    expect(poxInfo.rejection_votes_left_required).toBe(0);
+    // This vote count is for the next cycle, so it should be reset.
+    expect(poxInfo.rejection_votes_left_required).toBeGreaterThan(0);
 
     isPoxActive = await callReadOnlyIsPoxActive(
       3,
@@ -180,13 +195,13 @@ describe("testing reject-pox", () => {
       Accounts.WALLET_1,
       poxInfo.current_cycle.id
     );
-    expect(isPoxActive).toEqual(trueCV());
+    expect(isPoxActive).toEqual(falseCV());
   });
 
   it("pox should be re-enabled in the next cycle", async () => {
     const network = new StacksTestnet({ url: orchestrator.getStacksNodeUrl() });
 
-    await waitForNextRewardPhase(network, orchestrator);
+    await waitForNextRewardPhase(network, orchestrator, 1);
 
     let poxInfo = await getPoxInfo(network);
     expect(poxInfo.rejection_votes_left_required).toBeGreaterThan(0);
@@ -197,6 +212,6 @@ describe("testing reject-pox", () => {
       Accounts.WALLET_1,
       poxInfo.current_cycle.id
     );
-    expect(isPoxActive).toEqual(falseCV());
+    expect(isPoxActive).toEqual(trueCV());
   });
 });
