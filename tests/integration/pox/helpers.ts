@@ -5,19 +5,23 @@ import {
 import { StacksNetwork } from "@stacks/network";
 import { CoreInfo, PoxInfo } from "@stacks/stacking";
 import {
+  AnchorMode,
   BufferCV,
   ClarityType,
   ClarityValue,
   OptionalCV,
+  PostConditionMode,
   PrincipalCV,
   SomeCV,
   TupleCV,
   TxBroadcastResult,
   UIntCV,
+  broadcastTransaction,
   callReadOnlyFunction,
   cvToHex,
   cvToString,
   hexToCV,
+  makeContractCall,
   principalCV,
   responseErrorCV,
   stringAsciiCV,
@@ -376,4 +380,64 @@ export const readRewardCyclePoxAddressListAtIndex = async (
   } else if (cv.type === ClarityType.OptionalNone) {
     return null;
   }
+};
+
+export const broadcastRejectPox = async ({
+  poxVersion,
+  network,
+  account,
+  fee,
+  nonce,
+}: BroadcastOptionsPox): Promise<TxBroadcastResult> => {
+  let poxContract = Contracts.POX[poxVersion] || Contracts.DEFAULT;
+  const txOptions = {
+    contractAddress: poxContract.address,
+    contractName: poxContract.name,
+    functionName: "reject-pox",
+    functionArgs: [],
+    fee,
+    nonce,
+    network,
+    anchorMode: AnchorMode.OnChainOnly,
+    postConditionMode: PostConditionMode.Allow,
+    senderKey: account.secretKey,
+  };
+  const tx = await makeContractCall(txOptions);
+  // Broadcast transaction to our Devnet stacks node
+  const result = await broadcastTransaction(tx, network);
+  return result;
+};
+
+export const callReadOnlyIsPoxActive = (
+  poxVersion: number,
+  network: StacksNetwork,
+  account: Account,
+  rewardCycle: number
+) => {
+  let poxContract = Contracts.POX[poxVersion] || Contracts.DEFAULT;
+  return callReadOnlyFunction({
+    contractName: poxContract.name,
+    contractAddress: poxContract.address,
+    functionName: "is-pox-active",
+    functionArgs: [uintCV(rewardCycle)],
+    network,
+    senderAddress: account.stxAddress,
+  });
+};
+
+export const getTotalPoxRejection = (
+  poxVersion: number,
+  network: StacksNetwork,
+  account: Account,
+  rewardCycle: number
+) => {
+  let poxContract = Contracts.POX[poxVersion] || Contracts.DEFAULT;
+  return callReadOnlyFunction({
+    contractName: poxContract.name,
+    contractAddress: poxContract.address,
+    functionName: "get-total-pox-rejection",
+    functionArgs: [uintCV(rewardCycle)],
+    network,
+    senderAddress: account.stxAddress,
+  });
 };
