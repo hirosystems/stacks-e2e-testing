@@ -188,7 +188,7 @@ describe("testing pooled stacking under epoch 2.4", () => {
       50_000_000_000_000
     );
 
-    // Bob delegates 90m STX
+    // Bob delegates 90m STX while stacking
     response = await broadcastDelegateSTX(
       {
         poxVersion: 3,
@@ -224,7 +224,7 @@ describe("testing pooled stacking under epoch 2.4", () => {
     [block, tx] = await waitForStacksTransaction(orchestrator, response.txid);
     expect(tx.success).toBeTruthy();
 
-    // assert that Bob still has 80m locked
+    // assert that Bob now has 80m locked
     await expectAccountToBe(
       network,
       Accounts.WALLET_2.stxAddress,

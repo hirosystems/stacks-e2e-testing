@@ -17,20 +17,18 @@ import {
   waitForStacksTransaction,
 } from "../../helpers";
 import {
-  expectAccountToBe,
+  getCoreInfo,
   getPoxInfo,
   readRewardCyclePoxAddressForAddress,
   readRewardCyclePoxAddressListAtIndex,
-  waitForNextRewardPhase,
+  waitForNextRewardPhase
 } from "../helpers";
 import {
   broadcastDelegateSTX,
   broadcastDelegateStackExtend,
   broadcastDelegateStackSTX,
-  broadcastRevokeDelegateStx,
-  broadcastStackAggregationCommitIndexed,
+  broadcastStackAggregationCommitIndexed
 } from "../helpers-pooled-stacking";
-import { getCoreInfo } from "../helpers";
 
 describe("testing pooled stacking for sbtc mini under epoch 2.4", () => {
   let orchestrator: DevnetNetworkOrchestrator;

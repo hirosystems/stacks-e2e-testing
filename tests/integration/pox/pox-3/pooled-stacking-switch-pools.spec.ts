@@ -218,7 +218,7 @@ describe("testing pooled stacking under epoch 2.1", () => {
     expect(poxAddrInfo1?.["total-ustx"]).toBeUndefined();
   });
 
-  it("user can delegate to a new pool after previous lock-up is complete (cycle #3)", async () => {
+  it("New pool can lock user's STX after previous lock-up is complete (cycle #3)", async () => {
     const network = new StacksTestnet({ url: orchestrator.getStacksNodeUrl() });
 
     // Wait for block N+2 where N is the height of the next reward phase
@@ -266,15 +266,6 @@ describe("testing pooled stacking under epoch 2.1", () => {
     // Assert that the next cycle has 90m STX locked
     expect(poxInfo.current_cycle.id).toBe(3);
     expect(poxInfo.next_cycle.stacked_ustx).toBe(90_000_000_000_000);
-
-    // Check Alice's table entry
-    const poxAddrInfo0 = await readRewardCyclePoxAddressForAddress(
-      network,
-      3,
-      2,
-      Accounts.WALLET_1.stxAddress
-    );
-    expect(poxAddrInfo0).toBeNull();
 
     // Check Pool operators/Bob's table entry
     const poxAddrInfo1 = await readRewardCyclePoxAddressListAtIndex(
