@@ -77,10 +77,10 @@ yarn install
 To run with the latest node, you'll need to specify the docker image URL to use via an environment variable:
 
 ```sh
-export CUSTOM_STACKS_NODE="blockstack/stacks-blockchain:devnet-2.4.0.0.0d"
+export CUSTOM_STACKS_NODE="blockstack/stacks-blockchain:devnet-2.4.0.0.0e"
 ```
 
-On a Mac with Apple Silicon, the published stacks-node image, `blockstack/stacks-blockchain:devnet-2.4.0.0.0d` does not seem to work correctly. You will know you have run into this problem if your tests fail with:
+On a Mac with Apple Silicon, the published stacks-node image, `blockstack/stacks-blockchain:devnet-2.4.0.0.0e` does not seem to work correctly. You will know you have run into this problem if your tests fail with:
 
 ```
 Unknown Error: waitForNextStacksBlock maxErrors reached
@@ -96,7 +96,7 @@ Apr 26 15:56:09.991729 ERRO Relayer: Failure fetching recipient set: ChainstateE
 As an alternative, you can build this image locally, or update the image URL in the environment variable to use:
 
 ```sh
-export CUSTOM_STACKS_NODE="stacksbrice/stacks-node:devnet-2.4.0.0.0d"
+export CUSTOM_STACKS_NODE="stacksbrice/stacks-node:devnet-2.4.0.0.0e"
 ```
 
 If this environment variable is not defined, `stacks-devnet-js` will default to an older version of the `stacks-node`.
