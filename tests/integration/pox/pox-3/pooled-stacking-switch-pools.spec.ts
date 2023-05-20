@@ -216,6 +216,7 @@ describe("testing pooled stacking under epoch 2.1", () => {
     expect(response.error).toBeUndefined();
     [block, tx] = await waitForStacksTransaction(orchestrator, response.txid);
     expect(tx.success).toBeFalsy();
+    expect(tx.result).toBe("(err 4)"); // ERR_STACKING_NO_SUCH_PRINCIPAL
 
     // Bob tries to increases Alice's lock to 95m
     response = await broadcastDelegateStackIncrease(
@@ -235,6 +236,7 @@ describe("testing pooled stacking under epoch 2.1", () => {
     expect(response.error).toBeUndefined();
     [block, tx] = await waitForStacksTransaction(orchestrator, response.txid);
     expect(tx.success).toBeFalsy();
+    expect(tx.result).toBe("(err 9)"); // ERR_STACKING_PERMISSION_DENIED
 
     // Bob tries to extend Alice's lock by 1 cycle
     response = await broadcastDelegateStackExtend(
@@ -254,6 +256,7 @@ describe("testing pooled stacking under epoch 2.1", () => {
     expect(response.error).toBeUndefined();
     [block, tx] = await waitForStacksTransaction(orchestrator, response.txid);
     expect(tx.success).toBeFalsy();
+    expect(tx.result).toBe("(err 9)"); // ERR_STACKING_PERMISSION_DENIED
 
     // Verify that we're still in cycle 1
     poxInfo = await getPoxInfo(network);
