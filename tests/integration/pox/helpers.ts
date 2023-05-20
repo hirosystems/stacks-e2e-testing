@@ -275,6 +275,37 @@ export const readRewardCyclePoxAddressList = async (
   return poxAddrInfoList;
 };
 
+export const readStackingStateForAddress = async (
+  network: StacksNetwork,
+  poxVersion: number,
+  address: string
+) => {
+  let poxContract = Contracts.POX[poxVersion] || Contracts.DEFAULT;
+  const url = network.getMapEntryUrl(
+    poxContract.address,
+    poxContract.name,
+    "stacking-state"
+  );
+  const keyValue = tupleCV({
+    "stacker": principalCV(address),
+  });
+  const response = await network.fetchFn(url, {
+    method: "POST",
+    body: JSON.stringify(cvToHex(keyValue)),
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+  if (!response.ok) {
+    const msg = await response.text().catch(() => "");
+    throw new Error(
+      `Error calling read-only function. Response ${response.status}: ${response.statusText}. Attempted to fetch ${url} and failed with the message: "${msg}"`
+    );
+  }
+  let json = await response.json();
+  return hexToCV(json.data);
+};
+
 export const readRewardCyclePoxAddressForAddress = async (
   network: StacksNetwork,
   poxVersion: number,

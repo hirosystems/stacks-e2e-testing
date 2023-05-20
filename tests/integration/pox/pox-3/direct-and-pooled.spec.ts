@@ -138,8 +138,7 @@ describe("testing mixed direct and pooled stacking in pox-3", () => {
           txCount++;
           break;
         case delegateTxid:
-          expect(metadata.success).toBeFalsy();
-          expect(metadata.result).toBe("(err 3)"); // ERR_STACKING_ALREADY_STACKED
+          expect(metadata.success).toBeTruthy();
           txCount++;
           break;
         case delegateStackTxid:

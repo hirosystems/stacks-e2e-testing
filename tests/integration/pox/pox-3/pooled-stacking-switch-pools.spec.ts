@@ -1,7 +1,7 @@
 import { DevnetNetworkOrchestrator } from "@hirosystems/stacks-devnet-js";
 import { StacksTestnet } from "@stacks/network";
 import { uintCV } from "@stacks/transactions";
-import { Accounts, Constants, DEFAULT_FEE } from "../../constants";
+import { Accounts, DEFAULT_FEE } from "../../constants";
 import {
   FAST_FORWARD_TO_EPOCH_2_4,
   asyncExpectStacksTransactionSuccess,
@@ -20,6 +20,7 @@ import {
 import {
   broadcastDelegateSTX,
   broadcastDelegateStackExtend,
+  broadcastDelegateStackIncrease,
   broadcastDelegateStackSTX,
   broadcastRevokeDelegateStx,
   broadcastStackAggregationCommitIndexed,
@@ -129,8 +130,10 @@ describe("testing pooled stacking under epoch 2.1", () => {
     expect(poxAddrInfo1?.["total-ustx"]).toEqual(uintCV(90_000_000_000_000));
   });
 
-  it("user cannot switch pools (cycle #1)", async () => {
+  it("user can switch pools, but new pool cannot lock, extend, or increase (cycle #1)", async () => {
     const network = new StacksTestnet({ url: orchestrator.getStacksNodeUrl() });
+    const chainInfo = await getChainInfo(network);
+    const blockHeight = chainInfo.burn_block_height;
 
     // Alice revokes, then delegates 95m STX to Bob
     let response = await broadcastRevokeDelegateStx({
@@ -157,8 +160,7 @@ describe("testing pooled stacking under epoch 2.1", () => {
       orchestrator,
       response.txid
     );
-    expect(tx.success).toBeFalsy();
-    expect(tx.result).toBe("(err 3)"); // ERR_STACKING_ALREADY_STACKED
+    expect(tx.success).toBeTruthy();
 
     let poxInfo = await getPoxInfo(network);
 
@@ -178,6 +180,84 @@ describe("testing pooled stacking under epoch 2.1", () => {
     );
 
     expect(poxAddrInfo0?.["total-ustx"]).toEqual(uintCV(90_000_000_000_000));
+
+    // Bob tries to lock 90m for Alice
+    response = await broadcastDelegateStackSTX(
+      {
+        poxVersion: 3,
+        network,
+        account: Accounts.WALLET_2,
+        fee: DEFAULT_FEE,
+        nonce: bobNonce++,
+      },
+      {
+        stacker: Accounts.WALLET_1,
+        amount: 90_000_000_000_000,
+        poolRewardAccount: Accounts.WALLET_2,
+        startBurnHeight: blockHeight,
+        lockPeriodCycles: 3,
+      }
+    );
+    expect(response.error).toBeUndefined();
+    [block, tx] = await waitForStacksTransaction(orchestrator, response.txid);
+    expect(tx.success).toBeFalsy();
+
+    // Bob tries to commit 90m
+    response = await broadcastStackAggregationCommitIndexed(
+      {
+        poxVersion: 3,
+        network,
+        account: Accounts.WALLET_2,
+        fee: DEFAULT_FEE,
+        nonce: bobNonce++,
+      },
+      { poolRewardAccount: Accounts.WALLET_2, cycleId: 2 }
+    );
+    expect(response.error).toBeUndefined();
+    [block, tx] = await waitForStacksTransaction(orchestrator, response.txid);
+    expect(tx.success).toBeFalsy();
+
+    // Bob tries to increases Alice's lock to 95m
+    response = await broadcastDelegateStackIncrease(
+      {
+        poxVersion: 3,
+        network,
+        account: Accounts.WALLET_2,
+        fee: DEFAULT_FEE,
+        nonce: bobNonce++,
+      },
+      {
+        stacker: Accounts.WALLET_1,
+        poolRewardAccount: Accounts.WALLET_2,
+        increaseByAmountUstx: 5_000_000_000_000,
+      }
+    );
+    expect(response.error).toBeUndefined();
+    [block, tx] = await waitForStacksTransaction(orchestrator, response.txid);
+    expect(tx.success).toBeFalsy();
+
+    // Bob tries to extend Alice's lock by 1 cycle
+    response = await broadcastDelegateStackExtend(
+      {
+        poxVersion: 3,
+        network,
+        account: Accounts.WALLET_2,
+        fee: DEFAULT_FEE,
+        nonce: bobNonce++,
+      },
+      {
+        stacker: Accounts.WALLET_1,
+        poolRewardAccount: Accounts.WALLET_2,
+        extendByCount: 1,
+      }
+    );
+    expect(response.error).toBeUndefined();
+    [block, tx] = await waitForStacksTransaction(orchestrator, response.txid);
+    expect(tx.success).toBeFalsy();
+
+    // Verify that we're still in cycle 1
+    poxInfo = await getPoxInfo(network);
+    expect(poxInfo.current_cycle.id).toBe(1);
   });
 
   it("STX are not locked for next cycle (cycle #2)", async () => {
