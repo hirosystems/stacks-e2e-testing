@@ -88,11 +88,11 @@ describe("stack-increase", async () => {
       {
         poxVersion: 3,
         network,
-        account: Accounts.WALLET_2,
+        account: Accounts.FAUCET,
         fee: fee,
-        nonce: bobNonce++,
+        nonce: faucetNonce++,
       },
-      { poolRewardAccount: Accounts.WALLET_2, cycleId: poxInfo.next_cycle.id }
+      { poolRewardAccount: Accounts.FAUCET, cycleId: poxInfo.next_cycle.id }
     );
     console.log(
       "Faucet tries to commit 50m for next cycle response: ",
