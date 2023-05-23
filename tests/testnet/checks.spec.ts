@@ -4,7 +4,9 @@ import {
   callReadOnlystackerInfo,
   getAccount,
   getPoxInfo,
+  readDelegationStateForAddress,
   readRewardCyclePoxAddressList,
+  readStackingStateForAddress,
 } from "../integration/pox/helpers";
 import { ClarityValue, cvToString } from "@stacks/transactions";
 import { poxAddressToBtcAddress } from "@stacks/stacking";
@@ -26,11 +28,20 @@ describe("stack-increase", async () => {
   });
 
   it("check it", async () => {
+    let poxInfo = await getPoxInfo(network);
+    console.log("poxInfo:");
+    console.log(poxInfo);
+
     let alice = await getAccount(network, Accounts.WALLET_1.stxAddress);
     let aliceInfo = await callReadOnlystackerInfo(
       network,
       3,
       Accounts.WALLET_1
+    );
+    let aliceState = await readDelegationStateForAddress(
+      network,
+      3,
+      Accounts.WALLET_1.stxAddress
     );
     console.log(
       "Alice",
@@ -42,9 +53,15 @@ describe("stack-increase", async () => {
     );
     console.log(alice);
     console.log(cvToString(aliceInfo));
+    console.log(cvToString(aliceState));
 
     let bob = await getAccount(network, Accounts.WALLET_2.stxAddress);
     let bobInfo = await callReadOnlystackerInfo(network, 3, Accounts.WALLET_2);
+    let bobState = await readDelegationStateForAddress(
+      network,
+      3,
+      Accounts.WALLET_2.stxAddress
+    );
     console.log(
       "Bob",
       Accounts.WALLET_2.stxAddress,
@@ -55,12 +72,18 @@ describe("stack-increase", async () => {
     );
     console.log(bob);
     console.log(cvToString(bobInfo));
+    console.log(cvToString(bobState));
 
     let chloe = await getAccount(network, Accounts.WALLET_3.stxAddress);
     let chloeInfo = await callReadOnlystackerInfo(
       network,
       3,
       Accounts.WALLET_3
+    );
+    let chloeState = await readDelegationStateForAddress(
+      network,
+      3,
+      Accounts.WALLET_3.stxAddress
     );
     console.log(
       "Chloe",
@@ -72,12 +95,18 @@ describe("stack-increase", async () => {
     );
     console.log(chloe);
     console.log(cvToString(chloeInfo));
+    console.log(cvToString(chloeState));
 
     let deployer = await getAccount(network, Accounts.DEPLOYER.stxAddress);
     let deployerInfo = await callReadOnlystackerInfo(
       network,
       3,
       Accounts.DEPLOYER
+    );
+    let deployerState = await readDelegationStateForAddress(
+      network,
+      3,
+      Accounts.DEPLOYER.stxAddress
     );
     console.log(
       "Deployer",
@@ -89,9 +118,15 @@ describe("stack-increase", async () => {
     );
     console.log(deployer);
     console.log(cvToString(deployerInfo));
+    console.log(cvToString(deployerState));
 
     let faucet = await getAccount(network, Accounts.FAUCET.stxAddress);
     let faucetInfo = await callReadOnlystackerInfo(network, 3, Accounts.FAUCET);
+    let faucetState = await readDelegationStateForAddress(
+      network,
+      3,
+      Accounts.FAUCET.stxAddress
+    );
     console.log(
       "Faucet",
       Accounts.FAUCET.stxAddress,
@@ -102,10 +137,7 @@ describe("stack-increase", async () => {
     );
     console.log(faucet);
     console.log(cvToString(faucetInfo));
-
-    let poxInfo = await getPoxInfo(network);
-    console.log("poxInfo:");
-    console.log(poxInfo);
+    console.log(cvToString(faucetState));
 
     let poxAddrs = await readRewardCyclePoxAddressList(
       network,
