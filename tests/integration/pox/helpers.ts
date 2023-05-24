@@ -886,7 +886,9 @@ export const broadcastDelegatedStackSTXThroughBitcoin = async (
     magicBytes,
     opCodeByte,
     amountBytes,
+    intToBytes(1, false, 1),
     rewardAddressOutputIndex,
+    intToBytes(1, false, 1),
     burnHeight
   );
   unwrapOutput = new Output({
