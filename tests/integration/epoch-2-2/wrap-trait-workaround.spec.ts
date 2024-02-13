@@ -58,7 +58,7 @@ describe("trait parameter with wrapped caller in Stacks 2.2", () => {
   beforeAll(() => {
     orchestrator = buildDevnetNetworkOrchestrator(
       getNetworkIdFromEnv(),
-      timeline
+      timeline,
     );
     orchestrator.start();
   });
@@ -78,7 +78,7 @@ describe("trait parameter with wrapped caller in Stacks 2.2", () => {
       Accounts.DEPLOYER,
       0,
       "test-trait",
-      codeBodyTestTrait
+      codeBodyTestTrait,
     );
     expect(response.error).toBeUndefined();
 
@@ -87,19 +87,19 @@ describe("trait parameter with wrapped caller in Stacks 2.2", () => {
       Accounts.DEPLOYER,
       1,
       "impl-trait",
-      codeBodyImplTrait
+      codeBodyImplTrait,
     ));
     expect(response.error).toBeUndefined();
     let [block, tx] = await asyncExpectStacksTransactionSuccess(
       orchestrator,
-      transaction.txid()
+      transaction.txid(),
     );
 
     await orchestrator.waitForNextStacksBlock();
 
     // Wait for the 2.2 activation, then check again
     await orchestrator.waitForStacksBlockAnchoredOnBitcoinBlockOfHeight(
-      timeline.epoch_2_2
+      timeline.epoch_2_2,
     );
 
     // Deploy a wrapper contract
@@ -108,12 +108,12 @@ describe("trait parameter with wrapped caller in Stacks 2.2", () => {
       Accounts.DEPLOYER,
       2,
       "test-trait-wrapper",
-      codeBodyTestTraitWrapper
+      codeBodyTestTraitWrapper,
     ));
     expect(response.error).toBeUndefined();
     [block, tx] = await asyncExpectStacksTransactionSuccess(
       orchestrator,
-      transaction.txid()
+      transaction.txid(),
     );
 
     // Call the public function
@@ -136,7 +136,7 @@ describe("trait parameter with wrapped caller in Stacks 2.2", () => {
     response = await broadcastTransaction(transaction, network);
     [block, tx] = await waitForStacksTransaction(
       orchestrator,
-      transaction.txid()
+      transaction.txid(),
     );
     expect((tx as StacksTransactionMetadata).result).toEqual("(err none)");
   });

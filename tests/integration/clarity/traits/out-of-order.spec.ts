@@ -87,10 +87,10 @@ describe("use", () => {
       // Wait for the transaction to be processed
       let [block, tx] = await waitForStacksTransaction(
         orchestrator,
-        transaction.txid()
+        transaction.txid(),
       );
       expect(tx.description).toBe(
-        `deployed: ${Accounts.DEPLOYER.stxAddress}.out-of-order-trait`
+        `deployed: ${Accounts.DEPLOYER.stxAddress}.out-of-order-trait`,
       );
       // expect(tx.success).toBeFalsy(); // todo(brice)
     });
@@ -100,7 +100,7 @@ describe("use", () => {
     beforeAll(async () => {
       // Wait for 2.1 to go live
       await orchestrator.waitForStacksBlockAnchoredOnBitcoinBlockOfHeight(
-        STACKS_2_1_EPOCH + 1
+        STACKS_2_1_EPOCH + 1,
       );
     });
 
@@ -129,10 +129,10 @@ describe("use", () => {
       // Wait for the transaction to be processed
       let [block, tx] = await waitForStacksTransaction(
         orchestrator,
-        transaction.txid()
+        transaction.txid(),
       );
       expect(tx.description).toBe(
-        `deployed: ${Accounts.DEPLOYER.stxAddress}.out-of-order-trait-2`
+        `deployed: ${Accounts.DEPLOYER.stxAddress}.out-of-order-trait-2`,
       );
       // expect(tx.success).toBeFalsy(); // todo(brice)
     });

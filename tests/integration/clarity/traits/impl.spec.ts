@@ -85,10 +85,10 @@ describe("impl", () => {
       // Wait for the transaction to be processed
       let [block, tx] = await waitForStacksTransaction(
         orchestrator,
-        transaction.txid()
+        transaction.txid(),
       );
       expect(tx.description).toBe(
-        `deployed: ${Accounts.DEPLOYER.stxAddress}.math-trait`
+        `deployed: ${Accounts.DEPLOYER.stxAddress}.math-trait`,
       );
       expect(tx.success).toBeTruthy();
     });
@@ -119,10 +119,10 @@ describe("impl", () => {
       // Wait for the transaction to be processed
       let [block, tx] = await waitForStacksTransaction(
         orchestrator,
-        transaction.txid()
+        transaction.txid(),
       );
       expect(tx.description).toBe(
-        `deployed: ${Accounts.DEPLOYER.stxAddress}.impl-math-trait`
+        `deployed: ${Accounts.DEPLOYER.stxAddress}.impl-math-trait`,
       );
       expect(tx.success).toBeTruthy();
     });
@@ -132,7 +132,7 @@ describe("impl", () => {
     beforeAll(async () => {
       // Wait for 2.1 to go live
       await orchestrator.waitForStacksBlockAnchoredOnBitcoinBlockOfHeight(
-        STACKS_2_1_EPOCH + 1
+        STACKS_2_1_EPOCH + 1,
       );
     });
 
@@ -161,10 +161,10 @@ describe("impl", () => {
       // Wait for the transaction to be processed
       let [block, tx] = await waitForStacksTransaction(
         orchestrator,
-        transaction.txid()
+        transaction.txid(),
       );
       expect(tx.description).toBe(
-        `deployed: ${Accounts.DEPLOYER.stxAddress}.impl-math-trait-2`
+        `deployed: ${Accounts.DEPLOYER.stxAddress}.impl-math-trait-2`,
       );
       expect(tx.success).toBeTruthy();
     });

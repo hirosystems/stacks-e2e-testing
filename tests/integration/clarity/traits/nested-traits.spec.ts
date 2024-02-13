@@ -39,35 +39,35 @@ describe("use redefined trait from contract that redefines it", () => {
       "empty-trait",
       0,
       network,
-      orchestrator
+      orchestrator,
     );
     await load_versioned(
       Accounts.DEPLOYER,
       "nested-trait-1",
       1,
       network,
-      orchestrator
+      orchestrator,
     );
     await load_versioned(
       Accounts.DEPLOYER,
       "nested-trait-2",
       2,
       network,
-      orchestrator
+      orchestrator,
     );
     await load_versioned(
       Accounts.DEPLOYER,
       "nested-trait-3",
       3,
       network,
-      orchestrator
+      orchestrator,
     );
     let res = await load_versioned(
       Accounts.DEPLOYER,
       "nested-trait-4",
       4,
       network,
-      orchestrator
+      orchestrator,
     );
     expect(res.ok).toBeTruthy();
 
@@ -80,7 +80,7 @@ describe("use redefined trait from contract that redefines it", () => {
     beforeAll(async () => {
       // Wait for 2.1 to go live
       await orchestrator.waitForStacksBlockAnchoredOnBitcoinBlockOfHeight(
-        STACKS_2_1_EPOCH + 1
+        STACKS_2_1_EPOCH + 1,
       );
     });
 
@@ -91,7 +91,7 @@ describe("use redefined trait from contract that redefines it", () => {
         0,
         network,
         orchestrator,
-        1
+        1,
       );
       await load_versioned(
         Accounts.WALLET_1,
@@ -99,7 +99,7 @@ describe("use redefined trait from contract that redefines it", () => {
         1,
         network,
         orchestrator,
-        1
+        1,
       );
       await load_versioned(
         Accounts.WALLET_1,
@@ -107,7 +107,7 @@ describe("use redefined trait from contract that redefines it", () => {
         2,
         network,
         orchestrator,
-        1
+        1,
       );
       await load_versioned(
         Accounts.WALLET_1,
@@ -115,7 +115,7 @@ describe("use redefined trait from contract that redefines it", () => {
         3,
         network,
         orchestrator,
-        1
+        1,
       );
       let res = await load_versioned(
         Accounts.WALLET_1,
@@ -123,7 +123,7 @@ describe("use redefined trait from contract that redefines it", () => {
         4,
         network,
         orchestrator,
-        1
+        1,
       );
       expect(res.ok).toBeTruthy();
     });
@@ -135,7 +135,7 @@ describe("use redefined trait from contract that redefines it", () => {
         0,
         network,
         orchestrator,
-        2
+        2,
       );
       await load_versioned(
         Accounts.WALLET_2,
@@ -143,7 +143,7 @@ describe("use redefined trait from contract that redefines it", () => {
         1,
         network,
         orchestrator,
-        2
+        2,
       );
       await load_versioned(
         Accounts.WALLET_2,
@@ -151,7 +151,7 @@ describe("use redefined trait from contract that redefines it", () => {
         2,
         network,
         orchestrator,
-        2
+        2,
       );
       await load_versioned(
         Accounts.WALLET_2,
@@ -159,7 +159,7 @@ describe("use redefined trait from contract that redefines it", () => {
         3,
         network,
         orchestrator,
-        2
+        2,
       );
       let res = await load_versioned(
         Accounts.WALLET_2,
@@ -167,7 +167,7 @@ describe("use redefined trait from contract that redefines it", () => {
         4,
         network,
         orchestrator,
-        2
+        2,
       );
       expect(res.ok).toBeTruthy();
     });

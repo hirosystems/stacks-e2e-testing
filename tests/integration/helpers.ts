@@ -99,7 +99,7 @@ export function buildDevnetNetworkOrchestrator(
   networkId: number,
   timeline: EpochTimeline = DEFAULT_EPOCH_TIMELINE,
   logs = false,
-  stacks_node_image_url?: string
+  stacks_node_image_url?: string,
 ) {
   let uuid = Date.now();
   let working_dir = `/tmp/stacks-test-${uuid}-${networkId}`;
@@ -132,14 +132,14 @@ export function buildDevnetNetworkOrchestrator(
   };
   let consolidatedConfig = getIsolatedNetworkConfigUsingNetworkId(
     networkId,
-    config
+    config,
   );
   let orchestrator = new DevnetNetworkOrchestrator(consolidatedConfig, 2500);
   return orchestrator;
 }
 
 export const getBitcoinBlockHeight = (
-  chainUpdate: StacksChainUpdate
+  chainUpdate: StacksChainUpdate,
 ): number => {
   let metadata = chainUpdate.new_blocks[0].block
     .metadata! as StacksBlockMetadata;
@@ -148,7 +148,7 @@ export const getBitcoinBlockHeight = (
 
 export const waitForStacksTransaction = async (
   orchestrator: DevnetNetworkOrchestrator,
-  txid: string
+  txid: string,
 ): Promise<[StacksBlockMetadata, StacksTransactionMetadata]> => {
   let { chainUpdate, transaction } =
     await orchestrator.waitForStacksBlockIncludingTransaction(txid);
@@ -162,8 +162,8 @@ export const getNetworkIdFromEnv = (): number => {
   let networkId = process.env.JEST_WORKER_ID
     ? parseInt(process.env.JEST_WORKER_ID!)
     : process.env.VITEST_WORKER_ID
-    ? parseInt(process.env.VITEST_WORKER_ID!)
-    : 1;
+      ? parseInt(process.env.VITEST_WORKER_ID!)
+      : 1;
   return networkId;
 };
 
@@ -183,7 +183,7 @@ const delay = () => new Promise((resolve) => setTimeout(resolve, 2000));
 
 export const getChainInfo = async (
   network: StacksNetwork,
-  retry?: number
+  retry?: number,
 ): Promise<any> => {
   let retryCountdown = retry ? retry : 20;
   if (retryCountdown == 0) return Promise.reject();
@@ -206,7 +206,7 @@ export interface AccountInfo {
 
 export async function asyncExpectStacksTransactionSuccess(
   orchestrator: DevnetNetworkOrchestrator,
-  txid: string
+  txid: string,
 ) {
   let [block, tx] = await waitForStacksTransaction(orchestrator, txid);
   expect(tx.success, tx.result).toBeTruthy();
@@ -228,7 +228,7 @@ export interface BroadcastOptions {
 
 export const broadcastSTXTransfer = async (
   { network, account, fee, nonce }: BroadcastOptions,
-  { recipient, amount }: { recipient: string; amount: number }
+  { recipient, amount }: { recipient: string; amount: number },
 ): Promise<TxBroadcastResult> => {
   const txOptions = {
     recipient,
@@ -251,7 +251,7 @@ export async function deployContract(
   sender: Account,
   nonce: number,
   contractName: string,
-  codeBody: string
+  codeBody: string,
 ) {
   // Build the transaction to deploy the contract
   let deployTxOptions = {

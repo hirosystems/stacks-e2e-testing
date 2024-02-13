@@ -18,7 +18,7 @@ describe("testing stacking under epoch 2.1", () => {
     };
     orchestrator = buildDevnetNetworkOrchestrator(
       getNetworkIdFromEnv(),
-      timeline
+      timeline,
     );
     orchestrator.start();
   });
@@ -37,7 +37,7 @@ describe("testing stacking under epoch 2.1", () => {
     let blockHeight = Constants.DEVNET_DEFAULT_POX_2_ACTIVATION + 1;
     let chainUpdate =
       await orchestrator.waitForStacksBlockAnchoredOnBitcoinBlockOfHeight(
-        blockHeight
+        blockHeight,
       );
 
     // Broadcast some STX stacking orders
@@ -45,19 +45,19 @@ describe("testing stacking under epoch 2.1", () => {
     let cycles = 1;
     let response = await broadcastStackSTX(
       { poxVersion: 2, network, account: Accounts.WALLET_1, fee, nonce: 0 },
-      { amount: 25_000_000_000_000, blockHeight, cycles }
+      { amount: 25_000_000_000_000, blockHeight, cycles },
     );
     expect(response.error).toBeUndefined();
 
     response = await broadcastStackSTX(
       { poxVersion: 2, network, account: Accounts.WALLET_2, fee, nonce: 0 },
-      { amount: 50_000_000_000_000, blockHeight, cycles }
+      { amount: 50_000_000_000_000, blockHeight, cycles },
     );
     expect(response.error).toBeUndefined();
 
     response = await broadcastStackSTX(
       { poxVersion: 2, network, account: Accounts.WALLET_3, fee, nonce: 0 },
-      { amount: 75_000_000_000_000, blockHeight, cycles }
+      { amount: 75_000_000_000_000, blockHeight, cycles },
     );
     expect(response.error).toBeUndefined();
 

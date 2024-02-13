@@ -25,7 +25,7 @@ describe("testing multiple stack-stx and stack-increase calls in the same block"
   beforeAll(() => {
     orchestrator = buildDevnetNetworkOrchestrator(
       getNetworkIdFromEnv(),
-      timeline
+      timeline,
     );
     orchestrator.start();
   });
@@ -40,7 +40,7 @@ describe("testing multiple stack-stx and stack-increase calls in the same block"
 
     // Wait for 2.4 to go live
     await orchestrator.waitForStacksBlockAnchoredOnBitcoinBlockOfHeight(
-      timeline.epoch_2_4
+      timeline.epoch_2_4,
     );
     await orchestrator.waitForNextStacksBlock();
 
@@ -60,14 +60,14 @@ describe("testing multiple stack-stx and stack-increase calls in the same block"
         amount: 80_000_000_000_000,
         blockHeight,
         cycles: 1,
-      }
+      },
     );
     expect(response.error).toBeUndefined();
 
     // Wait for Alice's stacking transaction to confirm
     let [block, tx] = await waitForStacksTransaction(
       orchestrator,
-      response.txid
+      response.txid,
     );
     expect(tx.success).toBeTruthy();
 
@@ -84,7 +84,7 @@ describe("testing multiple stack-stx and stack-increase calls in the same block"
         amount: 80_000_000_000_000,
         blockHeight,
         cycles: 1,
-      }
+      },
     );
     expect(response.error).toBeUndefined();
 
@@ -102,7 +102,7 @@ describe("testing multiple stack-stx and stack-increase calls in the same block"
         fee,
         nonce: aliceNonce++,
       },
-      { amount: increaseAmount }
+      { amount: increaseAmount },
     );
 
     const bobIncrease = broadcastStackIncrease(
@@ -113,7 +113,7 @@ describe("testing multiple stack-stx and stack-increase calls in the same block"
         fee,
         nonce: bobNonce++,
       },
-      { amount: increaseAmount }
+      { amount: increaseAmount },
     );
 
     // Wait for both stack-increase transactions to confirm
@@ -127,7 +127,7 @@ describe("testing multiple stack-stx and stack-increase calls in the same block"
 
     const [bobBlock, bobTx] = await waitForStacksTransaction(
       orchestrator,
-      bobResponse.txid
+      bobResponse.txid,
     );
     expect(bobTx.success).toBeTruthy();
 
@@ -136,13 +136,13 @@ describe("testing multiple stack-stx and stack-increase calls in the same block"
       network,
       3,
       2, // the next cycle
-      Accounts.WALLET_1.stxAddress
+      Accounts.WALLET_1.stxAddress,
     );
     const bobPoxAddressInfo = await readRewardCyclePoxAddressForAddress(
       network,
       3,
       2, // the next cycle
-      Accounts.WALLET_2.stxAddress
+      Accounts.WALLET_2.stxAddress,
     );
 
     const aliceTotalUstx = alicePoxAddressInfo

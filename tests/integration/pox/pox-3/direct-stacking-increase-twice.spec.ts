@@ -23,7 +23,7 @@ describe("testing solo stacker increase without bug", () => {
   beforeAll(() => {
     orchestrator = buildDevnetNetworkOrchestrator(
       getNetworkIdFromEnv(),
-      timeline
+      timeline,
     );
     orchestrator.start();
   });
@@ -37,7 +37,7 @@ describe("testing solo stacker increase without bug", () => {
 
     // Wait for 2.4 to go live
     await orchestrator.waitForStacksBlockAnchoredOnBitcoinBlockOfHeight(
-      timeline.epoch_2_4
+      timeline.epoch_2_4,
     );
     await orchestrator.waitForNextStacksBlock();
 
@@ -54,7 +54,7 @@ describe("testing solo stacker increase without bug", () => {
         fee,
         nonce: bobNonce++,
       },
-      { amount: 30_000_000_000_010, blockHeight, cycles }
+      { amount: 30_000_000_000_010, blockHeight, cycles },
     );
     expect(response.error).toBeUndefined();
 
@@ -67,7 +67,7 @@ describe("testing solo stacker increase without bug", () => {
         fee,
         nonce: bobNonce++,
       },
-      { amount: 20_000_000_000_100 }
+      { amount: 20_000_000_000_100 },
     );
     expect(response.error).toBeUndefined();
 
@@ -80,13 +80,13 @@ describe("testing solo stacker increase without bug", () => {
         fee,
         nonce: bobNonce++,
       },
-      { amount: 5_000_000_001_000 }
+      { amount: 5_000_000_001_000 },
     );
     expect(response.error).toBeUndefined();
 
     let [block, tx] = await waitForStacksTransaction(
       orchestrator,
-      response.txid
+      response.txid,
     );
     expect(tx.success).toBeTruthy();
 
@@ -98,7 +98,7 @@ describe("testing solo stacker increase without bug", () => {
       network,
       Accounts.WALLET_2.stxAddress,
       100_000_000_000_000 - 55_000_000_001_110 - bobNonce * fee,
-      55_000_000_001_110
+      55_000_000_001_110,
     );
   });
 });

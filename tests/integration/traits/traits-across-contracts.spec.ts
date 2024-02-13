@@ -67,7 +67,7 @@ describe("traits across contracts", () => {
     network: StacksNetwork,
     sender: Account,
     nonce: number,
-    { traitImplName }: { traitImplName: string }
+    { traitImplName }: { traitImplName: string },
   ) => {
     let callTxOptions: SignedContractCallOptions = {
       senderKey: sender.secretKey,
@@ -91,7 +91,7 @@ describe("traits across contracts", () => {
   beforeAll(() => {
     orchestrator = buildDevnetNetworkOrchestrator(
       getNetworkIdFromEnv(),
-      timeline
+      timeline,
     );
     orchestrator.start();
   });
@@ -110,7 +110,7 @@ describe("traits across contracts", () => {
       Accounts.DEPLOYER,
       0,
       "test-trait",
-      codeBodyTestTrait
+      codeBodyTestTrait,
     );
     expect(response.error).toBeUndefined();
     await asyncExpectStacksTransactionSuccess(orchestrator, transaction.txid());
@@ -120,7 +120,7 @@ describe("traits across contracts", () => {
       Accounts.DEPLOYER,
       1,
       "test-trait-2",
-      codeBodyTestTrait
+      codeBodyTestTrait,
     ));
     expect(response.error).toBeUndefined();
     await asyncExpectStacksTransactionSuccess(orchestrator, transaction.txid());
@@ -130,7 +130,7 @@ describe("traits across contracts", () => {
       Accounts.DEPLOYER,
       2,
       "meta-contract",
-      codeBodyMetaContract
+      codeBodyMetaContract,
     ));
     expect(response.error).toBeUndefined();
     await asyncExpectStacksTransactionSuccess(orchestrator, transaction.txid());
@@ -142,16 +142,16 @@ describe("traits across contracts", () => {
       network,
       Accounts.WALLET_1,
       0,
-      { traitImplName: "test-trait" }
+      { traitImplName: "test-trait" },
     ));
     // assert (ok true)
     expect(
       response.error,
-      JSON.stringify(response.reason_data) + JSON.stringify(response.reason)
+      JSON.stringify(response.reason_data) + JSON.stringify(response.reason),
     ).toBeUndefined();
     let [_, tx] = await asyncExpectStacksTransactionSuccess(
       orchestrator,
-      transaction.txid()
+      transaction.txid(),
     );
     expect((tx as StacksTransactionMetadata).result).toEqual("(ok true)");
 
@@ -159,12 +159,12 @@ describe("traits across contracts", () => {
       network,
       Accounts.WALLET_1,
       1,
-      { traitImplName: "test-trait-2" }
+      { traitImplName: "test-trait-2" },
     ));
     expect(response.error).toBe("transaction rejected");
     expect(response.reason).toBe("BadFunctionArgument");
     expect(
-      (response as BadFunctionArgumentRejection).reason_data?.message
+      (response as BadFunctionArgumentRejection).reason_data?.message,
     ).toBe('BadTraitImplementation("meta-trait", "call-foo")');
   });
 });

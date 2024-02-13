@@ -90,10 +90,10 @@ describe("use", () => {
       // Wait for the transaction to be processed
       let [block, tx] = await waitForStacksTransaction(
         orchestrator,
-        transaction.txid()
+        transaction.txid(),
       );
       expect(tx.description).toBe(
-        `deployed: ${Accounts.DEPLOYER.stxAddress}.math-trait`
+        `deployed: ${Accounts.DEPLOYER.stxAddress}.math-trait`,
       );
       expect(tx.success).toBeTruthy();
     });
@@ -126,13 +126,13 @@ describe("use", () => {
       // Wait for the transaction to be processed
       let [block, tx] = await waitForStacksTransaction(
         orchestrator,
-        transaction.txid()
+        transaction.txid(),
       );
       expect(block.bitcoin_anchor_block_identifier.index).toBeLessThan(
-        STACKS_2_1_EPOCH
+        STACKS_2_1_EPOCH,
       );
       expect(tx.description).toBe(
-        `deployed: ${Accounts.DEPLOYER.stxAddress}.use-math-trait`
+        `deployed: ${Accounts.DEPLOYER.stxAddress}.use-math-trait`,
       );
       expect(tx.success).toBeTruthy();
     });
@@ -142,7 +142,7 @@ describe("use", () => {
     beforeAll(async () => {
       // Wait for 2.1 to go live
       await orchestrator.waitForStacksBlockAnchoredOnBitcoinBlockOfHeight(
-        STACKS_2_1_EPOCH + 1
+        STACKS_2_1_EPOCH + 1,
       );
     });
 
@@ -173,10 +173,10 @@ describe("use", () => {
         // Wait for the transaction to be processed
         let [_, tx] = await waitForStacksTransaction(
           orchestrator,
-          transaction.txid()
+          transaction.txid(),
         );
         expect(tx.description).toBe(
-          `deployed: ${Accounts.DEPLOYER.stxAddress}.use-math-trait-2-clarity-1`
+          `deployed: ${Accounts.DEPLOYER.stxAddress}.use-math-trait-2-clarity-1`,
         );
         expect(tx.success).toBeTruthy();
       });
@@ -207,10 +207,10 @@ describe("use", () => {
         // Wait for the transaction to be processed
         let [_, tx] = await waitForStacksTransaction(
           orchestrator,
-          transaction.txid()
+          transaction.txid(),
         );
         expect(tx.description).toBe(
-          `deployed: ${Accounts.DEPLOYER.stxAddress}.use-math-trait-2-clarity-2`
+          `deployed: ${Accounts.DEPLOYER.stxAddress}.use-math-trait-2-clarity-2`,
         );
         expect(tx.success).toBeTruthy();
       });

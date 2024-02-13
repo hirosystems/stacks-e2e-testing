@@ -63,7 +63,7 @@ describe("trait user deployed in 2.0, trait implementer deployed in 2.2", () => 
 
   const callReadOnlyTestTraitCallFoo = (
     network: StacksNetwork,
-    { a }: { a: number }
+    { a }: { a: number },
   ) => {
     return callReadOnlyFunction({
       contractName: "test-trait",
@@ -82,7 +82,7 @@ describe("trait user deployed in 2.0, trait implementer deployed in 2.2", () => 
     network: StacksNetwork,
     sender: Account,
     nonce: number,
-    { a }: { a: number }
+    { a }: { a: number },
   ) => {
     let callTxOptions: SignedContractCallOptions = {
       senderKey: sender.secretKey,
@@ -107,7 +107,7 @@ describe("trait user deployed in 2.0, trait implementer deployed in 2.2", () => 
   beforeAll(() => {
     orchestrator = buildDevnetNetworkOrchestrator(
       getNetworkIdFromEnv(),
-      timeline
+      timeline,
     );
     orchestrator.start();
   });
@@ -126,14 +126,14 @@ describe("trait user deployed in 2.0, trait implementer deployed in 2.2", () => 
       Accounts.DEPLOYER,
       0,
       "test-trait",
-      codeBodyTestTrait
+      codeBodyTestTrait,
     );
     expect(response.error).toBeUndefined();
     await asyncExpectStacksTransactionSuccess(orchestrator, transaction.txid());
 
     // Wait for the 2.2 activation
     await orchestrator.waitForStacksBlockAnchoredOnBitcoinBlockOfHeight(
-      timeline.epoch_2_2 + 2
+      timeline.epoch_2_2 + 2,
     );
 
     ({ response, transaction } = await deployContract(
@@ -141,7 +141,7 @@ describe("trait user deployed in 2.0, trait implementer deployed in 2.2", () => 
       Accounts.DEPLOYER,
       1,
       "impl-trait",
-      codeBodyImplTrait
+      codeBodyImplTrait,
     ));
     expect(response.error).toBeUndefined();
     await asyncExpectStacksTransactionSuccess(orchestrator, transaction.txid());
@@ -150,20 +150,20 @@ describe("trait user deployed in 2.0, trait implementer deployed in 2.2", () => 
 
     // Call the readonly function
     let output = await callReadOnlyTestTraitFooArg(network).catch((e: Error) =>
-      errorToCV(e)
+      errorToCV(e),
     );
 
     expect(cvToString(output), cvToString(output)).toContain(
-      "Unchecked(TypeValueError(TraitReferenceType"
+      "Unchecked(TypeValueError(TraitReferenceType",
     );
 
     // call public function as readonly
     output = await callReadOnlyTestTraitCallFoo(network, { a: 2 }).catch(
-      (e: Error) => errorToCV(e)
+      (e: Error) => errorToCV(e),
     );
 
     expect(cvToString(output), cvToString(output)).toContain(
-      "Unchecked(TypeValueError(TraitReferenceType"
+      "Unchecked(TypeValueError(TraitReferenceType",
     );
 
     // Call the public function
@@ -171,7 +171,7 @@ describe("trait user deployed in 2.0, trait implementer deployed in 2.2", () => 
       network,
       Accounts.WALLET_1,
       0,
-      { a: 2 }
+      { a: 2 },
     ));
     expect(response.error).toEqual("transaction rejected");
   });
@@ -182,7 +182,7 @@ describe("trait user deployed in 2.0, trait implementer deployed in 2.2", () => 
     });
     // Wait for the 2.3 activation, then check again
     await orchestrator.waitForStacksBlockAnchoredOnBitcoinBlockOfHeight(
-      timeline.epoch_2_3 + 2
+      timeline.epoch_2_3 + 2,
     );
 
     // Call the readonly function
@@ -198,12 +198,12 @@ describe("trait user deployed in 2.0, trait implementer deployed in 2.2", () => 
       network,
       Accounts.WALLET_1,
       0, // use nonce again
-      { a: 3 }
+      { a: 3 },
     );
     expect(response.error).toBeUndefined();
     let [_, tx] = await waitForStacksTransaction(
       orchestrator,
-      transaction.txid()
+      transaction.txid(),
     );
     expect(tx.result).toEqual("(ok u3)");
   });

@@ -25,7 +25,7 @@ describe("testing solo stacker increase without bug", () => {
   beforeAll(() => {
     orchestrator = buildDevnetNetworkOrchestrator(
       getNetworkIdFromEnv(),
-      timeline
+      timeline,
     );
     orchestrator.start();
   });
@@ -41,7 +41,7 @@ describe("testing solo stacker increase without bug", () => {
 
     // Wait for 2.4 to go live
     await orchestrator.waitForStacksBlockAnchoredOnBitcoinBlockOfHeight(
-      timeline.epoch_2_4
+      timeline.epoch_2_4,
     );
     await orchestrator.waitForNextStacksBlock();
 
@@ -58,12 +58,12 @@ describe("testing solo stacker increase without bug", () => {
         fee,
         nonce: bobNonce++,
       },
-      { amount: 30_000_000_000_010, blockHeight, cycles }
+      { amount: 30_000_000_000_010, blockHeight, cycles },
     );
     expect(response.error).toBeUndefined();
     let [block, tx] = await waitForStacksTransaction(
       orchestrator,
-      response.txid
+      response.txid,
     );
     expect(tx.success).toBeTruthy();
 
@@ -76,7 +76,7 @@ describe("testing solo stacker increase without bug", () => {
         fee,
         nonce: aliceNonce++,
       },
-      { amount: 50_000_000_000_001, blockHeight, cycles }
+      { amount: 50_000_000_000_001, blockHeight, cycles },
     );
     expect(response.error).toBeUndefined();
     [block, tx] = await waitForStacksTransaction(orchestrator, response.txid);
@@ -91,7 +91,7 @@ describe("testing solo stacker increase without bug", () => {
         fee,
         nonce: bobNonce++,
       },
-      { amount: 20000000000100 }
+      { amount: 20000000000100 },
     );
     expect(response.error).toBeUndefined();
     [block, tx] = await waitForStacksTransaction(orchestrator, response.txid);
@@ -112,7 +112,7 @@ describe("testing solo stacker increase without bug", () => {
       network,
       3,
       2,
-      Accounts.WALLET_2.stxAddress
+      Accounts.WALLET_2.stxAddress,
     )) as Record<string, ClarityValue>;
     expect(cvToString(poxAddrInfo0["total-ustx"])).toBe("u50000000000110");
 
@@ -122,7 +122,7 @@ describe("testing solo stacker increase without bug", () => {
       network,
       3,
       2,
-      Accounts.WALLET_1.stxAddress
+      Accounts.WALLET_1.stxAddress,
     )) as Record<string, ClarityValue>;
     expect(poxAddrInfo1["total-ustx"]).toEqual(uintCV(50_000_000_000_001));
   });

@@ -62,7 +62,7 @@ describe("trait implementer and trait user both deployed in 2.2", () => {
 
   const callReadOnlyTestTraitCallFoo = (
     network: StacksNetwork,
-    { a }: { a: number }
+    { a }: { a: number },
   ) => {
     return callReadOnlyFunction({
       contractName: "test-trait",
@@ -81,7 +81,7 @@ describe("trait implementer and trait user both deployed in 2.2", () => {
     network: StacksNetwork,
     sender: Account,
     nonce: number,
-    { a }: { a: number }
+    { a }: { a: number },
   ) => {
     let callTxOptions: SignedContractCallOptions = {
       senderKey: sender.secretKey,
@@ -106,7 +106,7 @@ describe("trait implementer and trait user both deployed in 2.2", () => {
   beforeAll(() => {
     orchestrator = buildDevnetNetworkOrchestrator(
       getNetworkIdFromEnv(),
-      timeline
+      timeline,
     );
     orchestrator.start();
   });
@@ -120,7 +120,7 @@ describe("trait implementer and trait user both deployed in 2.2", () => {
 
     // Wait for the 2.1 activation
     await orchestrator.waitForStacksBlockAnchoredOnBitcoinBlockOfHeight(
-      timeline.epoch_2_2
+      timeline.epoch_2_2,
     );
 
     let { response, transaction } = await deployContract(
@@ -128,7 +128,7 @@ describe("trait implementer and trait user both deployed in 2.2", () => {
       Accounts.DEPLOYER,
       0,
       "impl-trait",
-      codeBodyImplTrait
+      codeBodyImplTrait,
     );
     expect(response.error).toBeUndefined();
     await asyncExpectStacksTransactionSuccess(orchestrator, transaction.txid());
@@ -138,7 +138,7 @@ describe("trait implementer and trait user both deployed in 2.2", () => {
       Accounts.DEPLOYER,
       1,
       "test-trait",
-      codeBodyTestTrait
+      codeBodyTestTrait,
     ));
     expect(response.error).toBeUndefined();
     await asyncExpectStacksTransactionSuccess(orchestrator, transaction.txid());
@@ -158,12 +158,12 @@ describe("trait implementer and trait user both deployed in 2.2", () => {
       network,
       Accounts.WALLET_1,
       0,
-      { a: 2 }
+      { a: 2 },
     ));
     expect(response.error).toBeUndefined();
     let [_, tx] = await waitForStacksTransaction(
       orchestrator,
-      transaction.txid()
+      transaction.txid(),
     );
     expect(tx.result).toEqual("(ok u2)");
   });
@@ -174,7 +174,7 @@ describe("trait implementer and trait user both deployed in 2.2", () => {
     });
     // Wait for the 2.3 activation, then check again
     await orchestrator.waitForStacksBlockAnchoredOnBitcoinBlockOfHeight(
-      timeline.epoch_2_3 + 2
+      timeline.epoch_2_3 + 2,
     );
 
     // Call the readonly function
@@ -190,12 +190,12 @@ describe("trait implementer and trait user both deployed in 2.2", () => {
       network,
       Accounts.WALLET_1,
       1,
-      { a: 3 }
+      { a: 3 },
     );
     expect(response.error).toBeUndefined();
     let [_, tx] = await waitForStacksTransaction(
       orchestrator,
-      transaction.txid()
+      transaction.txid(),
     );
     expect(tx.result).toEqual("(ok u3)");
   });

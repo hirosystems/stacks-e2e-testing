@@ -70,13 +70,13 @@ describe("principal-destruct?", () => {
     // Wait for the transaction to be processed
     let [block, tx] = await waitForStacksTransaction(
       orchestrator,
-      transaction.txid()
+      transaction.txid(),
     );
     expect(block.bitcoin_anchor_block_identifier.index).toBeLessThanOrEqual(
-      Constants.DEVNET_DEFAULT_EPOCH_2_1
+      Constants.DEVNET_DEFAULT_EPOCH_2_1,
     );
     expect(tx.description).toBe(
-      `deployed: ${Accounts.DEPLOYER.stxAddress}.test-2-05`
+      `deployed: ${Accounts.DEPLOYER.stxAddress}.test-2-05`,
     );
     expect(tx.success).toBeFalsy();
   });
@@ -85,7 +85,7 @@ describe("principal-destruct?", () => {
     beforeAll(async () => {
       // Wait for 2.1 to go live
       await orchestrator.waitForStacksBlockAnchoredOnBitcoinBlockOfHeight(
-        Constants.DEVNET_DEFAULT_EPOCH_2_1
+        Constants.DEVNET_DEFAULT_EPOCH_2_1,
       );
       await orchestrator.waitForNextStacksBlock();
     });
@@ -123,10 +123,10 @@ describe("principal-destruct?", () => {
       // Wait for the transaction to be processed
       let [block, tx] = await waitForStacksTransaction(
         orchestrator,
-        transaction.txid()
+        transaction.txid(),
       );
       expect(tx.description).toBe(
-        `deployed: ${Accounts.DEPLOYER.stxAddress}.test-2-1`
+        `deployed: ${Accounts.DEPLOYER.stxAddress}.test-2-1`,
       );
       expect(tx.success).toBeTruthy();
     });
@@ -157,13 +157,13 @@ describe("principal-destruct?", () => {
       // Wait for the transaction to be processed
       let [block, tx] = await waitForStacksTransaction(
         orchestrator,
-        transaction.txid()
+        transaction.txid(),
       );
       expect(tx.description).toBe(
-        `invoked: ${Accounts.DEPLOYER.stxAddress}.test-2-1::test-literal-1()`
+        `invoked: ${Accounts.DEPLOYER.stxAddress}.test-2-1::test-literal-1()`,
       );
       expect(tx.result).toBe(
-        "(ok (tuple (hash-bytes 0x164247d6f2b425ac5771423ae6c80c754f7172b0) (name none) (version 0x1a)))"
+        "(ok (tuple (hash-bytes 0x164247d6f2b425ac5771423ae6c80c754f7172b0) (name none) (version 0x1a)))",
       );
       expect(tx.success).toBeTruthy();
     });
@@ -194,13 +194,13 @@ describe("principal-destruct?", () => {
       // Wait for the transaction to be processed
       let [_, tx] = await waitForStacksTransaction(
         orchestrator,
-        transaction.txid()
+        transaction.txid(),
       );
       expect(tx.description).toBe(
-        `invoked: ${Accounts.DEPLOYER.stxAddress}.test-2-1::test-literal-2()`
+        `invoked: ${Accounts.DEPLOYER.stxAddress}.test-2-1::test-literal-2()`,
       );
       expect(tx.result).toBe(
-        '(ok (tuple (hash-bytes 0x164247d6f2b425ac5771423ae6c80c754f7172b0) (name (some "foo")) (version 0x1a)))'
+        '(ok (tuple (hash-bytes 0x164247d6f2b425ac5771423ae6c80c754f7172b0) (name (some "foo")) (version 0x1a)))',
       );
       expect(tx.success).toBeTruthy();
     });
@@ -231,13 +231,13 @@ describe("principal-destruct?", () => {
       // Wait for the transaction to be processed
       let [block, tx] = await waitForStacksTransaction(
         orchestrator,
-        transaction.txid()
+        transaction.txid(),
       );
       expect(tx.description).toBe(
-        `invoked: ${Accounts.DEPLOYER.stxAddress}.test-2-1::test(STB44HYPYAT2BB2QE513NSP81HTMYWBJP02HPGK6)`
+        `invoked: ${Accounts.DEPLOYER.stxAddress}.test-2-1::test(STB44HYPYAT2BB2QE513NSP81HTMYWBJP02HPGK6)`,
       );
       expect(tx.result).toBe(
-        "(ok (tuple (hash-bytes 0x164247d6f2b425ac5771423ae6c80c754f7172b0) (name none) (version 0x1a)))"
+        "(ok (tuple (hash-bytes 0x164247d6f2b425ac5771423ae6c80c754f7172b0) (name none) (version 0x1a)))",
       );
       expect(tx.success).toBeTruthy();
     });
@@ -270,13 +270,13 @@ describe("principal-destruct?", () => {
       // Wait for the transaction to be processed
       let [_, tx] = await waitForStacksTransaction(
         orchestrator,
-        transaction.txid()
+        transaction.txid(),
       );
       expect(tx.description).toBe(
-        `invoked: ${Accounts.DEPLOYER.stxAddress}.test-2-1::test(STB44HYPYAT2BB2QE513NSP81HTMYWBJP02HPGK6.foo)`
+        `invoked: ${Accounts.DEPLOYER.stxAddress}.test-2-1::test(STB44HYPYAT2BB2QE513NSP81HTMYWBJP02HPGK6.foo)`,
       );
       expect(tx.result).toBe(
-        '(ok (tuple (hash-bytes 0x164247d6f2b425ac5771423ae6c80c754f7172b0) (name (some "foo")) (version 0x1a)))'
+        '(ok (tuple (hash-bytes 0x164247d6f2b425ac5771423ae6c80c754f7172b0) (name (some "foo")) (version 0x1a)))',
       );
       expect(tx.success).toBeTruthy();
     });
@@ -309,13 +309,13 @@ describe("principal-destruct?", () => {
       // Wait for the transaction to be processed
       let [_, tx] = await waitForStacksTransaction(
         orchestrator,
-        transaction.txid()
+        transaction.txid(),
       );
       expect(tx.description).toBe(
-        `invoked: ${Accounts.DEPLOYER.stxAddress}.test-2-1::test(SP3X6QWWETNBZWGBK6DRGTR1KX50S74D3433WDGJY)`
+        `invoked: ${Accounts.DEPLOYER.stxAddress}.test-2-1::test(SP3X6QWWETNBZWGBK6DRGTR1KX50S74D3433WDGJY)`,
       );
       expect(tx.result).toBe(
-        "(err (tuple (hash-bytes 0xfa6bf38ed557fe417333710d6033e9419391a320) (name none) (version 0x16)))"
+        "(err (tuple (hash-bytes 0xfa6bf38ed557fe417333710d6033e9419391a320) (name none) (version 0x16)))",
       );
       expect(tx.success).toBeFalsy();
     });
@@ -348,13 +348,13 @@ describe("principal-destruct?", () => {
       // Wait for the transaction to be processed
       let [_, tx] = await waitForStacksTransaction(
         orchestrator,
-        transaction.txid()
+        transaction.txid(),
       );
       expect(tx.description).toBe(
-        `invoked: ${Accounts.DEPLOYER.stxAddress}.test-2-1::test(SP3X6QWWETNBZWGBK6DRGTR1KX50S74D3433WDGJY.foo)`
+        `invoked: ${Accounts.DEPLOYER.stxAddress}.test-2-1::test(SP3X6QWWETNBZWGBK6DRGTR1KX50S74D3433WDGJY.foo)`,
       );
       expect(tx.result).toBe(
-        '(err (tuple (hash-bytes 0xfa6bf38ed557fe417333710d6033e9419391a320) (name (some "foo")) (version 0x16)))'
+        '(err (tuple (hash-bytes 0xfa6bf38ed557fe417333710d6033e9419391a320) (name (some "foo")) (version 0x16)))',
       );
       expect(tx.success).toBeFalsy();
     });

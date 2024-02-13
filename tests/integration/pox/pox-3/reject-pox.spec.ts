@@ -29,7 +29,7 @@ describe("testing reject-pox", () => {
   beforeAll(() => {
     orchestrator = buildDevnetNetworkOrchestrator(
       getNetworkIdFromEnv(),
-      timeline
+      timeline,
     );
     orchestrator.start();
   });
@@ -43,7 +43,7 @@ describe("testing reject-pox", () => {
 
     // Wait for 2.4 to go live
     await orchestrator.waitForStacksBlockAnchoredOnBitcoinBlockOfHeight(
-      timeline.epoch_2_4
+      timeline.epoch_2_4,
     );
     await orchestrator.waitForNextStacksBlock();
 
@@ -60,12 +60,12 @@ describe("testing reject-pox", () => {
         fee,
         nonce: aliceNonce++,
       },
-      { amount: 90_000_000_000_001, blockHeight, cycles }
+      { amount: 90_000_000_000_001, blockHeight, cycles },
     );
     expect(response.error).toBeUndefined();
     let [block, tx] = await waitForStacksTransaction(
       orchestrator,
-      response.txid
+      response.txid,
     );
     expect(tx.success).toBeTruthy();
 
@@ -78,7 +78,7 @@ describe("testing reject-pox", () => {
         fee,
         nonce: bobNonce++,
       },
-      { amount: 90_000_000_000_010, blockHeight, cycles }
+      { amount: 90_000_000_000_010, blockHeight, cycles },
     );
     expect(response.error).toBeUndefined();
     [block, tx] = await waitForStacksTransaction(orchestrator, response.txid);
@@ -111,7 +111,7 @@ describe("testing reject-pox", () => {
       3,
       network,
       Accounts.WALLET_1,
-      poxInfo.current_cycle.id
+      poxInfo.current_cycle.id,
     );
     expect(isPoxActive).toEqual(trueCV());
 
@@ -119,7 +119,7 @@ describe("testing reject-pox", () => {
       3,
       network,
       Accounts.WALLET_1,
-      poxInfo.next_cycle.id
+      poxInfo.next_cycle.id,
     );
     expect(isPoxActive).toEqual(trueCV());
 
@@ -141,7 +141,7 @@ describe("testing reject-pox", () => {
     expect(response.error).toBeUndefined();
     let [block, tx] = await waitForStacksTransaction(
       orchestrator,
-      response.txid
+      response.txid,
     );
     expect(tx.success).toBeFalsy();
     expect(tx.result).toBe("(err 3)");
@@ -160,7 +160,7 @@ describe("testing reject-pox", () => {
     expect(response.error).toBeUndefined();
     let [block, tx] = await waitForStacksTransaction(
       orchestrator,
-      response.txid
+      response.txid,
     );
     expect(tx.success).toBeTruthy();
 
@@ -171,7 +171,7 @@ describe("testing reject-pox", () => {
       3,
       network,
       Accounts.WALLET_1,
-      poxInfo.current_cycle.id
+      poxInfo.current_cycle.id,
     );
     expect(isPoxActive).toEqual(trueCV());
 
@@ -179,7 +179,7 @@ describe("testing reject-pox", () => {
       3,
       network,
       Accounts.WALLET_1,
-      poxInfo.next_cycle.id
+      poxInfo.next_cycle.id,
     );
     expect(isPoxActive).toEqual(falseCV());
 
@@ -193,7 +193,7 @@ describe("testing reject-pox", () => {
       3,
       network,
       Accounts.WALLET_1,
-      poxInfo.current_cycle.id
+      poxInfo.current_cycle.id,
     );
     expect(isPoxActive).toEqual(falseCV());
   });
@@ -210,7 +210,7 @@ describe("testing reject-pox", () => {
       3,
       network,
       Accounts.WALLET_1,
-      poxInfo.current_cycle.id
+      poxInfo.current_cycle.id,
     );
     expect(isPoxActive).toEqual(trueCV());
   });

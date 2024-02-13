@@ -60,14 +60,14 @@ describe("testing multiple stack-stx and stack-increase calls in the same block"
         amount: 80_000_000_000_000,
         blockHeight,
         cycles: 1,
-      }
+      },
     );
     expect(response.error).toBeUndefined();
 
     // Wait for Alice's stacking transaction to confirm
     let [block, tx] = await waitForStacksTransaction(
       orchestrator,
-      response.txid
+      response.txid,
     );
     expect(tx.success).toBeTruthy();
 
@@ -84,7 +84,7 @@ describe("testing multiple stack-stx and stack-increase calls in the same block"
         amount: 80_000_000_000_000,
         blockHeight,
         cycles: 1,
-      }
+      },
     );
     expect(response.error).toBeUndefined();
 
@@ -102,7 +102,7 @@ describe("testing multiple stack-stx and stack-increase calls in the same block"
         fee,
         nonce: aliceNonce++,
       },
-      { amount: increaseAmount }
+      { amount: increaseAmount },
     );
 
     const bobIncrease = broadcastStackIncrease(
@@ -113,7 +113,7 @@ describe("testing multiple stack-stx and stack-increase calls in the same block"
         fee,
         nonce: bobNonce++,
       },
-      { amount: increaseAmount }
+      { amount: increaseAmount },
     );
 
     // Wait for both stack-increase transactions to confirm
@@ -127,7 +127,7 @@ describe("testing multiple stack-stx and stack-increase calls in the same block"
 
     const [aliceBlock, aliceTx] = await waitForStacksTransaction(
       orchestrator,
-      aliceResponse.txid
+      aliceResponse.txid,
     );
     expect(aliceTx.success).toBeTruthy();
 
@@ -136,13 +136,13 @@ describe("testing multiple stack-stx and stack-increase calls in the same block"
       network,
       2,
       2, // the next cycle
-      Accounts.WALLET_1.stxAddress
+      Accounts.WALLET_1.stxAddress,
     );
     const bobPoxAddressInfo = await readRewardCyclePoxAddressForAddress(
       network,
       2,
       2, // the next cycle
-      Accounts.WALLET_2.stxAddress
+      Accounts.WALLET_2.stxAddress,
     );
 
     const aliceTotalUstx = alicePoxAddressInfo
@@ -165,7 +165,7 @@ describe("testing multiple stack-stx and stack-increase calls in the same block"
 
     // Wait for 2.2 activation and unlock
     await orchestrator.waitForStacksBlockAnchoredOnBitcoinBlockOfHeight(
-      Constants.DEVNET_DEFAULT_EPOCH_2_2 + 2
+      Constants.DEVNET_DEFAULT_EPOCH_2_2 + 2,
     );
 
     // Check Alice's account info
@@ -173,7 +173,7 @@ describe("testing multiple stack-stx and stack-increase calls in the same block"
       network,
       Accounts.WALLET_1.stxAddress,
       100_000_000_000_000 - aliceNonce * fee,
-      0
+      0,
     );
 
     // Verify that Alice's STX are really unlocked by doing a transfer
@@ -182,7 +182,7 @@ describe("testing multiple stack-stx and stack-increase calls in the same block"
       {
         amount: 100_000_000_000_000 - aliceNonce * fee,
         recipient: Accounts.WALLET_3.stxAddress,
-      }
+      },
     );
     await asyncExpectStacksTransactionSuccess(orchestrator, response.txid);
 
@@ -191,7 +191,7 @@ describe("testing multiple stack-stx and stack-increase calls in the same block"
       network,
       Accounts.WALLET_2.stxAddress,
       100_000_000_000_000 - bobNonce * fee,
-      0
+      0,
     );
 
     // Verify that Bob's STX are really unlocked by doing a transfer
@@ -200,7 +200,7 @@ describe("testing multiple stack-stx and stack-increase calls in the same block"
       {
         amount: 100_000_000_000_000 - bobNonce * fee,
         recipient: Accounts.WALLET_3.stxAddress,
-      }
+      },
     );
     await asyncExpectStacksTransactionSuccess(orchestrator, response.txid);
   });
@@ -214,7 +214,7 @@ describe("testing multiple stack-stx and stack-increase calls in the same block"
       await waitForNextRewardPhase(
         network,
         orchestrator,
-        poxInfo.current_cycle.id + 1
+        poxInfo.current_cycle.id + 1,
       );
 
       poxInfo = await getPoxInfo(network);

@@ -19,7 +19,7 @@ export const broadcastStackSTX = async (
     amount,
     blockHeight,
     cycles,
-  }: { amount: number; blockHeight: number; cycles: number }
+  }: { amount: number; blockHeight: number; cycles: number },
 ): Promise<TxBroadcastResult> => {
   const { version, data } = decodeBtcAddress(account.btcAddress);
   const address = {
@@ -53,7 +53,7 @@ export const broadcastStackSTX = async (
 
 export const broadcastStackIncrease = async (
   { poxVersion, network, account, fee, nonce }: BroadcastOptionsPox,
-  { amount }: { amount: number }
+  { amount }: { amount: number },
 ): Promise<TxBroadcastResult> => {
   let poxContract = Contracts.POX[poxVersion] || Contracts.DEFAULT;
   const txOptions = {
@@ -76,7 +76,7 @@ export const broadcastStackIncrease = async (
 
 export const broadcastStackExtend = async (
   { poxVersion, network, account, fee, nonce }: BroadcastOptionsPox,
-  { cycles }: { cycles: number }
+  { cycles }: { cycles: number },
 ): Promise<TxBroadcastResult> => {
   const { version, data } = decodeBtcAddress(account.btcAddress);
   const address = {

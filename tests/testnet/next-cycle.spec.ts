@@ -43,7 +43,7 @@ describe("stack-increase", async () => {
         fee,
         nonce: bobNonce++,
       },
-      { cycles: 5 }
+      { cycles: 5 },
     );
     console.log("Bob extends 5 cycles response: ", response);
     expect(response.error).toBeUndefined();
@@ -57,7 +57,7 @@ describe("stack-increase", async () => {
         fee,
         nonce: chloeNonce++,
       },
-      { amount: 81_000_000_000_000 }
+      { amount: 81_000_000_000_000 },
     );
     console.log("Chloe increases 81M response: ", response);
     expect(response.error).toBeUndefined();
@@ -88,7 +88,7 @@ describe("stack-increase", async () => {
         poolRewardAccount: Accounts.FAUCET,
         startBurnHeight: blockHeight,
         lockPeriodCycles: 1,
-      }
+      },
     );
     console.log("Faucet tries to stack Alice's 50m STX response: ", response);
     expect(response.error).toBeUndefined();
@@ -113,7 +113,7 @@ describe("stack-increase", async () => {
         fee,
         nonce: deployerNonce++,
       },
-      { amount: 300_000_000_000_000, poolAddress: Accounts.FAUCET }
+      { amount: 300_000_000_000_000, poolAddress: Accounts.FAUCET },
     );
     console.log("Deployer re-delegates 300m to faucet pool: ", response);
     expect(response.error).toBeUndefined();
@@ -131,7 +131,7 @@ describe("stack-increase", async () => {
         stacker: Accounts.DEPLOYER,
         poolRewardAccount: Accounts.FAUCET,
         increaseByAmountUstx: 100_000_000_000_000,
-      }
+      },
     );
     console.log("Faucet increases deployer's stack: ", response);
     expect(response.error).toBeUndefined();
@@ -149,7 +149,7 @@ describe("stack-increase", async () => {
         stacker: Accounts.DEPLOYER,
         poolRewardAccount: Accounts.FAUCET,
         extendByCount: 6,
-      }
+      },
     );
     console.log("Faucet extends deployer's stack: ", response);
     expect(response.error).toBeUndefined();

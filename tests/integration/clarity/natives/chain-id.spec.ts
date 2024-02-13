@@ -65,13 +65,13 @@ describe("chain-id", () => {
     // Wait for the transaction to be processed
     let [block, tx] = await waitForStacksTransaction(
       orchestrator,
-      transaction.txid()
+      transaction.txid(),
     );
     expect(block.bitcoin_anchor_block_identifier.index).toBeLessThanOrEqual(
-      Constants.DEVNET_DEFAULT_EPOCH_2_1
+      Constants.DEVNET_DEFAULT_EPOCH_2_1,
     );
     expect(tx.description).toBe(
-      `deployed: ${Accounts.DEPLOYER.stxAddress}.test-2-05`
+      `deployed: ${Accounts.DEPLOYER.stxAddress}.test-2-05`,
     );
     expect(tx.success).toBeFalsy();
   });
@@ -80,7 +80,7 @@ describe("chain-id", () => {
     beforeAll(async () => {
       // Wait for 2.1 to go live
       await orchestrator.waitForStacksBlockAnchoredOnBitcoinBlockOfHeight(
-        Constants.DEVNET_DEFAULT_EPOCH_2_1
+        Constants.DEVNET_DEFAULT_EPOCH_2_1,
       );
       await orchestrator.waitForNextStacksBlock();
     });
@@ -110,10 +110,10 @@ describe("chain-id", () => {
       // Wait for the transaction to be processed
       let [block, tx] = await waitForStacksTransaction(
         orchestrator,
-        transaction.txid()
+        transaction.txid(),
       );
       expect(tx.description).toBe(
-        `deployed: ${Accounts.DEPLOYER.stxAddress}.test-2-1`
+        `deployed: ${Accounts.DEPLOYER.stxAddress}.test-2-1`,
       );
       expect(tx.success).toBeTruthy();
     });
@@ -144,10 +144,10 @@ describe("chain-id", () => {
       // Wait for the transaction to be processed
       let [block, tx] = await waitForStacksTransaction(
         orchestrator,
-        transaction.txid()
+        transaction.txid(),
       );
       expect(tx.description).toBe(
-        `invoked: ${Accounts.DEPLOYER.stxAddress}.test-2-1::test-1()`
+        `invoked: ${Accounts.DEPLOYER.stxAddress}.test-2-1::test-1()`,
       );
       expect(tx.result).toBe("(ok u2147483648)");
       expect(tx.success).toBeTruthy();

@@ -28,7 +28,7 @@ export const broadcastDelegateSTX = async (
     poolAddress: Account;
     poolRewardAccount?: Account;
     untilBurnHeight?: number;
-  }
+  },
 ): Promise<TxBroadcastResult> => {
   let poxAddressCV;
   if (poolRewardAccount) {
@@ -110,7 +110,7 @@ export const broadcastDelegateStackSTX = async (
     poolRewardAccount: Account;
     startBurnHeight: number;
     lockPeriodCycles: number;
-  }
+  },
 ): Promise<TxBroadcastResult> => {
   const { version, data } = decodeBtcAddress(poolRewardAccount.btcAddress);
   const poxAddress = {
@@ -149,7 +149,7 @@ export const broadcastDelegateStackExtend = async (
     stacker,
     poolRewardAccount,
     extendByCount,
-  }: { stacker: Account; poolRewardAccount: Account; extendByCount: number }
+  }: { stacker: Account; poolRewardAccount: Account; extendByCount: number },
 ): Promise<TxBroadcastResult> => {
   const { version, data } = decodeBtcAddress(poolRewardAccount.btcAddress);
   const poxAddress = {
@@ -190,7 +190,7 @@ export const broadcastDelegateStackIncrease = async (
     stacker: Account;
     poolRewardAccount: Account;
     increaseByAmountUstx: number;
-  }
+  },
 ): Promise<TxBroadcastResult> => {
   const { version, data } = decodeBtcAddress(poolRewardAccount.btcAddress);
   const poxAddress = {
@@ -238,7 +238,7 @@ export const broadcastStackAggregationCommitIndexed = async (
   {
     poolRewardAccount,
     cycleId,
-  }: { poolRewardAccount: Account; cycleId: number }
+  }: { poolRewardAccount: Account; cycleId: number },
 ): Promise<TxBroadcastResult> => {
   const { version, data } = decodeBtcAddress(poolRewardAccount.btcAddress);
   const poxAddress = {
@@ -274,7 +274,7 @@ export const broadcastStackAggregationIncrease = async (
     poolRewardAccount,
     cycleId,
     rewardIndex,
-  }: { poolRewardAccount: Account; cycleId: number; rewardIndex: number }
+  }: { poolRewardAccount: Account; cycleId: number; rewardIndex: number },
 ): Promise<TxBroadcastResult> => {
   let poxContract = Contracts.POX[poxVersion] || Contracts.DEFAULT;
   const { version, data } = decodeBtcAddress(poolRewardAccount.btcAddress);

@@ -39,7 +39,7 @@ describe("testing direct stacker as pool operator without auto-unlock under epoc
   beforeAll(() => {
     orchestrator = buildDevnetNetworkOrchestrator(
       getNetworkIdFromEnv(),
-      timeline
+      timeline,
     );
     orchestrator.start();
   });
@@ -68,7 +68,7 @@ describe("testing direct stacker as pool operator without auto-unlock under epoc
         fee,
         nonce: aliceNonce++,
       },
-      { amount: 80_000_000_000_000, blockHeight, cycles }
+      { amount: 80_000_000_000_000, blockHeight, cycles },
     );
     expect(response.error).toBeUndefined();
 
@@ -81,12 +81,12 @@ describe("testing direct stacker as pool operator without auto-unlock under epoc
         fee,
         nonce: faucetNonce++,
       },
-      { amount: 999000000000000, poolAddress: Accounts.WALLET_1 }
+      { amount: 999000000000000, poolAddress: Accounts.WALLET_1 },
     );
     expect(response.error).toBeUndefined();
     let [block, tx] = await waitForStacksTransaction(
       orchestrator,
-      response.txid
+      response.txid,
     );
     expect(tx.success, tx.result).toBeTruthy();
 
@@ -105,7 +105,7 @@ describe("testing direct stacker as pool operator without auto-unlock under epoc
         poolRewardAccount: Accounts.WALLET_1,
         startBurnHeight: blockHeight,
         lockPeriodCycles: 1,
-      }
+      },
     );
     expect(response.error).toBeUndefined();
     [block, tx] = await waitForStacksTransaction(orchestrator, response.txid);
@@ -120,7 +120,7 @@ describe("testing direct stacker as pool operator without auto-unlock under epoc
         fee,
         nonce: aliceNonce++,
       },
-      { poolRewardAccount: Accounts.WALLET_1, cycleId: 2 }
+      { poolRewardAccount: Accounts.WALLET_1, cycleId: 2 },
     );
     expect(response.error).toBeUndefined();
 
@@ -138,7 +138,7 @@ describe("testing direct stacker as pool operator without auto-unlock under epoc
       network,
       2,
       2,
-      0
+      0,
     );
     expect(poxAddrInfo0?.["total-ustx"]).toEqual(uintCV(80_000_000_000_000));
 
@@ -147,7 +147,7 @@ describe("testing direct stacker as pool operator without auto-unlock under epoc
       network,
       2,
       2,
-      1
+      1,
     );
     expect(poxAddrInfo1?.["total-ustx"]).toEqual(uintCV(999_000_000_000_000));
 
@@ -155,7 +155,7 @@ describe("testing direct stacker as pool operator without auto-unlock under epoc
       network,
       Accounts.WALLET_1.stxAddress,
       100_000_000_000_000 - 80_000_000_000_000 - aliceNonce * fee,
-      80_000_000_000_000
+      80_000_000_000_000,
     );
 
     // Wait until unlock happens that is block N+5 where N is the height of the next reward phase
@@ -182,7 +182,7 @@ describe("testing direct stacker as pool operator without auto-unlock under epoc
       network,
       Accounts.WALLET_1.stxAddress,
       100_000_000_000_000 - 80_000_000_000_000 - aliceNonce * fee,
-      80_000_000_000_000
+      80_000_000_000_000,
     );
   });
 
@@ -195,7 +195,7 @@ describe("testing direct stacker as pool operator without auto-unlock under epoc
 
     // Wait for 2.2 activation and unlock
     await orchestrator.waitForStacksBlockAnchoredOnBitcoinBlockOfHeight(
-      timeline.epoch_2_2 + 2
+      timeline.epoch_2_2 + 2,
     );
 
     // Check Alice's account info
@@ -203,7 +203,7 @@ describe("testing direct stacker as pool operator without auto-unlock under epoc
       network,
       Accounts.WALLET_1.stxAddress,
       100_000_000_000_000 - aliceNonce * fee,
-      0
+      0,
     );
 
     // Verify that Alice's STX are really unlocked by doing a transfer
@@ -212,7 +212,7 @@ describe("testing direct stacker as pool operator without auto-unlock under epoc
       {
         amount: 100_000_000_000_000 - aliceNonce * fee,
         recipient: Accounts.WALLET_3.stxAddress,
-      }
+      },
     );
     await asyncExpectStacksTransactionSuccess(orchestrator, response.txid);
 
@@ -221,7 +221,7 @@ describe("testing direct stacker as pool operator without auto-unlock under epoc
       network,
       Accounts.FAUCET.stxAddress,
       1_000_000_000_000_000 - faucetNonce * fee,
-      0
+      0,
     );
 
     // Verify that Faucet's STX are really unlocked by doing a transfer
@@ -230,7 +230,7 @@ describe("testing direct stacker as pool operator without auto-unlock under epoc
       {
         amount: 1_000_000_000_000_000 - faucetNonce * fee,
         recipient: Accounts.WALLET_3.stxAddress,
-      }
+      },
     );
     await asyncExpectStacksTransactionSuccess(orchestrator, response.txid);
   });
@@ -244,7 +244,7 @@ describe("testing direct stacker as pool operator without auto-unlock under epoc
       await waitForNextRewardPhase(
         network,
         orchestrator,
-        poxInfo.current_cycle.id + 1
+        poxInfo.current_cycle.id + 1,
       );
 
       poxInfo = await getPoxInfo(network);
