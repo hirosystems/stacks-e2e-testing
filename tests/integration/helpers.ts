@@ -38,8 +38,10 @@ export const DEFAULT_EPOCH_TIMELINE = {
   pox_2_activation: Constants.DEVNET_DEFAULT_POX_2_ACTIVATION,
   epoch_2_2: Constants.DEVNET_DEFAULT_EPOCH_2_2,
   epoch_2_3: Constants.DEVNET_DEFAULT_EPOCH_2_3,
+  pox_3_activation: Constants.DEVNET_DEFAULT_POX_3_ACTIVATION,
   epoch_2_4: Constants.DEVNET_DEFAULT_EPOCH_2_4,
   epoch_2_5: Constants.DEVNET_DEFAULT_EPOCH_2_5,
+  pox_4_activation: Constants.DEVNET_DEFAULT_POX_4_ACTIVATION,
   epoch_3_0: Constants.DEVNET_DEFAULT_EPOCH_3_0,
 };
 
@@ -88,6 +90,9 @@ function fillTimeline(timeline: EpochTimeline) {
       timeline.epoch_2_3 += POX_CYCLE_LENGTH;
     }
   }
+  if (timeline.pox_3_activation === undefined) {
+    timeline.pox_3_activation = timeline.epoch_2_3 + 1;
+  }
   if (timeline.epoch_2_4 === undefined) {
     timeline.epoch_2_4 = DEFAULT_EPOCH_TIMELINE.epoch_2_4;
     while (timeline.epoch_2_4 <= timeline.epoch_2_3) {
@@ -99,6 +104,9 @@ function fillTimeline(timeline: EpochTimeline) {
     while (timeline.epoch_2_5 <= timeline.epoch_2_4) {
       timeline.epoch_2_5 += POX_CYCLE_LENGTH;
     }
+  }
+  if (timeline.pox_4_activation === undefined) {
+    timeline.pox_4_activation = timeline.epoch_2_5 + 1;
   }
   if (timeline.epoch_3_0 === undefined) {
     timeline.epoch_3_0 = DEFAULT_EPOCH_TIMELINE.epoch_2_5;

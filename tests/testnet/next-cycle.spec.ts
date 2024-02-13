@@ -1,19 +1,17 @@
 import { StacksTestnet } from "@stacks/network";
+import { Accounts } from "../integration/constants";
 import { getChainInfo } from "../integration/helpers";
 import {
   broadcastStackExtend,
   broadcastStackIncrease,
 } from "../integration/pox/helpers-direct-stacking";
-import { Accounts } from "../integration/constants";
 import {
   broadcastDelegateSTX,
   broadcastDelegateStackExtend,
   broadcastDelegateStackIncrease,
   broadcastDelegateStackSTX,
-  broadcastRevokeDelegateStx,
-  broadcastStackAggregationCommitIndexed,
+  broadcastRevokeDelegateStx
 } from "../integration/pox/helpers-pooled-stacking";
-import { getPoxInfo } from "../integration/pox/helpers";
 
 describe("stack-increase", async () => {
   const fee = 1000;
