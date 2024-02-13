@@ -39,6 +39,8 @@ export const DEFAULT_EPOCH_TIMELINE = {
   epoch_2_2: Constants.DEVNET_DEFAULT_EPOCH_2_2,
   epoch_2_3: Constants.DEVNET_DEFAULT_EPOCH_2_3,
   epoch_2_4: Constants.DEVNET_DEFAULT_EPOCH_2_4,
+  epoch_2_5: Constants.DEVNET_DEFAULT_EPOCH_2_5,
+  epoch_3_0: Constants.DEVNET_DEFAULT_EPOCH_3_0,
 };
 
 export const FAST_FORWARD_TO_EPOCH_2_4 = {
@@ -92,6 +94,18 @@ function fillTimeline(timeline: EpochTimeline) {
       timeline.epoch_2_4 += POX_CYCLE_LENGTH;
     }
   }
+  if (timeline.epoch_2_5 === undefined) {
+    timeline.epoch_2_5 = DEFAULT_EPOCH_TIMELINE.epoch_2_5;
+    while (timeline.epoch_2_5 <= timeline.epoch_2_4) {
+      timeline.epoch_2_5 += POX_CYCLE_LENGTH;
+    }
+  }
+  if (timeline.epoch_3_0 === undefined) {
+    timeline.epoch_3_0 = DEFAULT_EPOCH_TIMELINE.epoch_2_5;
+    while (timeline.epoch_3_0 <= timeline.epoch_2_5) {
+      timeline.epoch_3_0 += POX_CYCLE_LENGTH;
+    }
+  }
   return timeline;
 }
 
@@ -122,6 +136,8 @@ export function buildDevnetNetworkOrchestrator(
       epoch_2_2: full_timeline.epoch_2_2,
       epoch_2_3: full_timeline.epoch_2_3,
       epoch_2_4: full_timeline.epoch_2_4,
+      epoch_2_5: full_timeline.epoch_2_5,
+      epoch_3_0: full_timeline.epoch_3_0,
       bitcoin_controller_automining_disabled: false,
       working_dir,
       use_docker_gateway_routing: process.env.GITHUB_ACTIONS ? true : false,
