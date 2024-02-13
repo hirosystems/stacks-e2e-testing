@@ -6,6 +6,11 @@ export namespace Constants {
   export const DEVNET_DEFAULT_EPOCH_2_2 = 122;
   export const DEVNET_DEFAULT_EPOCH_2_3 = 128;
   export const DEVNET_DEFAULT_EPOCH_2_4 = 134;
+  export const DEVNET_DEFAULT_POX_3_ACTIVATION = 136;
+  export const DEVNET_DEFAULT_EPOCH_2_5 = 140;
+  export const DEVNET_DEFAULT_POX_4_ACTIVATION = 142;
+  export const DEVNET_DEFAULT_EPOCH_3_0 = 144;
+
   export const BITCOIN_BLOCK_TIME = 10_000;
 }
 

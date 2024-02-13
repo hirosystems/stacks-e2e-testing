@@ -32,7 +32,7 @@ import {
 import { expect } from "vitest";
 import { Contracts } from "../constants";
 import { BroadcastOptions } from "../helpers";
-const fetch = require("node-fetch");
+import fetch from "node-fetch";
 
 export interface Account {
   stxAddress: string;

@@ -13,11 +13,8 @@ import {
 } from "@stacks/transactions";
 import { Contracts } from "../constants";
 
-import { toBytes } from "@stacks/common";
 import { decodeBtcAddress } from "@stacks/stacking";
 import { Account, BroadcastOptionsPox } from "./helpers";
-import { BroadcastOptions } from "../helpers";
-const fetch = require("node-fetch");
 
 export const broadcastDelegateSTX = async (
   { poxVersion, network, account, fee, nonce }: BroadcastOptionsPox,
@@ -37,7 +34,7 @@ export const broadcastDelegateSTX = async (
   if (poolRewardAccount) {
     const { version, data } = decodeBtcAddress(poolRewardAccount.btcAddress);
     const poxAddress = {
-      version: bufferCV(toBytes(new Uint8Array([version.valueOf()]))),
+      version: bufferCV(new Uint8Array([version.valueOf()])),
       hashbytes: bufferCV(data),
     };
     poxAddressCV = someCV(tupleCV(poxAddress));
@@ -117,7 +114,7 @@ export const broadcastDelegateStackSTX = async (
 ): Promise<TxBroadcastResult> => {
   const { version, data } = decodeBtcAddress(poolRewardAccount.btcAddress);
   const poxAddress = {
-    version: bufferCV(toBytes(new Uint8Array([version.valueOf()]))),
+    version: bufferCV(new Uint8Array([version.valueOf()])),
     hashbytes: bufferCV(data),
   };
   let poxContract = Contracts.POX[poxVersion] || Contracts.DEFAULT;
@@ -156,7 +153,7 @@ export const broadcastDelegateStackExtend = async (
 ): Promise<TxBroadcastResult> => {
   const { version, data } = decodeBtcAddress(poolRewardAccount.btcAddress);
   const poxAddress = {
-    version: bufferCV(toBytes(new Uint8Array([version.valueOf()]))),
+    version: bufferCV(new Uint8Array([version.valueOf()])),
     hashbytes: bufferCV(data),
   };
   let poxContract = Contracts.POX[poxVersion] || Contracts.DEFAULT;
@@ -197,7 +194,7 @@ export const broadcastDelegateStackIncrease = async (
 ): Promise<TxBroadcastResult> => {
   const { version, data } = decodeBtcAddress(poolRewardAccount.btcAddress);
   const poxAddress = {
-    version: bufferCV(toBytes(new Uint8Array([version.valueOf()]))),
+    version: bufferCV(new Uint8Array([version.valueOf()])),
     hashbytes: bufferCV(data),
   };
   let poxContract = Contracts.POX[poxVersion] || Contracts.DEFAULT;
@@ -245,7 +242,7 @@ export const broadcastStackAggregationCommitIndexed = async (
 ): Promise<TxBroadcastResult> => {
   const { version, data } = decodeBtcAddress(poolRewardAccount.btcAddress);
   const poxAddress = {
-    version: bufferCV(toBytes(new Uint8Array([version.valueOf()]))),
+    version: bufferCV(new Uint8Array([version.valueOf()])),
     hashbytes: bufferCV(data),
   };
   let poxContract = Contracts.POX[poxVersion] || Contracts.DEFAULT;
@@ -282,7 +279,7 @@ export const broadcastStackAggregationIncrease = async (
   let poxContract = Contracts.POX[poxVersion] || Contracts.DEFAULT;
   const { version, data } = decodeBtcAddress(poolRewardAccount.btcAddress);
   const poxAddress = {
-    version: bufferCV(toBytes(new Uint8Array([version.valueOf()]))),
+    version: bufferCV(new Uint8Array([version.valueOf()])),
     hashbytes: bufferCV(data),
   };
 

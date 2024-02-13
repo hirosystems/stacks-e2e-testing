@@ -10,10 +10,8 @@ import {
 } from "@stacks/transactions";
 import { Contracts } from "../constants";
 
-import { toBytes } from "@stacks/common";
 import { decodeBtcAddress } from "@stacks/stacking";
 import { BroadcastOptionsPox } from "./helpers";
-const fetch = require("node-fetch");
 
 export const broadcastStackSTX = async (
   { poxVersion, network, account, fee, nonce }: BroadcastOptionsPox,
@@ -25,7 +23,7 @@ export const broadcastStackSTX = async (
 ): Promise<TxBroadcastResult> => {
   const { version, data } = decodeBtcAddress(account.btcAddress);
   const address = {
-    version: bufferCV(toBytes(new Uint8Array([version.valueOf()]))),
+    version: bufferCV(new Uint8Array([version.valueOf()])),
     hashbytes: bufferCV(data),
   };
 
@@ -82,7 +80,7 @@ export const broadcastStackExtend = async (
 ): Promise<TxBroadcastResult> => {
   const { version, data } = decodeBtcAddress(account.btcAddress);
   const address = {
-    version: bufferCV(toBytes(new Uint8Array([version.valueOf()]))),
+    version: bufferCV(new Uint8Array([version.valueOf()])),
     hashbytes: bufferCV(data),
   };
 

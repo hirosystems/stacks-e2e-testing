@@ -15,7 +15,7 @@ import {
   makeContractDeploy,
   makeSTXTokenTransfer,
 } from "@stacks/transactions";
-const fetch = require("node-fetch");
+import fetch from "node-fetch";
 
 interface EpochTimeline {
   epoch_2_0?: number;
@@ -24,7 +24,11 @@ interface EpochTimeline {
   pox_2_activation?: number;
   epoch_2_2?: number;
   epoch_2_3?: number;
+  pox_3_activation?: number;
   epoch_2_4?: number;
+  epoch_2_5?: number;
+  pox_4_activation?: number;
+  epoch_3_0?: number;
 }
 
 export const DEFAULT_EPOCH_TIMELINE = {

@@ -27,51 +27,6 @@ When running multiple tests, you'll want to limit it to one test at a time becau
 yarn vitest --run tests/integration/pox/stacking/ --threads false
 ```
 
-#### Using 2.4 `stacks-node`
-
-To run tests using the 2.2 node (the tests in the _pox-disabled/_ directory), you'll need to use a currently unpublished version of the `stacks-devnet-js` package which has support for the new settings. To build this locally:
-
-```
-git clone https://github.com/hirosystems/clarinet.git
-cd clarinet
-git checkout feat/devnet-epoch-2.2
-cd components/stacks-devnet-js
-npm install
-```
-
-Then you'll want to run one of the following commands, depending on your platform:
-
-```
-npm run build-linux-x64-glibc
-npm run build-linux-x64-musl
-npm run build-windows-x64
-npm run build-darwin-x64   # Mac with Intel
-npm run build-darwin-arm64 # Mac with Apple Silicon
-```
-
-Finally, you'll use `npm link` to utilize this version in this testing repo. First, in the `stacks-devnet-js` directory, run:
-
-```
-npm link
-```
-
-This will create a symbolic link from the local package directory to the global node_modules directory.
-
-Then back in this testing directory, run:
-
-```
-npm link @hirosystems/stacks-devnet-js
-```
-
-Now, you can run the tests expecting this 2.2 node, i.e. those in the _pox-disabled/_ directory.
-
-To switch back to the default version, run:
-
-```
-npm unlink @hirosystems/stacks-devnet-js --no-save
-yarn install
-```
-
 #### 2.4 `stacks-node` Image
 
 To run with the latest node, you'll need to specify the docker image URL to use via an environment variable:
