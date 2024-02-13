@@ -81,7 +81,10 @@ export const getPoxInfo = async (
   if (retryCountdown == 0) return Promise.reject();
   try {
     let response = await fetch(network.getPoxInfoUrl(), {});
-    let poxInfo = await response.json();
+    let poxInfo = await response.json() as PoxInfo & {
+      total_liquid_supply_ustx: number;
+      pox_activation_threshold_ustx: number;
+    }
     return poxInfo;
   } catch (e) {
     await delay();

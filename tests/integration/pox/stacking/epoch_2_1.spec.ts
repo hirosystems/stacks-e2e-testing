@@ -68,6 +68,5 @@ describe("testing stacking under epoch 2.1", () => {
     // Assert
     expect(poxInfo.contract_id).toBe("ST000000000000000000002AMW42H.pox-2");
     expect(poxInfo.current_cycle.is_pox_active).toBe(true);
-    expect(poxInfo.total);
   });
 });
