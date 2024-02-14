@@ -57,4 +57,5 @@ export CUSTOM_STACKS_NODE="stacksbrice/stacks-node:devnet-2.4.0.0.0"
 If this environment variable is not defined, `stacks-devnet-js` will default to an older version of the `stacks-node`.
 
 ## Logging
+
 The devnet orchestrator outputs logging details to folder `/tmp/stacks-node-...`
