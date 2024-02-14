@@ -29,10 +29,9 @@ import {
   uintCV,
 } from "@stacks/transactions";
 
-import { expect } from "vitest";
 import { Contracts } from "../constants";
 import { BroadcastOptions } from "../helpers";
-import fetch from "node-fetch";
+const fetch = require("node-fetch");
 
 export interface Account {
   stxAddress: string;
@@ -81,10 +80,10 @@ export const getPoxInfo = async (
   if (retryCountdown == 0) return Promise.reject();
   try {
     let response = await fetch(network.getPoxInfoUrl(), {});
-    let poxInfo = await response.json() as PoxInfo & {
+    let poxInfo = (await response.json()) as PoxInfo & {
       total_liquid_supply_ustx: number;
       pox_activation_threshold_ustx: number;
-    }
+    };
     return poxInfo;
   } catch (e) {
     await delay();
@@ -101,6 +100,12 @@ export const getAccount = async (
   if (retryCountdown == 0) return Promise.reject();
   try {
     let response = await fetch(network.getAccountApiUrl(address), {});
+    if (response.status === 404) {
+      return Promise.reject(
+        `account api url not found on ${network.getAccountApiUrl(address)}`,
+      );
+    }
+    expect(response.status).toBe(200);
     let payload: any = await response.json();
     return {
       balance: BigInt(payload.balance),

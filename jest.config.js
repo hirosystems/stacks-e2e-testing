@@ -1,5 +1,5 @@
 /** @type {import('ts-jest/dist/types').InitialOptionsTsJest} */
-module.exports = {
+const config = {
   preset: "ts-jest",
   testEnvironment: "node",
   testTimeout: 300_000,
@@ -7,3 +7,5 @@ module.exports = {
   reporters: ["default", "jest-github-actions-reporter"],
   testLocationInResults: true,
 };
+
+export default config;

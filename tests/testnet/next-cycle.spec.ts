@@ -10,7 +10,7 @@ import {
   broadcastDelegateStackExtend,
   broadcastDelegateStackIncrease,
   broadcastDelegateStackSTX,
-  broadcastRevokeDelegateStx
+  broadcastRevokeDelegateStx,
 } from "../integration/pox/helpers-pooled-stacking";
 
 describe("stack-increase", async () => {

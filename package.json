@@ -23,7 +23,7 @@
     "@stacks/transactions": "^6.11.3",
     "@types/node": "^20.11.17",
     "micro-btc-signer": "^0.4.2",
-    "node-fetch": "^3.3.2",
+    "node-fetch": "2.6.7",
     "typescript": "^5.3.3"
   },
   "author": "",
