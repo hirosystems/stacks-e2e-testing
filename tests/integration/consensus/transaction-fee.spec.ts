@@ -62,39 +62,39 @@ describe("transaction-fee", () => {
 
     // Wait for Stacks 2.1 to start
     await orchestrator.waitForStacksBlockAnchoredOnBitcoinBlockOfHeight(
-      Constants.DEVNET_DEFAULT_EPOCH_2_1
+      Constants.DEVNET_DEFAULT_EPOCH_2_1,
     );
 
     let deploy = deployContract(orchestrator, network);
     let tx_foo = await deploy("foo", CONTRACT_TRAIT, 0);
 
     expect(tx_foo.description).toBe(
-      `deployed: ${Accounts.DEPLOYER.stxAddress}.foo`
+      `deployed: ${Accounts.DEPLOYER.stxAddress}.foo`,
     );
     expect(tx_foo.success).toBeTruthy();
 
     let tx_foo_impl = await deploy("foo-impl", CONTRACT_IMPL_TRAIT, 1);
 
     expect(tx_foo_impl.description).toBe(
-      `deployed: ${Accounts.DEPLOYER.stxAddress}.foo-impl`
+      `deployed: ${Accounts.DEPLOYER.stxAddress}.foo-impl`,
     );
     expect(tx_foo_impl.success).toBeTruthy();
 
     let tx_foo_test = await deploy("foo-test", CONTRACT_TRIGGER_CHECKERROR, 2);
 
     expect(tx_foo_test.description).toBe(
-      `deployed: ${Accounts.DEPLOYER.stxAddress}.foo-test`
+      `deployed: ${Accounts.DEPLOYER.stxAddress}.foo-test`,
     );
     expect(tx_foo_test.success).toBeTruthy();
 
     let { balance: balanceBeforeFunctionCall } = await getAccount(
       network,
-      Accounts.DEPLOYER.stxAddress
+      Accounts.DEPLOYER.stxAddress,
     );
 
     let contractPrincipalArg = contractPrincipalCV(
       Accounts.DEPLOYER.stxAddress,
-      "foo-impl"
+      "foo-impl",
     );
 
     let call = callFunction(orchestrator, network);
@@ -105,7 +105,7 @@ describe("transaction-fee", () => {
       "foo-test",
       "test",
       [contractPrincipalArg],
-      4
+      4,
     );
 
     expect(tx_function_call_1.success).toBeTruthy();
@@ -118,20 +118,20 @@ describe("transaction-fee", () => {
       network,
       Accounts.DEPLOYER.stxAddress,
       expectedBalanceAfterFunctionCall,
-      0
+      0,
     );
   });
 });
 
 function callFunction(
   orchestrator: DevnetNetworkOrchestrator,
-  network: StacksNetwork
+  network: StacksNetwork,
 ) {
   return async (
     contractName: string,
     functionName: string,
     functionArgs: ClarityValue[],
-    nonce: number
+    nonce: number,
   ) => {
     let deployTxOptions = {
       senderKey: Accounts.DEPLOYER.secretKey,
@@ -155,7 +155,7 @@ function callFunction(
     // Wait for the transaction to be processed
     let [_, transaction] = await waitForStacksTransaction(
       orchestrator,
-      tx.txid()
+      tx.txid(),
     );
     return transaction;
   };
@@ -163,7 +163,7 @@ function callFunction(
 
 function deployContract(
   orchestrator: DevnetNetworkOrchestrator,
-  network: StacksNetwork
+  network: StacksNetwork,
 ) {
   return async (contractName: string, codeBody: string, nonce: number) => {
     let deployTxOptions = {
@@ -187,7 +187,7 @@ function deployContract(
     // Wait for the transaction to be processed
     let [_, transaction] = await waitForStacksTransaction(
       orchestrator,
-      tx.txid()
+      tx.txid(),
     );
     return transaction;
   };

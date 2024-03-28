@@ -56,7 +56,7 @@ describe("testing stacker who is a bad pool operator under epoch 2.1", () => {
         fee,
         nonce: aliceNonce++,
       },
-      { amount: 90_000_000_000_000, blockHeight, cycles }
+      { amount: 90_000_000_000_000, blockHeight, cycles },
     );
     expect(response.error).toBeUndefined();
 
@@ -69,12 +69,12 @@ describe("testing stacker who is a bad pool operator under epoch 2.1", () => {
         fee,
         nonce: bobNonce++,
       },
-      { amount: 80000000000000, poolAddress: Accounts.WALLET_1 }
+      { amount: 80000000000000, poolAddress: Accounts.WALLET_1 },
     );
     expect(response.error).toBeUndefined();
     let [block, tx] = await waitForStacksTransaction(
       orchestrator,
-      response.txid
+      response.txid,
     );
     expect(tx.success).toBeTruthy();
 
@@ -91,7 +91,7 @@ describe("testing stacker who is a bad pool operator under epoch 2.1", () => {
         stacker: Accounts.WALLET_2,
         poolRewardAccount: Accounts.WALLET_1,
         increaseByAmountUstx: 80000000000000,
-      }
+      },
     );
     expect(response.error).toBeUndefined();
     [block, tx] = await waitForStacksTransaction(orchestrator, response.txid);
@@ -113,7 +113,7 @@ describe("testing stacker who is a bad pool operator under epoch 2.1", () => {
 
     // Wait for 2.2 activation and unlock
     await orchestrator.waitForStacksBlockAnchoredOnBitcoinBlockOfHeight(
-      Constants.DEVNET_DEFAULT_EPOCH_2_2 + 2
+      Constants.DEVNET_DEFAULT_EPOCH_2_2 + 2,
     );
 
     // Check Alice's account info
@@ -121,7 +121,7 @@ describe("testing stacker who is a bad pool operator under epoch 2.1", () => {
       network,
       Accounts.WALLET_1.stxAddress,
       100_000_000_000_000 - aliceNonce * fee,
-      0
+      0,
     );
 
     // Verify that Alice's STX are really unlocked by doing a transfer
@@ -130,7 +130,7 @@ describe("testing stacker who is a bad pool operator under epoch 2.1", () => {
       {
         amount: 100_000_000_000_000 - aliceNonce * fee,
         recipient: Accounts.WALLET_3.stxAddress,
-      }
+      },
     );
     await asyncExpectStacksTransactionSuccess(orchestrator, response.txid);
 
@@ -139,7 +139,7 @@ describe("testing stacker who is a bad pool operator under epoch 2.1", () => {
       network,
       Accounts.WALLET_2.stxAddress,
       100_000_000_000_000 - bobNonce * fee,
-      0
+      0,
     );
 
     // Verify that Bob's STX are really unlocked by doing a transfer
@@ -148,7 +148,7 @@ describe("testing stacker who is a bad pool operator under epoch 2.1", () => {
       {
         amount: 100_000_000_000_000 - bobNonce * fee,
         recipient: Accounts.WALLET_3.stxAddress,
-      }
+      },
     );
     await asyncExpectStacksTransactionSuccess(orchestrator, response.txid);
   });
@@ -163,7 +163,7 @@ describe("testing stacker who is a bad pool operator under epoch 2.1", () => {
       await waitForNextRewardPhase(
         network,
         orchestrator,
-        poxInfo.current_cycle.id + 1
+        poxInfo.current_cycle.id + 1,
       );
 
       poxInfo = await getPoxInfo(network);

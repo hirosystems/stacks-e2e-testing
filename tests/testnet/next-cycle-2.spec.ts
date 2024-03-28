@@ -34,7 +34,7 @@ describe("stack-increase", async () => {
         stacker: Accounts.DEPLOYER,
         poolRewardAccount: Accounts.FAUCET,
         increaseByAmountUstx: 100_000_000_000_000,
-      }
+      },
     );
     console.log("Faucet increases deployer's stack: ", response);
     expect(response.error).toBeUndefined();
@@ -52,7 +52,7 @@ describe("stack-increase", async () => {
         stacker: Accounts.DEPLOYER,
         poolRewardAccount: Accounts.FAUCET,
         extendByCount: 6,
-      }
+      },
     );
     console.log("Faucet extends deployer's stack: ", response);
     expect(response.error).toBeUndefined();

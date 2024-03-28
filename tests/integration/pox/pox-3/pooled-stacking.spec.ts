@@ -43,7 +43,7 @@ describe("testing pooled stacking under epoch 2.4", () => {
   beforeAll(() => {
     orchestrator = buildDevnetNetworkOrchestrator(
       getNetworkIdFromEnv(),
-      timeline
+      timeline,
     );
     orchestrator.start();
   });
@@ -57,7 +57,7 @@ describe("testing pooled stacking under epoch 2.4", () => {
 
     // Wait for 2.4 to go live
     await orchestrator.waitForStacksBlockAnchoredOnBitcoinBlockOfHeight(
-      timeline.epoch_2_4
+      timeline.epoch_2_4,
     );
     await orchestrator.waitForNextStacksBlock();
 
@@ -70,7 +70,7 @@ describe("testing pooled stacking under epoch 2.4", () => {
         fee,
         nonce: aliceNonce++,
       },
-      { amount: 90_000_000_000_000, poolAddress: Accounts.WALLET_3 }
+      { amount: 90_000_000_000_000, poolAddress: Accounts.WALLET_3 },
     );
     expect(response.error).toBeUndefined();
 
@@ -83,7 +83,7 @@ describe("testing pooled stacking under epoch 2.4", () => {
         fee,
         nonce: bobNonce++,
       },
-      { amount: 50_000_000_000_000, poolAddress: Accounts.WALLET_3 }
+      { amount: 50_000_000_000_000, poolAddress: Accounts.WALLET_3 },
     );
     expect(response.error).toBeUndefined();
 
@@ -102,13 +102,13 @@ describe("testing pooled stacking under epoch 2.4", () => {
         poolRewardAccount: Accounts.WALLET_3,
         startBurnHeight: Constants.DEVNET_DEFAULT_POX_2_ACTIVATION + 6,
         lockPeriodCycles: 1,
-      }
+      },
     );
     expect(response.error).toBeUndefined();
 
     let [block, tx] = await waitForStacksTransaction(
       orchestrator,
-      response.txid
+      response.txid,
     );
     expect(tx.success).toBeTruthy();
 
@@ -121,7 +121,7 @@ describe("testing pooled stacking under epoch 2.4", () => {
         fee,
         nonce: chloeNonce++,
       },
-      { poolRewardAccount: Accounts.WALLET_3, cycleId: 2 }
+      { poolRewardAccount: Accounts.WALLET_3, cycleId: 2 },
     );
     expect(response.error).toBeUndefined();
 
@@ -138,7 +138,7 @@ describe("testing pooled stacking under epoch 2.4", () => {
       network,
       3,
       2,
-      Accounts.WALLET_1.stxAddress
+      Accounts.WALLET_1.stxAddress,
     );
     expect(poxAddrInfo0).toBeNull();
 
@@ -147,7 +147,7 @@ describe("testing pooled stacking under epoch 2.4", () => {
       network,
       3,
       2,
-      0
+      0,
     );
     expect(poxAddrInfo1?.["total-ustx"]).toEqual(uintCV(80_000_000_000_000));
   });
@@ -170,7 +170,7 @@ describe("testing pooled stacking under epoch 2.4", () => {
         poolRewardAccount: Accounts.WALLET_3,
         startBurnHeight: Constants.DEVNET_DEFAULT_POX_2_ACTIVATION + 6,
         lockPeriodCycles: 1,
-      }
+      },
     );
     expect(response.error).toBeUndefined();
 
@@ -187,12 +187,12 @@ describe("testing pooled stacking under epoch 2.4", () => {
         poolRewardAccount: Accounts.WALLET_3,
         cycleId: 2,
         rewardIndex: 0, // reward index 0 because we are the only stackers
-      }
+      },
     );
     expect(response.error).toBeUndefined();
     let [block, tx] = await waitForStacksTransaction(
       orchestrator,
-      response.txid
+      response.txid,
     );
     expect(tx.success).toBeTruthy();
 
@@ -210,7 +210,7 @@ describe("testing pooled stacking under epoch 2.4", () => {
       network,
       3,
       2,
-      0
+      0,
     );
 
     expect(poxAddrInfo0?.["total-ustx"]).toEqual(uintCV(130_000_000_000_000));
@@ -237,7 +237,7 @@ describe("testing pooled stacking under epoch 2.4", () => {
 
     let [block, tx] = await waitForStacksTransaction(
       orchestrator,
-      response.txid
+      response.txid,
     );
     expect(tx.result).toBe("(ok true)");
 
@@ -246,7 +246,7 @@ describe("testing pooled stacking under epoch 2.4", () => {
       network,
       Accounts.WALLET_2.stxAddress,
       100_000_000_000_000 - 50_000_000_000_000 - bobNonce * fee,
-      50_000_000_000_000
+      50_000_000_000_000,
     );
   });
 
@@ -268,13 +268,13 @@ describe("testing pooled stacking under epoch 2.4", () => {
         poolRewardAccount: Accounts.WALLET_3,
         startBurnHeight: Constants.DEVNET_DEFAULT_POX_2_ACTIVATION + 16,
         lockPeriodCycles: 1,
-      }
+      },
     );
     expect(response.error).toBeUndefined();
 
     let [block, tx] = await waitForStacksTransaction(
       orchestrator,
-      response.txid
+      response.txid,
     );
     expect(tx.result).toBe("(err 3)"); // ERR_STACKING_ALREADY_STACKED
     expect(tx.success).toBeFalsy();
@@ -297,13 +297,13 @@ describe("testing pooled stacking under epoch 2.4", () => {
         stacker: Accounts.WALLET_1,
         poolRewardAccount: Accounts.WALLET_3,
         extendByCount: 1,
-      }
+      },
     );
     expect(response.error).toBeUndefined();
 
     let [block, tx] = await waitForStacksTransaction(
       orchestrator,
-      response.txid
+      response.txid,
     );
     expect(tx.success).toBeTruthy();
     let poxInfo = await getPoxInfo(network);
@@ -321,7 +321,7 @@ describe("testing pooled stacking under epoch 2.4", () => {
       network,
       3,
       3,
-      0
+      0,
     );
 
     expect(poxAddrInfo0).toBeNull();
@@ -343,7 +343,7 @@ describe("testing pooled stacking under epoch 2.4", () => {
         stacker: Accounts.WALLET_1,
         poolRewardAccount: Accounts.WALLET_3,
         increaseByAmountUstx: 10000000000000,
-      }
+      },
     );
     expect(response.error).toBeUndefined();
 
@@ -356,13 +356,13 @@ describe("testing pooled stacking under epoch 2.4", () => {
         fee,
         nonce: chloeNonce++,
       },
-      { poolRewardAccount: Accounts.WALLET_3, cycleId: 3 }
+      { poolRewardAccount: Accounts.WALLET_3, cycleId: 3 },
     );
     expect(response.error).toBeUndefined();
 
     let [block, tx] = await waitForStacksTransaction(
       orchestrator,
-      response.txid
+      response.txid,
     );
     expect(tx.result).toBe("(ok u0)");
     expect(tx.success).toBeTruthy();
@@ -383,7 +383,7 @@ describe("testing pooled stacking under epoch 2.4", () => {
       network,
       3,
       3,
-      0
+      0,
     );
 
     expect(poxAddrInfo0?.["total-ustx"]).toEqual(uintCV(90_000_000_000_000));
@@ -420,7 +420,7 @@ describe("testing pooled stacking under epoch 2.4", () => {
     const stackerInfo = await callReadOnlystackerInfo(
       network,
       3,
-      Accounts.WALLET_1
+      Accounts.WALLET_1,
     );
     expect(cvToString(stackerInfo)).toBe(cvToString(noneCV()));
 
@@ -437,12 +437,12 @@ describe("testing pooled stacking under epoch 2.4", () => {
         stacker: Accounts.WALLET_1,
         poolRewardAccount: Accounts.WALLET_3,
         extendByCount: 1,
-      }
+      },
     );
     expect(response.error).toBeUndefined();
     let [block, tx] = await waitForStacksTransaction(
       orchestrator,
-      response.txid
+      response.txid,
     );
     expect(tx.success).toBeFalsy();
     expect(tx.result).toBe("(err 26)"); // ERR_STACK_EXTEND_NOT_LOCKED
@@ -456,7 +456,7 @@ describe("testing pooled stacking under epoch 2.4", () => {
         fee,
         nonce: chloeNonce++,
       },
-      { poolRewardAccount: Accounts.WALLET_3, cycleId: 5 }
+      { poolRewardAccount: Accounts.WALLET_3, cycleId: 5 },
     );
     expect(response.error).toBeUndefined();
     [block, tx] = await waitForStacksTransaction(orchestrator, response.txid);

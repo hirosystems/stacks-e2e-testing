@@ -36,7 +36,7 @@ describe("use and define trait with same name", () => {
     console.log(`network #${networkId}`);
     orchestrator = buildDevnetNetworkOrchestrator(
       getNetworkIdFromEnv(),
-      timeline
+      timeline,
     );
     orchestrator.start();
     network = new StacksTestnet({ url: orchestrator.getStacksNodeUrl() });
@@ -109,7 +109,7 @@ describe("use and define trait with same name", () => {
       await orchestrator.waitForStacksBlockIncludingTransaction(tx.txid());
     let metadata = <StacksTransactionMetadata>transaction.metadata;
     expect(metadata.description).toBe(
-      `deployed: ${Accounts.DEPLOYER.stxAddress}.use-original-and-define-a-trait`
+      `deployed: ${Accounts.DEPLOYER.stxAddress}.use-original-and-define-a-trait`,
     );
     expect(metadata.success).toBeFalsy();
 
@@ -121,7 +121,7 @@ describe("use and define trait with same name", () => {
     beforeAll(async () => {
       // Wait for 2.1 to go live
       await orchestrator.waitForStacksBlockAnchoredOnBitcoinBlockOfHeight(
-        timeline.epoch_2_1 + 1
+        timeline.epoch_2_1 + 1,
       );
     });
 
@@ -154,7 +154,7 @@ describe("use and define trait with same name", () => {
         await orchestrator.waitForStacksBlockIncludingTransaction(tx.txid());
       let metadata = <StacksTransactionMetadata>transaction.metadata;
       expect(metadata.description).toBe(
-        `deployed: ${Accounts.DEPLOYER.stxAddress}.use-original-and-define-a-trait-c1`
+        `deployed: ${Accounts.DEPLOYER.stxAddress}.use-original-and-define-a-trait-c1`,
       );
       expect(metadata.success).toBeFalsy();
     });
@@ -188,7 +188,7 @@ describe("use and define trait with same name", () => {
           await orchestrator.waitForStacksBlockIncludingTransaction(tx.txid());
         let metadata = <StacksTransactionMetadata>transaction.metadata;
         expect(metadata.description).toBe(
-          `deployed: ${Accounts.DEPLOYER.stxAddress}.use-original-and-define-a-trait-c2`
+          `deployed: ${Accounts.DEPLOYER.stxAddress}.use-original-and-define-a-trait-c2`,
         );
         expect(metadata.success).toBeTruthy();
       });
@@ -243,7 +243,7 @@ describe("use and define trait with same name", () => {
           await orchestrator.waitForStacksBlockIncludingTransaction(tx.txid());
         let metadata = <StacksTransactionMetadata>transaction.metadata;
         expect(metadata.description).toBe(
-          `deployed: ${Accounts.WALLET_1.stxAddress}.use-original-and-define-a-trait`
+          `deployed: ${Accounts.WALLET_1.stxAddress}.use-original-and-define-a-trait`,
         );
         expect(metadata.success).toBeTruthy();
       });

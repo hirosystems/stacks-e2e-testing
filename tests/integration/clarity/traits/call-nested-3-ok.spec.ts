@@ -42,21 +42,21 @@ describe("call functions with nested traits", () => {
       "empty-trait",
       1,
       network,
-      orchestrator
+      orchestrator,
     );
     await load_versioned(
       Accounts.DEPLOYER,
       "math-trait",
       2,
       network,
-      orchestrator
+      orchestrator,
     );
     await load_versioned(
       Accounts.DEPLOYER,
       "nested-trait-3",
       3,
       network,
-      orchestrator
+      orchestrator,
     );
     let res = await contract_call(
       Accounts.WALLET_1,
@@ -65,12 +65,12 @@ describe("call functions with nested traits", () => {
       "foo",
       [
         responseOkCV(
-          contractPrincipalCV(Accounts.DEPLOYER.stxAddress, "empty")
+          contractPrincipalCV(Accounts.DEPLOYER.stxAddress, "empty"),
         ),
       ],
       0,
       network,
-      orchestrator
+      orchestrator,
     );
     expect(res.ok).toBeFalsy();
 
@@ -83,7 +83,7 @@ describe("call functions with nested traits", () => {
     beforeAll(async () => {
       // Wait for 2.1 to go live
       await orchestrator.waitForStacksBlockAnchoredOnBitcoinBlockOfHeight(
-        STACKS_2_1_EPOCH + 1
+        STACKS_2_1_EPOCH + 1,
       );
     });
 
@@ -93,7 +93,7 @@ describe("call functions with nested traits", () => {
         "empty",
         0, // Reuse nonce 0 since previous tx was rejected
         network,
-        orchestrator
+        orchestrator,
       );
       await load_versioned(
         Accounts.WALLET_1,
@@ -101,7 +101,7 @@ describe("call functions with nested traits", () => {
         1,
         network,
         orchestrator,
-        1
+        1,
       );
       await load_versioned(
         Accounts.WALLET_1,
@@ -109,7 +109,7 @@ describe("call functions with nested traits", () => {
         2,
         network,
         orchestrator,
-        1
+        1,
       );
       await load_versioned(
         Accounts.WALLET_1,
@@ -117,7 +117,7 @@ describe("call functions with nested traits", () => {
         3,
         network,
         orchestrator,
-        1
+        1,
       );
       let res = await contract_call(
         Accounts.WALLET_2,
@@ -126,12 +126,12 @@ describe("call functions with nested traits", () => {
         "foo",
         [
           responseOkCV(
-            contractPrincipalCV(Accounts.WALLET_1.stxAddress, "empty")
+            contractPrincipalCV(Accounts.WALLET_1.stxAddress, "empty"),
           ),
         ],
         0,
         network,
-        orchestrator
+        orchestrator,
       );
       expect(res.ok).toBeFalsy();
     });
@@ -142,7 +142,7 @@ describe("call functions with nested traits", () => {
         "empty",
         0, // Reuse nonce 0 since previous tx was rejected
         network,
-        orchestrator
+        orchestrator,
       );
       await load_versioned(
         Accounts.WALLET_2,
@@ -150,7 +150,7 @@ describe("call functions with nested traits", () => {
         1,
         network,
         orchestrator,
-        2
+        2,
       );
       await load_versioned(
         Accounts.WALLET_2,
@@ -158,7 +158,7 @@ describe("call functions with nested traits", () => {
         2,
         network,
         orchestrator,
-        2
+        2,
       );
       await load_versioned(
         Accounts.WALLET_2,
@@ -166,7 +166,7 @@ describe("call functions with nested traits", () => {
         3,
         network,
         orchestrator,
-        2
+        2,
       );
       let res = await contract_call(
         Accounts.WALLET_3,
@@ -175,12 +175,12 @@ describe("call functions with nested traits", () => {
         "foo",
         [
           responseOkCV(
-            contractPrincipalCV(Accounts.WALLET_2.stxAddress, "empty")
+            contractPrincipalCV(Accounts.WALLET_2.stxAddress, "empty"),
           ),
         ],
         0,
         network,
-        orchestrator
+        orchestrator,
       );
       expect(res.ok).toBeTruthy();
     });

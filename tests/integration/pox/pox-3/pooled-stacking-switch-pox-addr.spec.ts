@@ -21,13 +21,13 @@ import {
   getPoxInfo,
   readRewardCyclePoxAddressForAddress,
   readRewardCyclePoxAddressListAtIndex,
-  waitForNextRewardPhase
+  waitForNextRewardPhase,
 } from "../helpers";
 import {
   broadcastDelegateSTX,
   broadcastDelegateStackExtend,
   broadcastDelegateStackSTX,
-  broadcastStackAggregationCommitIndexed
+  broadcastStackAggregationCommitIndexed,
 } from "../helpers-pooled-stacking";
 
 describe("testing pooled stacking for sbtc mini under epoch 2.4", () => {
@@ -41,7 +41,7 @@ describe("testing pooled stacking for sbtc mini under epoch 2.4", () => {
   beforeAll(() => {
     orchestrator = buildDevnetNetworkOrchestrator(
       getNetworkIdFromEnv(),
-      timeline
+      timeline,
     );
     orchestrator.start();
   });
@@ -55,7 +55,7 @@ describe("testing pooled stacking for sbtc mini under epoch 2.4", () => {
 
     // Wait for 2.4 to go live
     await orchestrator.waitForStacksBlockAnchoredOnBitcoinBlockOfHeight(
-      timeline.epoch_2_4
+      timeline.epoch_2_4,
     );
     await orchestrator.waitForNextStacksBlock();
 
@@ -68,7 +68,7 @@ describe("testing pooled stacking for sbtc mini under epoch 2.4", () => {
         fee,
         nonce: aliceNonce++,
       },
-      { amount: 95_000_000_000_000, poolAddress: Accounts.WALLET_3 }
+      { amount: 95_000_000_000_000, poolAddress: Accounts.WALLET_3 },
     );
     expect(response.error).toBeUndefined();
 
@@ -81,7 +81,7 @@ describe("testing pooled stacking for sbtc mini under epoch 2.4", () => {
         fee,
         nonce: bobNonce++,
       },
-      { amount: 10_000_000_000_000, poolAddress: Accounts.WALLET_3 }
+      { amount: 10_000_000_000_000, poolAddress: Accounts.WALLET_3 },
     );
     expect(response.error).toBeUndefined();
 
@@ -103,7 +103,7 @@ describe("testing pooled stacking for sbtc mini under epoch 2.4", () => {
         poolRewardAccount: Accounts.WALLET_3,
         startBurnHeight: blockHeight,
         lockPeriodCycles: 1,
-      }
+      },
     );
     expect(response.error).toBeUndefined();
 
@@ -116,7 +116,7 @@ describe("testing pooled stacking for sbtc mini under epoch 2.4", () => {
         fee,
         nonce: chloeNonce++,
       },
-      { poolRewardAccount: Accounts.WALLET_3, cycleId: 2 }
+      { poolRewardAccount: Accounts.WALLET_3, cycleId: 2 },
     );
     expect(response.error).toBeUndefined();
     await asyncExpectStacksTransactionSuccess(orchestrator, response.txid);
@@ -137,7 +137,7 @@ describe("testing pooled stacking for sbtc mini under epoch 2.4", () => {
         poolRewardAccount: Accounts.WALLET_2,
         startBurnHeight: blockHeight,
         lockPeriodCycles: 1,
-      }
+      },
     );
     expect(response.error).toBeUndefined();
 
@@ -152,7 +152,7 @@ describe("testing pooled stacking for sbtc mini under epoch 2.4", () => {
       network,
       3,
       2,
-      Accounts.WALLET_1.stxAddress
+      Accounts.WALLET_1.stxAddress,
     );
     expect(poxAddrInfo0).toBeNull();
 
@@ -161,7 +161,7 @@ describe("testing pooled stacking for sbtc mini under epoch 2.4", () => {
       network,
       3,
       2,
-      0
+      0,
     );
     expect(poxAddrInfo1?.["total-ustx"]).toEqual(uintCV(90_000_000_000_000));
   });
@@ -182,12 +182,12 @@ describe("testing pooled stacking for sbtc mini under epoch 2.4", () => {
         stacker: Accounts.WALLET_1,
         poolRewardAccount: Accounts.WALLET_2,
         extendByCount: 1,
-      }
+      },
     );
     expect(response.error).toBeUndefined();
     let [block, tx] = await waitForStacksTransaction(
       orchestrator,
-      response.txid
+      response.txid,
     );
     expect(tx.success).toBeTruthy();
     expect(tx.result).toBe(
@@ -196,9 +196,9 @@ describe("testing pooled stacking for sbtc mini under epoch 2.4", () => {
           tupleCV({
             stacker: principalCV(Accounts.WALLET_1.stxAddress),
             "unlock-burn-height": uintCV(140),
-          })
-        )
-      )
+          }),
+        ),
+      ),
     );
 
     // Chloe extends Bobs 10m by 1 cycle using wallet_2.btcAddress
@@ -214,7 +214,7 @@ describe("testing pooled stacking for sbtc mini under epoch 2.4", () => {
         stacker: Accounts.WALLET_2,
         poolRewardAccount: Accounts.WALLET_2,
         extendByCount: 1,
-      }
+      },
     );
     expect(response.error).toBeUndefined();
     [block, tx] = await waitForStacksTransaction(orchestrator, response.txid);
@@ -225,9 +225,9 @@ describe("testing pooled stacking for sbtc mini under epoch 2.4", () => {
           tupleCV({
             stacker: principalCV(Accounts.WALLET_2.stxAddress),
             "unlock-burn-height": uintCV(140),
-          })
-        )
-      )
+          }),
+        ),
+      ),
     );
 
     // Chloe commits 100m for cycle #3 using wallet_2.btcAddress
@@ -239,7 +239,7 @@ describe("testing pooled stacking for sbtc mini under epoch 2.4", () => {
         fee,
         nonce: chloeNonce++,
       },
-      { poolRewardAccount: Accounts.WALLET_2, cycleId: 3 }
+      { poolRewardAccount: Accounts.WALLET_2, cycleId: 3 },
     );
     expect(response.error).toBeUndefined();
     [block, tx] = await waitForStacksTransaction(orchestrator, response.txid);
@@ -260,7 +260,7 @@ describe("testing pooled stacking for sbtc mini under epoch 2.4", () => {
       network,
       3,
       2,
-      0
+      0,
     );
 
     expect(poxAddrInfo0?.["total-ustx"]).toEqual(uintCV(90_000_000_000_000));
@@ -290,7 +290,7 @@ describe("testing pooled stacking for sbtc mini under epoch 2.4", () => {
       network,
       3,
       3,
-      0
+      0,
     );
     expect(poxAddrInfo0?.["total-ustx"]).toEqual(uintCV(100_000_000_000_000));
   });

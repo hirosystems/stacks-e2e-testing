@@ -86,10 +86,10 @@ describe("use", () => {
       // Wait for the transaction to be processed
       let [block, tx] = await waitForStacksTransaction(
         orchestrator,
-        transaction.txid()
+        transaction.txid(),
       );
       expect(tx.description).toBe(
-        `deployed: ${Accounts.DEPLOYER.stxAddress}.circular-trait-1`
+        `deployed: ${Accounts.DEPLOYER.stxAddress}.circular-trait-1`,
       );
       expect(tx.success).toBeFalsy();
     });
@@ -120,10 +120,10 @@ describe("use", () => {
       // Wait for the transaction to be processed
       let [block, tx] = await waitForStacksTransaction(
         orchestrator,
-        transaction.txid()
+        transaction.txid(),
       );
       expect(tx.description).toBe(
-        `deployed: ${Accounts.DEPLOYER.stxAddress}.circular-trait-2`
+        `deployed: ${Accounts.DEPLOYER.stxAddress}.circular-trait-2`,
       );
       expect(tx.success).toBeFalsy();
     });
@@ -133,7 +133,7 @@ describe("use", () => {
     beforeAll(async () => {
       // Wait for 2.1 to go live
       await orchestrator.waitForStacksBlockAnchoredOnBitcoinBlockOfHeight(
-        STACKS_2_1_EPOCH + 1
+        STACKS_2_1_EPOCH + 1,
       );
     });
 
@@ -162,10 +162,10 @@ describe("use", () => {
       // Wait for the transaction to be processed
       let [block, tx] = await waitForStacksTransaction(
         orchestrator,
-        transaction.txid()
+        transaction.txid(),
       );
       expect(tx.description).toBe(
-        `deployed: ${Accounts.DEPLOYER.stxAddress}.circular-trait-1-2`
+        `deployed: ${Accounts.DEPLOYER.stxAddress}.circular-trait-1-2`,
       );
       expect(tx.success).toBeFalsy();
     });
@@ -195,10 +195,10 @@ describe("use", () => {
       // Wait for the transaction to be processed
       let [block, tx] = await waitForStacksTransaction(
         orchestrator,
-        transaction.txid()
+        transaction.txid(),
       );
       expect(tx.description).toBe(
-        `deployed: ${Accounts.DEPLOYER.stxAddress}.circular-trait-2-2`
+        `deployed: ${Accounts.DEPLOYER.stxAddress}.circular-trait-2-2`,
       );
       expect(tx.success).toBeFalsy();
     });

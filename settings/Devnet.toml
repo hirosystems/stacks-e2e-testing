@@ -38,6 +38,7 @@ balance = 1_000_000_000_000_000
 # btc_address: mjSrB3wS4xab3kYqFktwBzfTdPg367ZJ2d
 
 [devnet]
+use_nakamoto = true
 disable_stacks_explorer = true
 disable_stacks_api = true
 enable_next_features = true

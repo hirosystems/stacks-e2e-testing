@@ -41,7 +41,7 @@ describe("testing mixed direct and pooled stacking in pox-3", () => {
   beforeAll(() => {
     orchestrator = buildDevnetNetworkOrchestrator(
       getNetworkIdFromEnv(),
-      timeline
+      timeline,
     );
     orchestrator.start();
   });
@@ -55,7 +55,7 @@ describe("testing mixed direct and pooled stacking in pox-3", () => {
 
     // Wait for 2.4 to go live
     await orchestrator.waitForStacksBlockAnchoredOnBitcoinBlockOfHeight(
-      timeline.epoch_2_4
+      timeline.epoch_2_4,
     );
 
     // Wait for the next reward phase (#2)
@@ -74,7 +74,7 @@ describe("testing mixed direct and pooled stacking in pox-3", () => {
         fee,
         nonce: aliceNonce++,
       },
-      { amount: 75_000_000_000_000, blockHeight, cycles }
+      { amount: 75_000_000_000_000, blockHeight, cycles },
     );
     expect(response.error).toBeUndefined();
     const stackTxid = response.txid;
@@ -88,7 +88,7 @@ describe("testing mixed direct and pooled stacking in pox-3", () => {
         fee,
         nonce: aliceNonce++,
       },
-      { amount: 100_000_000_000_000, poolAddress: Accounts.WALLET_2 }
+      { amount: 100_000_000_000_000, poolAddress: Accounts.WALLET_2 },
     );
     expect(response.error).toBeUndefined();
     const delegateTxid = response.txid;
@@ -108,7 +108,7 @@ describe("testing mixed direct and pooled stacking in pox-3", () => {
         poolRewardAccount: Accounts.WALLET_2,
         startBurnHeight: blockHeight,
         lockPeriodCycles: 1,
-      }
+      },
     );
     expect(response.error).toBeUndefined();
     const delegateStackTxid = response.txid;
@@ -122,7 +122,7 @@ describe("testing mixed direct and pooled stacking in pox-3", () => {
         fee: fee,
         nonce: bobNonce++,
       },
-      { poolRewardAccount: Accounts.WALLET_2, cycleId: 3 }
+      { poolRewardAccount: Accounts.WALLET_2, cycleId: 3 },
     );
     expect(response.error).toBeUndefined();
     const commitTxid = response.txid;
@@ -169,7 +169,7 @@ describe("testing mixed direct and pooled stacking in pox-3", () => {
       network,
       3,
       3,
-      Accounts.WALLET_1.stxAddress
+      Accounts.WALLET_1.stxAddress,
     );
     expect(poxAddrInfo0?.["total-ustx"]).toEqual(uintCV(75_000_000_000_000));
   });
@@ -187,7 +187,7 @@ describe("testing mixed direct and pooled stacking in pox-3", () => {
         fee,
         nonce: faucetNonce++,
       },
-      { amount: 900_000_000_000_000, blockHeight, cycles }
+      { amount: 900_000_000_000_000, blockHeight, cycles },
     );
     expect(response.error).toBeUndefined();
 
@@ -199,7 +199,7 @@ describe("testing mixed direct and pooled stacking in pox-3", () => {
     let poxInfo = await getPoxInfo(network);
     expect(poxInfo.current_cycle.id).toBe(2);
     expect(poxInfo.current_burnchain_block_height).toBeLessThan(
-      poxInfo.next_cycle.prepare_phase_start_block_height
+      poxInfo.next_cycle.prepare_phase_start_block_height,
     );
     expect(poxInfo.current_cycle.min_threshold_ustx).toBe(29_290_000_000_000);
     expect(poxInfo.next_cycle.stacked_ustx).toBe(975_000_000_000_000);
@@ -235,7 +235,7 @@ describe("testing mixed direct and pooled stacking in pox-3", () => {
       network,
       3,
       3,
-      Accounts.WALLET_1.stxAddress
+      Accounts.WALLET_1.stxAddress,
     );
     expect(poxAddrInfo0).toBeNull();
 
@@ -244,7 +244,7 @@ describe("testing mixed direct and pooled stacking in pox-3", () => {
       network,
       3,
       3,
-      Accounts.FAUCET.stxAddress
+      Accounts.FAUCET.stxAddress,
     );
     expect(poxAddrInfo1?.["total-ustx"]).toEqual(uintCV(900_000_000_000_000));
 
@@ -253,7 +253,7 @@ describe("testing mixed direct and pooled stacking in pox-3", () => {
       network,
       3,
       4,
-      Accounts.WALLET_1.stxAddress
+      Accounts.WALLET_1.stxAddress,
     );
     expect(poxAddrInfo0).toBeNull();
 
@@ -268,7 +268,7 @@ describe("testing mixed direct and pooled stacking in pox-3", () => {
       network,
       Accounts.WALLET_1.stxAddress,
       100_000_000_000_000 - aliceNonce * fee,
-      0
+      0,
     );
   });
 
@@ -287,7 +287,7 @@ describe("testing mixed direct and pooled stacking in pox-3", () => {
         fee,
         nonce: chloeNonce++,
       },
-      { amount: 90_000_000_000_000, blockHeight, cycles }
+      { amount: 90_000_000_000_000, blockHeight, cycles },
     );
     expect(response.error).toBeUndefined();
     await asyncExpectStacksTransactionSuccess(orchestrator, response.txid);
@@ -295,7 +295,7 @@ describe("testing mixed direct and pooled stacking in pox-3", () => {
     let poxInfo = await getPoxInfo(network);
     expect(poxInfo.current_cycle.id).toBe(3);
     expect(poxInfo.current_burnchain_block_height).toBeLessThan(
-      poxInfo.next_cycle.prepare_phase_start_block_height
+      poxInfo.next_cycle.prepare_phase_start_block_height,
     );
     expect(poxInfo.next_cycle.stacked_ustx).toBe(90_000_000_000_000);
   });
@@ -324,7 +324,7 @@ describe("testing mixed direct and pooled stacking in pox-3", () => {
       network,
       3,
       4,
-      Accounts.WALLET_1.stxAddress
+      Accounts.WALLET_1.stxAddress,
     );
     expect(poxAddrInfo0).toBeNull();
 
@@ -333,7 +333,7 @@ describe("testing mixed direct and pooled stacking in pox-3", () => {
       network,
       3,
       4,
-      Accounts.WALLET_3.stxAddress
+      Accounts.WALLET_3.stxAddress,
     );
     expect(poxAddrInfo1?.["total-ustx"]).toEqual(uintCV(90_000_000_000_000));
 
@@ -342,7 +342,7 @@ describe("testing mixed direct and pooled stacking in pox-3", () => {
       network,
       Accounts.WALLET_1.stxAddress,
       100_000_000_000_000 - aliceNonce * fee,
-      0
+      0,
     );
 
     // Chloe's STX are locked
@@ -350,7 +350,7 @@ describe("testing mixed direct and pooled stacking in pox-3", () => {
       network,
       Accounts.WALLET_3.stxAddress,
       10_000_000_000_000 - chloeNonce * fee,
-      90_000_000_000_000
+      90_000_000_000_000,
     );
 
     // Faucet's STX are still unlocked
@@ -358,7 +358,7 @@ describe("testing mixed direct and pooled stacking in pox-3", () => {
       network,
       Accounts.FAUCET.stxAddress,
       1_000_000_000_000_000 - faucetNonce * fee,
-      0
+      0,
     );
   });
 });

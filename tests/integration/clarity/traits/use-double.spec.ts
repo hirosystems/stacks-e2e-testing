@@ -135,10 +135,10 @@ describe("use", () => {
       // Wait for the transaction to be processed
       let [_, tx] = await waitForStacksTransaction(
         orchestrator,
-        transaction.txid()
+        transaction.txid(),
       );
       expect(tx.description).toBe(
-        `deployed: ${Accounts.DEPLOYER.stxAddress}.use-double-trait`
+        `deployed: ${Accounts.DEPLOYER.stxAddress}.use-double-trait`,
       );
       expect(tx.success).toBeFalsy();
     });
@@ -148,7 +148,7 @@ describe("use", () => {
     beforeAll(async () => {
       // Wait for 2.1 to go live
       await orchestrator.waitForStacksBlockAnchoredOnBitcoinBlockOfHeight(
-        STACKS_2_1_EPOCH + 1
+        STACKS_2_1_EPOCH + 1,
       );
     });
 
@@ -178,10 +178,10 @@ describe("use", () => {
       // Wait for the transaction to be processed
       let [_, tx] = await waitForStacksTransaction(
         orchestrator,
-        transaction.txid()
+        transaction.txid(),
       );
       expect(tx.description).toBe(
-        `deployed: ${Accounts.DEPLOYER.stxAddress}.use-double-trait-2-c1`
+        `deployed: ${Accounts.DEPLOYER.stxAddress}.use-double-trait-2-c1`,
       );
       expect(tx.success).toBeFalsy();
     });
@@ -212,10 +212,10 @@ describe("use", () => {
       // Wait for the transaction to be processed
       let [_, tx] = await waitForStacksTransaction(
         orchestrator,
-        transaction.txid()
+        transaction.txid(),
       );
       expect(tx.description).toBe(
-        `deployed: ${Accounts.DEPLOYER.stxAddress}.use-double-trait-2-c2`
+        `deployed: ${Accounts.DEPLOYER.stxAddress}.use-double-trait-2-c2`,
       );
       expect(tx.success).toBeFalsy();
     });

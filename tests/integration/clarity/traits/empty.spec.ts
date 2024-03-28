@@ -77,10 +77,10 @@ describe("empty trait", () => {
       // Wait for the transaction to be processed
       let [block, tx] = await waitForStacksTransaction(
         orchestrator,
-        transaction.txid()
+        transaction.txid(),
       );
       expect(tx.description).toBe(
-        `deployed: ${Accounts.DEPLOYER.stxAddress}.empty-trait`
+        `deployed: ${Accounts.DEPLOYER.stxAddress}.empty-trait`,
       );
       expect(tx.success).toBeTruthy();
     });
@@ -111,10 +111,10 @@ describe("empty trait", () => {
       // Wait for the transaction to be processed
       let [block, tx] = await waitForStacksTransaction(
         orchestrator,
-        transaction.txid()
+        transaction.txid(),
       );
       expect(tx.description).toBe(
-        `deployed: ${Accounts.DEPLOYER.stxAddress}.empty-trait-copy`
+        `deployed: ${Accounts.DEPLOYER.stxAddress}.empty-trait-copy`,
       );
       expect(tx.success).toBeTruthy();
     });
@@ -124,7 +124,7 @@ describe("empty trait", () => {
     beforeAll(async () => {
       // Wait for 2.1 to go live
       await orchestrator.waitForStacksBlockAnchoredOnBitcoinBlockOfHeight(
-        STACKS_2_1_EPOCH + 1
+        STACKS_2_1_EPOCH + 1,
       );
     });
 
@@ -153,10 +153,10 @@ describe("empty trait", () => {
       // Wait for the transaction to be processed
       let [_, tx] = await waitForStacksTransaction(
         orchestrator,
-        transaction.txid()
+        transaction.txid(),
       );
       expect(tx.description).toBe(
-        `deployed: ${Accounts.DEPLOYER.stxAddress}.empty-trait-2`
+        `deployed: ${Accounts.DEPLOYER.stxAddress}.empty-trait-2`,
       );
       expect(tx.success).toBeTruthy();
     });
@@ -186,10 +186,10 @@ describe("empty trait", () => {
       // Wait for the transaction to be processed
       let [_, tx] = await waitForStacksTransaction(
         orchestrator,
-        transaction.txid()
+        transaction.txid(),
       );
       expect(tx.description).toBe(
-        `deployed: ${Accounts.DEPLOYER.stxAddress}.empty-trait-copy-2`
+        `deployed: ${Accounts.DEPLOYER.stxAddress}.empty-trait-copy-2`,
       );
       expect(tx.success).toBeTruthy();
     });

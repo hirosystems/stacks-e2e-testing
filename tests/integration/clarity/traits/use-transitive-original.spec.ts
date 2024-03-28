@@ -39,21 +39,21 @@ describe("use trait from contract that redefines it", () => {
       "a-trait",
       0,
       network,
-      orchestrator
+      orchestrator,
     );
     await load_versioned(
       Accounts.DEPLOYER,
       "use-and-define-a-trait",
       1,
       network,
-      orchestrator
+      orchestrator,
     );
     let res = await load_versioned(
       Accounts.DEPLOYER,
       "use-a-trait-transitive-original",
       2,
       network,
-      orchestrator
+      orchestrator,
     );
     expect(res.ok).toBeFalsy();
 
@@ -66,7 +66,7 @@ describe("use trait from contract that redefines it", () => {
     beforeAll(async () => {
       // Wait for 2.1 to go live
       await orchestrator.waitForStacksBlockAnchoredOnBitcoinBlockOfHeight(
-        STACKS_2_1_EPOCH + 1
+        STACKS_2_1_EPOCH + 1,
       );
     });
 
@@ -77,14 +77,14 @@ describe("use trait from contract that redefines it", () => {
           "a-trait",
           0,
           network,
-          orchestrator
+          orchestrator,
         );
         await load_versioned(
           Accounts.WALLET_1,
           "use-and-define-a-trait",
           1,
           network,
-          orchestrator
+          orchestrator,
         );
         let res = await load_versioned(
           Accounts.WALLET_1,
@@ -93,7 +93,7 @@ describe("use trait from contract that redefines it", () => {
           network,
           orchestrator,
           1,
-          "1"
+          "1",
         );
         expect(res.ok).toBeFalsy();
       });
@@ -104,14 +104,14 @@ describe("use trait from contract that redefines it", () => {
           "a-trait",
           0,
           network,
-          orchestrator
+          orchestrator,
         );
         await load_versioned(
           Accounts.WALLET_2,
           "use-and-define-a-trait",
           1,
           network,
-          orchestrator
+          orchestrator,
         );
         let res = await load_versioned(
           Accounts.WALLET_2,
@@ -120,7 +120,7 @@ describe("use trait from contract that redefines it", () => {
           network,
           orchestrator,
           2,
-          "2"
+          "2",
         );
         expect(res.ok).toBeFalsy();
       });

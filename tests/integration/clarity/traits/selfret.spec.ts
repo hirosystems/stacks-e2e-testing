@@ -72,17 +72,17 @@ describe("define a trait with duplicate identical methods", () => {
     // Wait for the transaction to be processed
     let [block, tx] = await waitForStacksTransaction(
       orchestrator,
-      transaction.txid()
+      transaction.txid(),
     );
     expect(tx.description).toBe(
-      `deployed: ${Accounts.DEPLOYER.stxAddress}.selfret`
+      `deployed: ${Accounts.DEPLOYER.stxAddress}.selfret`,
     );
     expect(tx.success).toBeFalsy();
 
     // Make sure we stayed in 2.05
     let chainUpdate = await orchestrator.waitForNextStacksBlock();
     expect(getBitcoinBlockHeight(chainUpdate)).toBeLessThanOrEqual(
-      STACKS_2_1_EPOCH
+      STACKS_2_1_EPOCH,
     );
   });
 
@@ -90,7 +90,7 @@ describe("define a trait with duplicate identical methods", () => {
     beforeAll(async () => {
       // Wait for 2.1 to go live
       await orchestrator.waitForStacksBlockAnchoredOnBitcoinBlockOfHeight(
-        STACKS_2_1_EPOCH + 1
+        STACKS_2_1_EPOCH + 1,
       );
     });
 
@@ -120,10 +120,10 @@ describe("define a trait with duplicate identical methods", () => {
       // Wait for the transaction to be processed
       let [block, tx] = await waitForStacksTransaction(
         orchestrator,
-        transaction.txid()
+        transaction.txid(),
       );
       expect(tx.description).toBe(
-        `deployed: ${Accounts.DEPLOYER.stxAddress}.selfret-2`
+        `deployed: ${Accounts.DEPLOYER.stxAddress}.selfret-2`,
       );
       expect(tx.success).toBeFalsy();
     });
@@ -154,10 +154,10 @@ describe("define a trait with duplicate identical methods", () => {
       // Wait for the transaction to be processed
       let [block, tx] = await waitForStacksTransaction(
         orchestrator,
-        transaction.txid()
+        transaction.txid(),
       );
       expect(tx.description).toBe(
-        `deployed: ${Accounts.DEPLOYER.stxAddress}.selfret-3`
+        `deployed: ${Accounts.DEPLOYER.stxAddress}.selfret-3`,
       );
       expect(tx.success).toBeFalsy();
     });

@@ -29,7 +29,6 @@ import {
   uintCV,
 } from "@stacks/transactions";
 
-import { expect } from "vitest";
 import { Contracts } from "../constants";
 import { BroadcastOptions } from "../helpers";
 const fetch = require("node-fetch");
@@ -48,7 +47,7 @@ const delay = () => new Promise((resolve) => setTimeout(resolve, 3000));
 
 export const getCoreInfo = async (
   network: StacksNetwork,
-  retry?: number
+  retry?: number,
 ): Promise<
   CoreInfo & {
     stacks_tip_height: number;
@@ -70,7 +69,7 @@ export const getCoreInfo = async (
 
 export const getPoxInfo = async (
   network: StacksNetwork,
-  retry?: number
+  retry?: number,
 ): Promise<
   PoxInfo & {
     total_liquid_supply_ustx: number;
@@ -81,7 +80,10 @@ export const getPoxInfo = async (
   if (retryCountdown == 0) return Promise.reject();
   try {
     let response = await fetch(network.getPoxInfoUrl(), {});
-    let poxInfo = await response.json();
+    let poxInfo = (await response.json()) as PoxInfo & {
+      total_liquid_supply_ustx: number;
+      pox_activation_threshold_ustx: number;
+    };
     return poxInfo;
   } catch (e) {
     await delay();
@@ -92,12 +94,18 @@ export const getPoxInfo = async (
 export const getAccount = async (
   network: StacksNetwork,
   address: string,
-  retry?: number
+  retry?: number,
 ): Promise<any> => {
   let retryCountdown = retry ? retry : 20;
   if (retryCountdown == 0) return Promise.reject();
   try {
     let response = await fetch(network.getAccountApiUrl(address), {});
+    if (response.status === 404) {
+      return Promise.reject(
+        `account api url not found on ${network.getAccountApiUrl(address)}`,
+      );
+    }
+    expect(response.status).toBe(200);
     let payload: any = await response.json();
     return {
       balance: BigInt(payload.balance),
@@ -113,7 +121,7 @@ export const getAccount = async (
 
 export const getBitcoinHeightOfNextRewardPhase = async (
   network: StacksNetwork,
-  retry?: number
+  retry?: number,
 ): Promise<number> => {
   let response = await getPoxInfo(network, retry);
   return response.next_cycle.reward_phase_start_block_height;
@@ -121,7 +129,7 @@ export const getBitcoinHeightOfNextRewardPhase = async (
 
 export const getBitcoinHeightOfNextPreparePhase = async (
   network: StacksNetwork,
-  retry?: number
+  retry?: number,
 ): Promise<number> => {
   let response = await getPoxInfo(network, retry);
   return response.next_cycle.prepare_phase_start_block_height;
@@ -130,14 +138,14 @@ export const getBitcoinHeightOfNextPreparePhase = async (
 export const waitForNextPreparePhase = async (
   network: StacksNetwork,
   orchestrator: DevnetNetworkOrchestrator,
-  offset?: number
+  offset?: number,
 ): Promise<StacksChainUpdate> => {
   var height = await getBitcoinHeightOfNextPreparePhase(network);
   if (offset) {
     height = height + offset;
   }
   return await orchestrator.waitForStacksBlockAnchoredOnBitcoinBlockOfHeight(
-    height
+    height,
   );
 };
 
@@ -145,7 +153,7 @@ export const waitForRewardCycleId = async (
   network: StacksNetwork,
   orchestrator: DevnetNetworkOrchestrator,
   id: number,
-  offset?: number
+  offset?: number,
 ): Promise<StacksChainUpdate> => {
   let response = await getPoxInfo(network);
   let height =
@@ -154,21 +162,21 @@ export const waitForRewardCycleId = async (
     height = height + offset;
   }
   return await orchestrator.waitForStacksBlockAnchoredOnBitcoinBlockOfHeight(
-    height
+    height,
   );
 };
 
 export const waitForNextRewardPhase = async (
   network: StacksNetwork,
   orchestrator: DevnetNetworkOrchestrator,
-  offset?: number
+  offset?: number,
 ): Promise<StacksChainUpdate> => {
   var height = await getBitcoinHeightOfNextRewardPhase(network);
   if (offset) {
     height = height + offset;
   }
   return await orchestrator.waitForStacksBlockAnchoredOnBitcoinBlockOfHeight(
-    height
+    height,
   );
 };
 
@@ -186,7 +194,7 @@ export const expectAccountToBe = async (
   network: StacksNetwork,
   address: string,
   account: number,
-  locked: number
+  locked: number,
 ) => {
   const wallet = await getAccount(network, address);
   expect(wallet.balance).toBe(BigInt(account));
@@ -196,7 +204,7 @@ export const expectAccountToBe = async (
 export const callReadOnlystackerInfo = (
   network: StacksNetwork,
   poxVersion: number,
-  user: Account
+  user: Account,
 ) => {
   let poxContract = Contracts.POX[poxVersion] || Contracts.DEFAULT;
   return callReadOnlyFunction({
@@ -216,7 +224,7 @@ export const expectNoError = (response: TxBroadcastResult) => {
       " " +
       response.reason +
       " " +
-      JSON.stringify(response.reason_data)
+      JSON.stringify(response.reason_data),
   ).toBeUndefined();
 };
 
@@ -228,13 +236,13 @@ export const errorToCV = (e: Error) => {
 export const readRewardCyclePoxAddressList = async (
   network: StacksNetwork,
   poxVersion: number,
-  cycleId: number
+  cycleId: number,
 ) => {
   let poxContract = Contracts.POX[poxVersion] || Contracts.DEFAULT;
   const url = network.getMapEntryUrl(
     poxContract.address,
     poxContract.name,
-    "reward-cycle-pox-address-list-len"
+    "reward-cycle-pox-address-list-len",
   );
   const cycleIdValue = uintCV(cycleId);
   const keyValue = tupleCV({
@@ -250,7 +258,7 @@ export const readRewardCyclePoxAddressList = async (
   if (!response.ok) {
     const msg = await response.text().catch(() => "");
     throw new Error(
-      `Error calling read-only function. Response ${response.status}: ${response.statusText}. Attempted to fetch ${url} and failed with the message: "${msg}"`
+      `Error calling read-only function. Response ${response.status}: ${response.statusText}. Attempted to fetch ${url} and failed with the message: "${msg}"`,
     );
   }
   let lengthJson = await response.json();
@@ -267,7 +275,7 @@ export const readRewardCyclePoxAddressList = async (
       network,
       poxVersion,
       cycleId,
-      i
+      i,
     )) as Record<string, ClarityValue>;
     poxAddrInfoList.push(poxAddressInfo);
   }
@@ -278,16 +286,16 @@ export const readRewardCyclePoxAddressList = async (
 export const readStackingStateForAddress = async (
   network: StacksNetwork,
   poxVersion: number,
-  address: string
+  address: string,
 ) => {
   let poxContract = Contracts.POX[poxVersion] || Contracts.DEFAULT;
   const url = network.getMapEntryUrl(
     poxContract.address,
     poxContract.name,
-    "stacking-state"
+    "stacking-state",
   );
   const keyValue = tupleCV({
-    "stacker": principalCV(address),
+    stacker: principalCV(address),
   });
   const response = await network.fetchFn(url, {
     method: "POST",
@@ -299,7 +307,7 @@ export const readStackingStateForAddress = async (
   if (!response.ok) {
     const msg = await response.text().catch(() => "");
     throw new Error(
-      `Error calling read-only function. Response ${response.status}: ${response.statusText}. Attempted to fetch ${url} and failed with the message: "${msg}"`
+      `Error calling read-only function. Response ${response.status}: ${response.statusText}. Attempted to fetch ${url} and failed with the message: "${msg}"`,
     );
   }
   let json = await response.json();
@@ -310,7 +318,7 @@ export const readRewardCyclePoxAddressForAddress = async (
   network: StacksNetwork,
   poxVersion: number,
   cycleId: number,
-  address: string
+  address: string,
 ) => {
   // TODO: There might be a better way to do this using the `stacking-state`
   //       map to get the index
@@ -318,7 +326,7 @@ export const readRewardCyclePoxAddressForAddress = async (
   const url = network.getMapEntryUrl(
     poxContract.address,
     poxContract.name,
-    "reward-cycle-pox-address-list-len"
+    "reward-cycle-pox-address-list-len",
   );
   const cycleIdValue = uintCV(cycleId);
   const keyValue = tupleCV({
@@ -334,7 +342,7 @@ export const readRewardCyclePoxAddressForAddress = async (
   if (!response.ok) {
     const msg = await response.text().catch(() => "");
     throw new Error(
-      `Error calling read-only function. Response ${response.status}: ${response.statusText}. Attempted to fetch ${url} and failed with the message: "${msg}"`
+      `Error calling read-only function. Response ${response.status}: ${response.statusText}. Attempted to fetch ${url} and failed with the message: "${msg}"`,
     );
   }
   let lengthJson = await response.json();
@@ -350,7 +358,7 @@ export const readRewardCyclePoxAddressForAddress = async (
       network,
       poxVersion,
       cycleId,
-      i
+      i,
     );
     if (poxAddressInfo?.["stacker"]?.type === ClarityType.OptionalNone) {
       continue;
@@ -375,13 +383,13 @@ export const readRewardCyclePoxAddressListAtIndex = async (
   network: StacksNetwork,
   poxVersion: number,
   cycleId: number,
-  index: number
+  index: number,
 ): Promise<RewardCyclePoxAddressMapEntry | null | undefined> => {
   let poxContract = Contracts.POX[poxVersion] || Contracts.DEFAULT;
   const url = network.getMapEntryUrl(
     poxContract.address,
     poxContract.name,
-    "reward-cycle-pox-address-list"
+    "reward-cycle-pox-address-list",
   );
   const cycleIdValue = uintCV(cycleId);
   const indexValue = uintCV(index);
@@ -399,7 +407,7 @@ export const readRewardCyclePoxAddressListAtIndex = async (
   if (!response.ok) {
     const msg = await response.text().catch(() => "");
     throw new Error(
-      `Error calling read-only function. Response ${response.status}: ${response.statusText}. Attempted to fetch ${url} and failed with the message: "${msg}"`
+      `Error calling read-only function. Response ${response.status}: ${response.statusText}. Attempted to fetch ${url} and failed with the message: "${msg}"`,
     );
   }
   let poxAddrInfoJson = await response.json();
@@ -443,7 +451,7 @@ export const callReadOnlyIsPoxActive = (
   poxVersion: number,
   network: StacksNetwork,
   account: Account,
-  rewardCycle: number
+  rewardCycle: number,
 ) => {
   let poxContract = Contracts.POX[poxVersion] || Contracts.DEFAULT;
   return callReadOnlyFunction({
@@ -460,7 +468,7 @@ export const getTotalPoxRejection = (
   poxVersion: number,
   network: StacksNetwork,
   account: Account,
-  rewardCycle: number
+  rewardCycle: number,
 ) => {
   let poxContract = Contracts.POX[poxVersion] || Contracts.DEFAULT;
   return callReadOnlyFunction({

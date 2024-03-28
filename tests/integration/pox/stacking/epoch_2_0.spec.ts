@@ -21,7 +21,7 @@ describe("testing stacking under epoch 2.0", () => {
   beforeAll(() => {
     orchestrator = buildDevnetNetworkOrchestrator(
       getNetworkIdFromEnv(),
-      timeline
+      timeline,
     );
     orchestrator.start();
   });
@@ -60,7 +60,7 @@ describe("testing stacking under epoch 2.0", () => {
     let stackedByWallet1 = 25_000_000_000_000;
     let response = await broadcastStackSTX(
       { poxVersion: 1, network, account: Accounts.WALLET_1, fee, nonce: 0 },
-      { amount: stackedByWallet1, blockHeight, cycles: 1 }
+      { amount: stackedByWallet1, blockHeight, cycles: 1 },
     );
     expect(response.error).toBeUndefined();
 
@@ -68,7 +68,7 @@ describe("testing stacking under epoch 2.0", () => {
     let stackedByWallet2 = 50_000_000_000_000;
     response = await broadcastStackSTX(
       { poxVersion: 1, network, account: Accounts.WALLET_2, fee, nonce: 0 },
-      { amount: stackedByWallet2, blockHeight, cycles: 6 }
+      { amount: stackedByWallet2, blockHeight, cycles: 6 },
     );
     expect(response.error).toBeUndefined();
 
@@ -76,7 +76,7 @@ describe("testing stacking under epoch 2.0", () => {
     let stackedByWallet3 = 75_000_000_000_000;
     response = await broadcastStackSTX(
       { poxVersion: 1, network, account: Accounts.WALLET_3, fee, nonce: 0 },
-      { amount: stackedByWallet3, blockHeight, cycles: 12 }
+      { amount: stackedByWallet3, blockHeight, cycles: 12 },
     );
     expect(response.error).toBeUndefined();
 
@@ -95,27 +95,27 @@ describe("testing stacking under epoch 2.0", () => {
     // WALLET_1 should have some tokens locked
     wallet1 = await getAccount(network, Accounts.WALLET_1.stxAddress);
     expect(wallet1.balance).toBe(
-      BigInt(genesisBalance - stackedByWallet1 - fee)
+      BigInt(genesisBalance - stackedByWallet1 - fee),
     );
     expect(wallet1.locked).toBe(BigInt(stackedByWallet1));
 
     // WALLET_2 should have some tokens locked
     wallet2 = await getAccount(network, Accounts.WALLET_2.stxAddress);
     expect(wallet2.balance).toBe(
-      BigInt(genesisBalance - stackedByWallet2 - fee)
+      BigInt(genesisBalance - stackedByWallet2 - fee),
     );
     expect(wallet2.locked).toBe(BigInt(stackedByWallet2));
 
     // WALLET_3 should have some tokens locked
     wallet3 = await getAccount(network, Accounts.WALLET_3.stxAddress);
     expect(wallet3.balance).toBe(
-      BigInt(genesisBalance - stackedByWallet3 - fee)
+      BigInt(genesisBalance - stackedByWallet3 - fee),
     );
     expect(wallet3.locked).toBe(BigInt(stackedByWallet3));
 
     // Wait for next PoX cycle (Bitcoin block #131)
     await orchestrator.waitForStacksBlockAnchoredOnBitcoinBlockOfHeight(
-      timeline.pox_2_activation + 1
+      timeline.pox_2_activation + 1,
     );
     poxInfo = await getPoxInfo(network);
 

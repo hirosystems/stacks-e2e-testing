@@ -52,7 +52,7 @@ describe("concrete trait parameter used in a wrapper", () => {
 
   const callReadOnlyTestTraitWrapperCallFo = (
     network: StacksNetwork,
-    { a }: { a: number }
+    { a }: { a: number },
   ) => {
     return callReadOnlyFunction({
       contractName: "test-trait-wrapper",
@@ -68,7 +68,7 @@ describe("concrete trait parameter used in a wrapper", () => {
     network: StacksNetwork,
     sender: Account,
     nonce: number,
-    { a }: { a: number }
+    { a }: { a: number },
   ) => {
     let callTxOptions: SignedContractCallOptions = {
       senderKey: sender.secretKey,
@@ -90,7 +90,7 @@ describe("concrete trait parameter used in a wrapper", () => {
   beforeAll(() => {
     orchestrator = buildDevnetNetworkOrchestrator(
       getNetworkIdFromEnv(),
-      timeline
+      timeline,
     );
     orchestrator.start();
   });
@@ -109,7 +109,7 @@ describe("concrete trait parameter used in a wrapper", () => {
       Accounts.DEPLOYER,
       0,
       "test-trait",
-      codeBodyTestTrait
+      codeBodyTestTrait,
     );
     expect(response.error).toBeUndefined();
     await asyncExpectStacksTransactionSuccess(orchestrator, transaction.txid());
@@ -119,7 +119,7 @@ describe("concrete trait parameter used in a wrapper", () => {
       Accounts.DEPLOYER,
       1,
       "impl-trait",
-      codeBodyImplTrait
+      codeBodyImplTrait,
     ));
     expect(response.error).toBeUndefined();
     await asyncExpectStacksTransactionSuccess(orchestrator, transaction.txid());
@@ -130,7 +130,7 @@ describe("concrete trait parameter used in a wrapper", () => {
     // Wait for the 2.2 activation, then check
     //
     await orchestrator.waitForStacksBlockAnchoredOnBitcoinBlockOfHeight(
-      timeline.epoch_2_2 + 2
+      timeline.epoch_2_2 + 2,
     );
 
     ({ response, transaction } = await deployContract(
@@ -138,7 +138,7 @@ describe("concrete trait parameter used in a wrapper", () => {
       Accounts.DEPLOYER,
       2,
       "test-trait-wrapper",
-      codeBodyTestTraitWrapper
+      codeBodyTestTraitWrapper,
     ));
     expect(response.error).toBeUndefined();
     await asyncExpectStacksTransactionSuccess(orchestrator, transaction.txid());
@@ -150,12 +150,12 @@ describe("concrete trait parameter used in a wrapper", () => {
       network,
       Accounts.WALLET_1,
       0,
-      { a: 3 }
+      { a: 3 },
     ));
     expect(response.error).toBeUndefined();
     let [_, tx] = await waitForStacksTransaction(
       orchestrator,
-      transaction.txid()
+      transaction.txid(),
     );
     expect(tx.result).toEqual("(err none)");
   });
@@ -166,7 +166,7 @@ describe("concrete trait parameter used in a wrapper", () => {
     // Wait for the 2.3 activation, then check again
     //
     await orchestrator.waitForStacksBlockAnchoredOnBitcoinBlockOfHeight(
-      timeline.epoch_2_3 + 2
+      timeline.epoch_2_3 + 2,
     );
 
     // Call the public function
@@ -174,12 +174,12 @@ describe("concrete trait parameter used in a wrapper", () => {
       network,
       Accounts.WALLET_1,
       1,
-      { a: 3 }
+      { a: 3 },
     );
     expect(response.error).toBeUndefined();
     let [_, tx] = await waitForStacksTransaction(
       orchestrator,
-      transaction.txid()
+      transaction.txid(),
     );
     expect(tx.result).toEqual("(ok u3)");
   });

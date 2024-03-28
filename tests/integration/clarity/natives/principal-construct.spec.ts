@@ -73,13 +73,13 @@ describe("principal-construct?", () => {
     // Wait for the transaction to be processed
     let [block, tx] = await waitForStacksTransaction(
       orchestrator,
-      transaction.txid()
+      transaction.txid(),
     );
     expect(block.bitcoin_anchor_block_identifier.index).toBeLessThanOrEqual(
-      Constants.DEVNET_DEFAULT_EPOCH_2_1
+      Constants.DEVNET_DEFAULT_EPOCH_2_1,
     );
     expect(tx.description).toBe(
-      `deployed: ${Accounts.DEPLOYER.stxAddress}.test-2-05`
+      `deployed: ${Accounts.DEPLOYER.stxAddress}.test-2-05`,
     );
     expect(tx.success).toBeFalsy();
   });
@@ -88,7 +88,7 @@ describe("principal-construct?", () => {
     beforeAll(async () => {
       // Wait for 2.1 to go live
       await orchestrator.waitForStacksBlockAnchoredOnBitcoinBlockOfHeight(
-        Constants.DEVNET_DEFAULT_EPOCH_2_1
+        Constants.DEVNET_DEFAULT_EPOCH_2_1,
       );
       await orchestrator.waitForNextStacksBlock();
     });
@@ -129,10 +129,10 @@ describe("principal-construct?", () => {
       // Wait for the transaction to be processed
       let [block, tx] = await waitForStacksTransaction(
         orchestrator,
-        transaction.txid()
+        transaction.txid(),
       );
       expect(tx.description).toBe(
-        `deployed: ${Accounts.DEPLOYER.stxAddress}.test-2-1`
+        `deployed: ${Accounts.DEPLOYER.stxAddress}.test-2-1`,
       );
       expect(tx.success).toBeTruthy();
     });
@@ -163,10 +163,10 @@ describe("principal-construct?", () => {
       // Wait for the transaction to be processed
       let [block, tx] = await waitForStacksTransaction(
         orchestrator,
-        transaction.txid()
+        transaction.txid(),
       );
       expect(tx.description).toBe(
-        `invoked: ${Accounts.DEPLOYER.stxAddress}.test-2-1::test-literal-1()`
+        `invoked: ${Accounts.DEPLOYER.stxAddress}.test-2-1::test-literal-1()`,
       );
       expect(tx.result).toBe("(ok ST3X6QWWETNBZWGBK6DRGTR1KX50S74D3425Q1TPK)");
       expect(tx.success).toBeTruthy();
@@ -198,13 +198,13 @@ describe("principal-construct?", () => {
       // Wait for the transaction to be processed
       let [block, tx] = await waitForStacksTransaction(
         orchestrator,
-        transaction.txid()
+        transaction.txid(),
       );
       expect(tx.description).toBe(
-        `invoked: ${Accounts.DEPLOYER.stxAddress}.test-2-1::test-literal-2()`
+        `invoked: ${Accounts.DEPLOYER.stxAddress}.test-2-1::test-literal-2()`,
       );
       expect(tx.result).toBe(
-        "(ok ST3X6QWWETNBZWGBK6DRGTR1KX50S74D3425Q1TPK.foo)"
+        "(ok ST3X6QWWETNBZWGBK6DRGTR1KX50S74D3425Q1TPK.foo)",
       );
       expect(tx.success).toBeTruthy();
     });
@@ -214,8 +214,8 @@ describe("principal-construct?", () => {
       let version = bufferCV(Uint8Array.from(Buffer.from("1a", "hex")));
       let pkh = bufferCV(
         Uint8Array.from(
-          Buffer.from("fa6bf38ed557fe417333710d6033e9419391a320", "hex")
-        )
+          Buffer.from("fa6bf38ed557fe417333710d6033e9419391a320", "hex"),
+        ),
       );
       let callTxOptions: SignedContractCallOptions = {
         senderKey: Accounts.WALLET_1.secretKey,
@@ -241,10 +241,10 @@ describe("principal-construct?", () => {
       // Wait for the transaction to be processed
       let [block, tx] = await waitForStacksTransaction(
         orchestrator,
-        transaction.txid()
+        transaction.txid(),
       );
       expect(tx.description).toBe(
-        `invoked: ${Accounts.DEPLOYER.stxAddress}.test-2-1::test-1(0x1a, 0xfa6bf38ed557fe417333710d6033e9419391a320)`
+        `invoked: ${Accounts.DEPLOYER.stxAddress}.test-2-1::test-1(0x1a, 0xfa6bf38ed557fe417333710d6033e9419391a320)`,
       );
       expect(tx.result).toBe("(ok ST3X6QWWETNBZWGBK6DRGTR1KX50S74D3425Q1TPK)");
       expect(tx.success).toBeTruthy();
@@ -255,8 +255,8 @@ describe("principal-construct?", () => {
       let version = bufferCV(Uint8Array.from(Buffer.from("1a", "hex")));
       let pkh = bufferCV(
         Uint8Array.from(
-          Buffer.from("fa6bf38ed557fe417333710d6033e9419391a320", "hex")
-        )
+          Buffer.from("fa6bf38ed557fe417333710d6033e9419391a320", "hex"),
+        ),
       );
       let callTxOptions: SignedContractCallOptions = {
         senderKey: Accounts.WALLET_1.secretKey,
@@ -282,13 +282,13 @@ describe("principal-construct?", () => {
       // Wait for the transaction to be processed
       let [block, tx] = await waitForStacksTransaction(
         orchestrator,
-        transaction.txid()
+        transaction.txid(),
       );
       expect(tx.description).toBe(
-        `invoked: ${Accounts.DEPLOYER.stxAddress}.test-2-1::test-2(0x1a, 0xfa6bf38ed557fe417333710d6033e9419391a320, "foo")`
+        `invoked: ${Accounts.DEPLOYER.stxAddress}.test-2-1::test-2(0x1a, 0xfa6bf38ed557fe417333710d6033e9419391a320, "foo")`,
       );
       expect(tx.result).toBe(
-        "(ok ST3X6QWWETNBZWGBK6DRGTR1KX50S74D3425Q1TPK.foo)"
+        "(ok ST3X6QWWETNBZWGBK6DRGTR1KX50S74D3425Q1TPK.foo)",
       );
       expect(tx.success).toBeTruthy();
     });
@@ -298,8 +298,8 @@ describe("principal-construct?", () => {
       let version = bufferCV(Uint8Array.from(Buffer.from("16", "hex")));
       let pkh = bufferCV(
         Uint8Array.from(
-          Buffer.from("fa6bf38ed557fe417333710d6033e9419391a320", "hex")
-        )
+          Buffer.from("fa6bf38ed557fe417333710d6033e9419391a320", "hex"),
+        ),
       );
       let callTxOptions: SignedContractCallOptions = {
         senderKey: Accounts.WALLET_1.secretKey,
@@ -325,13 +325,13 @@ describe("principal-construct?", () => {
       // Wait for the transaction to be processed
       let [block, tx] = await waitForStacksTransaction(
         orchestrator,
-        transaction.txid()
+        transaction.txid(),
       );
       expect(tx.description).toBe(
-        `invoked: ${Accounts.DEPLOYER.stxAddress}.test-2-1::test-1(0x16, 0xfa6bf38ed557fe417333710d6033e9419391a320)`
+        `invoked: ${Accounts.DEPLOYER.stxAddress}.test-2-1::test-1(0x16, 0xfa6bf38ed557fe417333710d6033e9419391a320)`,
       );
       expect(tx.result).toBe(
-        "(err (tuple (error_code u0) (value (some SP3X6QWWETNBZWGBK6DRGTR1KX50S74D3433WDGJY))))"
+        "(err (tuple (error_code u0) (value (some SP3X6QWWETNBZWGBK6DRGTR1KX50S74D3433WDGJY))))",
       );
       expect(tx.success).toBeFalsy();
     });
@@ -341,8 +341,8 @@ describe("principal-construct?", () => {
       let version = bufferCV(Uint8Array.from(Buffer.from("16", "hex")));
       let pkh = bufferCV(
         Uint8Array.from(
-          Buffer.from("fa6bf38ed557fe417333710d6033e9419391a320", "hex")
-        )
+          Buffer.from("fa6bf38ed557fe417333710d6033e9419391a320", "hex"),
+        ),
       );
       let callTxOptions: SignedContractCallOptions = {
         senderKey: Accounts.WALLET_1.secretKey,
@@ -368,13 +368,13 @@ describe("principal-construct?", () => {
       // Wait for the transaction to be processed
       let [block, tx] = await waitForStacksTransaction(
         orchestrator,
-        transaction.txid()
+        transaction.txid(),
       );
       expect(tx.description).toBe(
-        `invoked: ${Accounts.DEPLOYER.stxAddress}.test-2-1::test-2(0x16, 0xfa6bf38ed557fe417333710d6033e9419391a320, "foo")`
+        `invoked: ${Accounts.DEPLOYER.stxAddress}.test-2-1::test-2(0x16, 0xfa6bf38ed557fe417333710d6033e9419391a320, "foo")`,
       );
       expect(tx.result).toBe(
-        "(err (tuple (error_code u0) (value (some SP3X6QWWETNBZWGBK6DRGTR1KX50S74D3433WDGJY.foo))))"
+        "(err (tuple (error_code u0) (value (some SP3X6QWWETNBZWGBK6DRGTR1KX50S74D3433WDGJY.foo))))",
       );
       expect(tx.success).toBeFalsy();
     });
@@ -384,8 +384,8 @@ describe("principal-construct?", () => {
       let version = bufferCV(new Uint8Array());
       let pkh = bufferCV(
         Uint8Array.from(
-          Buffer.from("fa6bf38ed557fe417333710d6033e9419391a320", "hex")
-        )
+          Buffer.from("fa6bf38ed557fe417333710d6033e9419391a320", "hex"),
+        ),
       );
       let callTxOptions: SignedContractCallOptions = {
         senderKey: Accounts.WALLET_1.secretKey,
@@ -411,10 +411,10 @@ describe("principal-construct?", () => {
       // Wait for the transaction to be processed
       let [block, tx] = await waitForStacksTransaction(
         orchestrator,
-        transaction.txid()
+        transaction.txid(),
       );
       expect(tx.description).toBe(
-        `invoked: ${Accounts.DEPLOYER.stxAddress}.test-2-1::test-1(0x, 0xfa6bf38ed557fe417333710d6033e9419391a320)`
+        `invoked: ${Accounts.DEPLOYER.stxAddress}.test-2-1::test-1(0x, 0xfa6bf38ed557fe417333710d6033e9419391a320)`,
       );
       expect(tx.result).toBe("(err (tuple (error_code u1) (value none)))");
       expect(tx.success).toBeFalsy();
@@ -425,8 +425,8 @@ describe("principal-construct?", () => {
       let version = bufferCV(Uint8Array.from(Buffer.from("1a", "hex")));
       let pkh = bufferCV(
         Uint8Array.from(
-          Buffer.from("fa6bf38ed557fe417333710d6033e9419391a3", "hex")
-        )
+          Buffer.from("fa6bf38ed557fe417333710d6033e9419391a3", "hex"),
+        ),
       );
       let callTxOptions: SignedContractCallOptions = {
         senderKey: Accounts.WALLET_1.secretKey,
@@ -452,10 +452,10 @@ describe("principal-construct?", () => {
       // Wait for the transaction to be processed
       let [block, tx] = await waitForStacksTransaction(
         orchestrator,
-        transaction.txid()
+        transaction.txid(),
       );
       expect(tx.description).toBe(
-        `invoked: ${Accounts.DEPLOYER.stxAddress}.test-2-1::test-1(0x1a, 0xfa6bf38ed557fe417333710d6033e9419391a3)`
+        `invoked: ${Accounts.DEPLOYER.stxAddress}.test-2-1::test-1(0x1a, 0xfa6bf38ed557fe417333710d6033e9419391a3)`,
       );
       expect(tx.result).toBe("(err (tuple (error_code u1) (value none)))");
       expect(tx.success).toBeFalsy();
@@ -466,8 +466,8 @@ describe("principal-construct?", () => {
       let version = bufferCV(Uint8Array.from(Buffer.from("20", "hex")));
       let pkh = bufferCV(
         Uint8Array.from(
-          Buffer.from("fa6bf38ed557fe417333710d6033e9419391a320", "hex")
-        )
+          Buffer.from("fa6bf38ed557fe417333710d6033e9419391a320", "hex"),
+        ),
       );
       let callTxOptions: SignedContractCallOptions = {
         senderKey: Accounts.WALLET_1.secretKey,
@@ -493,10 +493,10 @@ describe("principal-construct?", () => {
       // Wait for the transaction to be processed
       let [block, tx] = await waitForStacksTransaction(
         orchestrator,
-        transaction.txid()
+        transaction.txid(),
       );
       expect(tx.description).toBe(
-        `invoked: ${Accounts.DEPLOYER.stxAddress}.test-2-1::test-1(0x20, 0xfa6bf38ed557fe417333710d6033e9419391a320)`
+        `invoked: ${Accounts.DEPLOYER.stxAddress}.test-2-1::test-1(0x20, 0xfa6bf38ed557fe417333710d6033e9419391a320)`,
       );
       expect(tx.result).toBe("(err (tuple (error_code u1) (value none)))");
       expect(tx.success).toBeFalsy();
@@ -507,8 +507,8 @@ describe("principal-construct?", () => {
       let version = bufferCV(Uint8Array.from(Buffer.from("1a", "hex")));
       let pkh = bufferCV(
         Uint8Array.from(
-          Buffer.from("fa6bf38ed557fe417333710d6033e9419391a320", "hex")
-        )
+          Buffer.from("fa6bf38ed557fe417333710d6033e9419391a320", "hex"),
+        ),
       );
       let callTxOptions: SignedContractCallOptions = {
         senderKey: Accounts.WALLET_1.secretKey,
@@ -534,10 +534,10 @@ describe("principal-construct?", () => {
       // Wait for the transaction to be processed
       let [block, tx] = await waitForStacksTransaction(
         orchestrator,
-        transaction.txid()
+        transaction.txid(),
       );
       expect(tx.description).toBe(
-        `invoked: ${Accounts.DEPLOYER.stxAddress}.test-2-1::test-2(0x1a, 0xfa6bf38ed557fe417333710d6033e9419391a320, "")`
+        `invoked: ${Accounts.DEPLOYER.stxAddress}.test-2-1::test-2(0x1a, 0xfa6bf38ed557fe417333710d6033e9419391a320, "")`,
       );
       expect(tx.result).toBe("(err (tuple (error_code u2) (value none)))");
       expect(tx.success).toBeFalsy();
@@ -548,8 +548,8 @@ describe("principal-construct?", () => {
       let version = bufferCV(Uint8Array.from(Buffer.from("1a", "hex")));
       let pkh = bufferCV(
         Uint8Array.from(
-          Buffer.from("fa6bf38ed557fe417333710d6033e9419391a320", "hex")
-        )
+          Buffer.from("fa6bf38ed557fe417333710d6033e9419391a320", "hex"),
+        ),
       );
       let callTxOptions: SignedContractCallOptions = {
         senderKey: Accounts.WALLET_1.secretKey,
@@ -575,10 +575,10 @@ describe("principal-construct?", () => {
       // Wait for the transaction to be processed
       let [block, tx] = await waitForStacksTransaction(
         orchestrator,
-        transaction.txid()
+        transaction.txid(),
       );
       expect(tx.description).toBe(
-        `invoked: ${Accounts.DEPLOYER.stxAddress}.test-2-1::test-2(0x1a, 0xfa6bf38ed557fe417333710d6033e9419391a320, "foo[")`
+        `invoked: ${Accounts.DEPLOYER.stxAddress}.test-2-1::test-2(0x1a, 0xfa6bf38ed557fe417333710d6033e9419391a320, "foo[")`,
       );
       expect(tx.result).toBe("(err (tuple (error_code u2) (value none)))");
       expect(tx.success).toBeFalsy();

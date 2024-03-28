@@ -36,7 +36,7 @@ describe("testing stack-extend functionality", () => {
   beforeAll(() => {
     orchestrator = buildDevnetNetworkOrchestrator(
       getNetworkIdFromEnv(),
-      timeline
+      timeline,
     );
     orchestrator.start();
   });
@@ -68,13 +68,13 @@ describe("testing stack-extend functionality", () => {
         amount: 80_000_000_000_000,
         blockHeight,
         cycles: 1,
-      }
+      },
     );
     expect(response.error).toBeUndefined();
     // Wait for Alice's stacking transaction to confirm
     let [block, tx] = await waitForStacksTransaction(
       orchestrator,
-      response.txid
+      response.txid,
     );
     expect(tx.success).toBeTruthy();
 
@@ -87,7 +87,7 @@ describe("testing stack-extend functionality", () => {
         fee,
         nonce: aliceNonce++,
       },
-      { cycles: 2 }
+      { cycles: 2 },
     );
     expect(response.error).toBeUndefined();
     // Wait for Alice's stacking extension transaction to confirm
@@ -105,7 +105,7 @@ describe("testing stack-extend functionality", () => {
         network,
         2,
         cycle + 1, // cycle + 1 because we are checking the next cycle, including rewards
-        Accounts.WALLET_1.stxAddress
+        Accounts.WALLET_1.stxAddress,
       )) as Record<string, ClarityValue>;
       expect(poxAddrInfo?.["total-ustx"]).toEqual(uintCV(80_000_000_000_000));
 
@@ -123,7 +123,7 @@ describe("testing stack-extend functionality", () => {
 
     // Wait for 2.2 activation and unlock
     await orchestrator.waitForStacksBlockAnchoredOnBitcoinBlockOfHeight(
-      timeline.epoch_2_2 + 2
+      timeline.epoch_2_2 + 2,
     );
 
     // Check Alice's account info
@@ -131,7 +131,7 @@ describe("testing stack-extend functionality", () => {
       network,
       Accounts.WALLET_1.stxAddress,
       100_000_000_000_000 - aliceNonce * fee,
-      0
+      0,
     );
 
     // Verify that Alice's STX are really unlocked by doing a transfer
@@ -140,7 +140,7 @@ describe("testing stack-extend functionality", () => {
       {
         amount: 100_000_000_000_000 - aliceNonce * fee,
         recipient: Accounts.WALLET_3.stxAddress,
-      }
+      },
     );
     await asyncExpectStacksTransactionSuccess(orchestrator, response.txid);
   });
@@ -154,7 +154,7 @@ describe("testing stack-extend functionality", () => {
       await waitForNextRewardPhase(
         network,
         orchestrator,
-        poxInfo.current_cycle.id + 1
+        poxInfo.current_cycle.id + 1,
       );
 
       poxInfo = await getPoxInfo(network);

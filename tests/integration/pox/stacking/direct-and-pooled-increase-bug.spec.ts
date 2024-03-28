@@ -39,7 +39,7 @@ describe("testing mixed direct and pooled stacking under epoch 2.1", () => {
   beforeAll(() => {
     orchestrator = buildDevnetNetworkOrchestrator(
       getNetworkIdFromEnv(),
-      timeline
+      timeline,
     );
     orchestrator.start();
   });
@@ -68,7 +68,7 @@ describe("testing mixed direct and pooled stacking under epoch 2.1", () => {
         fee,
         nonce: faucetNonce++,
       },
-      { amount: 75_000_000_000_000, blockHeight, cycles }
+      { amount: 75_000_000_000_000, blockHeight, cycles },
     );
     expect(response.error).toBeUndefined();
 
@@ -81,12 +81,12 @@ describe("testing mixed direct and pooled stacking under epoch 2.1", () => {
         fee,
         nonce: faucetNonce++,
       },
-      { amount: 1_100_000_000_000_000, poolAddress: Accounts.WALLET_2 }
+      { amount: 1_100_000_000_000_000, poolAddress: Accounts.WALLET_2 },
     );
     expect(response.error).toBeUndefined();
     let [block, tx] = await waitForStacksTransaction(
       orchestrator,
-      response.txid
+      response.txid,
     );
     expect(tx.success).toBeTruthy();
 
@@ -103,7 +103,7 @@ describe("testing mixed direct and pooled stacking under epoch 2.1", () => {
         stacker: Accounts.FAUCET,
         poolRewardAccount: Accounts.WALLET_2,
         increaseByAmountUstx: 920_000_000_000_000,
-      }
+      },
     );
     expect(response.error).toBeUndefined();
 
@@ -119,7 +119,7 @@ describe("testing mixed direct and pooled stacking under epoch 2.1", () => {
         fee,
         nonce: bobNonce++,
       },
-      { poolRewardAccount: Accounts.WALLET_2, cycleId: 2 }
+      { poolRewardAccount: Accounts.WALLET_2, cycleId: 2 },
     );
     expect(response.error).toBeUndefined();
 
@@ -139,7 +139,7 @@ describe("testing mixed direct and pooled stacking under epoch 2.1", () => {
       network,
       2,
       2,
-      0
+      0,
     );
     expect(poxAddrInfo0?.["total-ustx"]).toEqual(uintCV(75_000_000_000_000));
 
@@ -148,7 +148,7 @@ describe("testing mixed direct and pooled stacking under epoch 2.1", () => {
       network,
       2,
       2,
-      1
+      1,
     );
     expect(poxAddrInfo1?.["total-ustx"]).toEqual(uintCV(920_000_000_000_000));
   });
@@ -174,7 +174,7 @@ describe("testing mixed direct and pooled stacking under epoch 2.1", () => {
       network,
       2,
       2,
-      0
+      0,
     );
     expect(poxAddrInfo0?.["total-ustx"]).toEqual(uintCV(920_000_000_000_000));
 
@@ -182,7 +182,7 @@ describe("testing mixed direct and pooled stacking under epoch 2.1", () => {
       network,
       2,
       2,
-      1
+      1,
     );
     expect(poxAddrInfo1?.["total-ustx"]).toBeUndefined();
 
@@ -192,7 +192,7 @@ describe("testing mixed direct and pooled stacking under epoch 2.1", () => {
       network,
       Accounts.FAUCET.stxAddress,
       1_000_000_000_000_000 - faucetNonce * fee,
-      0
+      0,
     );
   });
 
@@ -205,7 +205,7 @@ describe("testing mixed direct and pooled stacking under epoch 2.1", () => {
 
     // Wait for 2.2 activation and unlock
     await orchestrator.waitForStacksBlockAnchoredOnBitcoinBlockOfHeight(
-      timeline.epoch_2_2 + 2
+      timeline.epoch_2_2 + 2,
     );
 
     // Check Bob's account info
@@ -213,7 +213,7 @@ describe("testing mixed direct and pooled stacking under epoch 2.1", () => {
       network,
       Accounts.WALLET_2.stxAddress,
       100_000_000_000_000 - bobNonce * fee,
-      0
+      0,
     );
 
     // Verify that Bob's STX are really unlocked by doing a transfer
@@ -222,7 +222,7 @@ describe("testing mixed direct and pooled stacking under epoch 2.1", () => {
       {
         amount: 100_000_000_000_000 - bobNonce * fee,
         recipient: Accounts.WALLET_3.stxAddress,
-      }
+      },
     );
     await asyncExpectStacksTransactionSuccess(orchestrator, response.txid);
 
@@ -231,7 +231,7 @@ describe("testing mixed direct and pooled stacking under epoch 2.1", () => {
       network,
       Accounts.FAUCET.stxAddress,
       1_000_000_000_000_000 - faucetNonce * fee,
-      0
+      0,
     );
 
     // Verify that Faucet's STX are really unlocked by doing a transfer
@@ -240,7 +240,7 @@ describe("testing mixed direct and pooled stacking under epoch 2.1", () => {
       {
         amount: 1_000_000_000_000_000 - faucetNonce * fee,
         recipient: Accounts.WALLET_3.stxAddress,
-      }
+      },
     );
     await asyncExpectStacksTransactionSuccess(orchestrator, response.txid);
   });
@@ -254,7 +254,7 @@ describe("testing mixed direct and pooled stacking under epoch 2.1", () => {
       await waitForNextRewardPhase(
         network,
         orchestrator,
-        poxInfo.current_cycle.id + 1
+        poxInfo.current_cycle.id + 1,
       );
 
       poxInfo = await getPoxInfo(network);

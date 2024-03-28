@@ -71,13 +71,13 @@ describe("to-consensus-buff?", () => {
     // Wait for the transaction to be processed
     let [block, tx] = await waitForStacksTransaction(
       orchestrator,
-      transaction.txid()
+      transaction.txid(),
     );
     expect(block.bitcoin_anchor_block_identifier.index).toBeLessThanOrEqual(
-      Constants.DEVNET_DEFAULT_EPOCH_2_1
+      Constants.DEVNET_DEFAULT_EPOCH_2_1,
     );
     expect(tx.description).toBe(
-      `deployed: ${Accounts.DEPLOYER.stxAddress}.test-2-05`
+      `deployed: ${Accounts.DEPLOYER.stxAddress}.test-2-05`,
     );
     expect(tx.success).toBeFalsy();
   });
@@ -86,7 +86,7 @@ describe("to-consensus-buff?", () => {
     beforeAll(async () => {
       // Wait for 2.1 to go live
       await orchestrator.waitForStacksBlockAnchoredOnBitcoinBlockOfHeight(
-        Constants.DEVNET_DEFAULT_EPOCH_2_1
+        Constants.DEVNET_DEFAULT_EPOCH_2_1,
       );
       await orchestrator.waitForNextStacksBlock();
     });
@@ -116,10 +116,10 @@ describe("to-consensus-buff?", () => {
       // Wait for the transaction to be processed
       let [block, tx] = await waitForStacksTransaction(
         orchestrator,
-        transaction.txid()
+        transaction.txid(),
       );
       expect(tx.description).toBe(
-        `deployed: ${Accounts.DEPLOYER.stxAddress}.test-2-1`
+        `deployed: ${Accounts.DEPLOYER.stxAddress}.test-2-1`,
       );
       expect(tx.success).toBeTruthy();
     });
@@ -150,13 +150,13 @@ describe("to-consensus-buff?", () => {
       // Wait for the transaction to be processed
       let [block, tx] = await waitForStacksTransaction(
         orchestrator,
-        transaction.txid()
+        transaction.txid(),
       );
       expect(tx.description).toBe(
-        `invoked: ${Accounts.DEPLOYER.stxAddress}.test-2-1::test-1()`
+        `invoked: ${Accounts.DEPLOYER.stxAddress}.test-2-1::test-1()`,
       );
       expect(tx.result).toBe(
-        "(ok (some 0x0000000000000000000000000000000001))"
+        "(ok (some 0x0000000000000000000000000000000001))",
       );
       expect(tx.success).toBeTruthy();
     });
@@ -187,13 +187,13 @@ describe("to-consensus-buff?", () => {
       // Wait for the transaction to be processed
       let [_, tx] = await waitForStacksTransaction(
         orchestrator,
-        transaction.txid()
+        transaction.txid(),
       );
       expect(tx.description).toBe(
-        `invoked: ${Accounts.DEPLOYER.stxAddress}.test-2-1::test-2()`
+        `invoked: ${Accounts.DEPLOYER.stxAddress}.test-2-1::test-2()`,
       );
       expect(tx.result).toBe(
-        "(ok (some 0x0100000000000000000000000000000001))"
+        "(ok (some 0x0100000000000000000000000000000001))",
       );
       expect(tx.success).toBeTruthy();
     });
@@ -224,13 +224,13 @@ describe("to-consensus-buff?", () => {
       // Wait for the transaction to be processed
       let [block, tx] = await waitForStacksTransaction(
         orchestrator,
-        transaction.txid()
+        transaction.txid(),
       );
       expect(tx.description).toBe(
-        `invoked: ${Accounts.DEPLOYER.stxAddress}.test-2-1::test-3()`
+        `invoked: ${Accounts.DEPLOYER.stxAddress}.test-2-1::test-3()`,
       );
       expect(tx.result).toBe(
-        "(ok (some 0x0c00000002036162630000000000000000000000000000000003036465660000000000000000000000000000000004))"
+        "(ok (some 0x0c00000002036162630000000000000000000000000000000003036465660000000000000000000000000000000004))",
       );
       expect(tx.success).toBeTruthy();
     });
