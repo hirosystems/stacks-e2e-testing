@@ -28,6 +28,7 @@ export const broadcastStackSTX = async (
   };
 
   let poxContract = Contracts.POX[poxVersion] || Contracts.DEFAULT;
+  // todo: generate signature and other args
   const txOptions = {
     contractAddress: poxContract.address,
     contractName: poxContract.name,

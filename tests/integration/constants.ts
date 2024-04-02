@@ -38,11 +38,16 @@ export namespace Contracts {
     address: "ST000000000000000000002AMW42H",
     name: "pox-3",
   };
+  export const POX_4 = {
+    address: "ST000000000000000000002AMW42H",
+    name: "pox-4",
+  };
   export const DEFAULT = POX_3;
   export const POX: PoxVersions = {
     1: POX_1,
     2: POX_2,
     3: POX_3,
+    4: POX_4,
   };
 }
 
