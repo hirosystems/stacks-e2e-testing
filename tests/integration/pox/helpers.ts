@@ -72,6 +72,7 @@ export const getPoxInfo = async (
   retry?: number,
 ): Promise<
   PoxInfo & {
+    rejection_votes_left_required: number;
     total_liquid_supply_ustx: number;
     pox_activation_threshold_ustx: number;
   }
@@ -81,6 +82,7 @@ export const getPoxInfo = async (
   try {
     let response = await fetch(network.getPoxInfoUrl(), {});
     let poxInfo = (await response.json()) as PoxInfo & {
+      rejection_votes_left_required: number;
       total_liquid_supply_ustx: number;
       pox_activation_threshold_ustx: number;
     };
