@@ -31,6 +31,8 @@ interface EpochTimeline {
   epoch_3_0?: number;
 }
 
+export const POX_CYCLE_LENGTH = 10;
+
 export const DEFAULT_EPOCH_TIMELINE = {
   epoch_2_0: Constants.DEVNET_DEFAULT_EPOCH_2_0,
   epoch_2_05: Constants.DEVNET_DEFAULT_EPOCH_2_05,
@@ -55,7 +57,39 @@ export const FAST_FORWARD_TO_EPOCH_2_4 = {
   epoch_2_4: 112,
 };
 
-export const POX_CYCLE_LENGTH = 10;
+export const EPOCH_TIMELINE_LONG_2_05 = {
+  epoch_2_0: Constants.DEVNET_DEFAULT_EPOCH_2_0,
+  epoch_2_05: Constants.DEVNET_DEFAULT_EPOCH_2_05,
+  epoch_2_1: Constants.DEVNET_DEFAULT_EPOCH_2_1 + POX_CYCLE_LENGTH,
+  pox_2_activation:
+    Constants.DEVNET_DEFAULT_POX_2_ACTIVATION + POX_CYCLE_LENGTH,
+  epoch_2_2: Constants.DEVNET_DEFAULT_EPOCH_2_2 + POX_CYCLE_LENGTH,
+  epoch_2_3: Constants.DEVNET_DEFAULT_EPOCH_2_3 + POX_CYCLE_LENGTH,
+  pox_3_activation:
+    Constants.DEVNET_DEFAULT_POX_3_ACTIVATION + POX_CYCLE_LENGTH,
+  epoch_2_4: Constants.DEVNET_DEFAULT_EPOCH_2_4 + POX_CYCLE_LENGTH,
+  epoch_2_5: Constants.DEVNET_DEFAULT_EPOCH_2_5 + POX_CYCLE_LENGTH,
+  pox_4_activation:
+    Constants.DEVNET_DEFAULT_POX_4_ACTIVATION + POX_CYCLE_LENGTH,
+  epoch_3_0: Constants.DEVNET_DEFAULT_EPOCH_3_0 + POX_CYCLE_LENGTH,
+};
+
+export const EPOCH_TIMELINE_LONG_2_1 = {
+  epoch_2_0: Constants.DEVNET_DEFAULT_EPOCH_2_0,
+  epoch_2_05: Constants.DEVNET_DEFAULT_EPOCH_2_05,
+  epoch_2_1: Constants.DEVNET_DEFAULT_EPOCH_2_1,
+  pox_2_activation:
+    Constants.DEVNET_DEFAULT_POX_2_ACTIVATION + 2 * POX_CYCLE_LENGTH,
+  epoch_2_2: Constants.DEVNET_DEFAULT_EPOCH_2_2 + 2 * POX_CYCLE_LENGTH,
+  epoch_2_3: Constants.DEVNET_DEFAULT_EPOCH_2_3 + 2 * POX_CYCLE_LENGTH,
+  pox_3_activation:
+    Constants.DEVNET_DEFAULT_POX_3_ACTIVATION + 2 * POX_CYCLE_LENGTH,
+  epoch_2_4: Constants.DEVNET_DEFAULT_EPOCH_2_4 + 2 * POX_CYCLE_LENGTH,
+  epoch_2_5: Constants.DEVNET_DEFAULT_EPOCH_2_5 + 2 * POX_CYCLE_LENGTH,
+  pox_4_activation:
+    Constants.DEVNET_DEFAULT_POX_4_ACTIVATION + 2 * POX_CYCLE_LENGTH,
+  epoch_3_0: Constants.DEVNET_DEFAULT_EPOCH_3_0 + 2 * POX_CYCLE_LENGTH,
+};
 
 /// This function will fill in any missing epoch values in the timeline
 /// with reasonable block heights.

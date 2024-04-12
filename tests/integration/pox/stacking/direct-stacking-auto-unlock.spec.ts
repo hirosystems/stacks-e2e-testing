@@ -44,7 +44,9 @@ describe("testing solo stacker below minimum", () => {
   });
 
   it("stacking above minimum increment should succeed", async () => {
-    const network = new StacksTestnet({ url: orchestrator.getStacksNodeUrl() });
+    const network = new StacksTestnet({
+      url: orchestrator.getStacksNodeUrl().replace("localhost", "127.0.0.1"),
+    });
 
     // Wait for Stacks genesis block
     await orchestrator.waitForNextStacksBlock();
@@ -122,7 +124,9 @@ describe("testing solo stacker below minimum", () => {
   });
 
   it("Increased slot price should auto-unlock user (cycle #2)", async () => {
-    const network = new StacksTestnet({ url: orchestrator.getStacksNodeUrl() });
+    const network = new StacksTestnet({
+      url: orchestrator.getStacksNodeUrl().replace("localhost", "127.0.0.1"),
+    });
 
     // Wait for block N+5 where N is the height of the next reward phase
     await waitForNextRewardPhase(network, orchestrator, 5);
@@ -163,7 +167,9 @@ describe("testing solo stacker below minimum", () => {
     if (Number(version) < 2.2) {
       return;
     }
-    const network = new StacksTestnet({ url: orchestrator.getStacksNodeUrl() });
+    const network = new StacksTestnet({
+      url: orchestrator.getStacksNodeUrl().replace("localhost", "127.0.0.1"),
+    });
 
     // Wait for 2.2 activation and unlock
     await orchestrator.waitForStacksBlockAnchoredOnBitcoinBlockOfHeight(
@@ -210,7 +216,7 @@ describe("testing solo stacker below minimum", () => {
   it("PoX should stay disabled indefinitely in 2.2 and 2.3", async () => {
     if (version === "2.2" || version === "2.3") {
       const network = new StacksTestnet({
-        url: orchestrator.getStacksNodeUrl(),
+        url: orchestrator.getStacksNodeUrl().replace("localhost", "127.0.0.1"),
       });
       let poxInfo = await getPoxInfo(network);
       await waitForNextRewardPhase(

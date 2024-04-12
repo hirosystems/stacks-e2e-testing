@@ -35,7 +35,9 @@ describe("use", () => {
       pox_2_activation: 120,
     });
     orchestrator.start();
-    network = new StacksTestnet({ url: orchestrator.getStacksNodeUrl() });
+    network = new StacksTestnet({
+      url: orchestrator.getStacksNodeUrl().replace("localhost", "127.0.0.1"),
+    });
   });
 
   afterAll(() => {
@@ -48,7 +50,7 @@ describe("use", () => {
   const circularTrait2 = `(define-trait circular1 (
     (circular (<circular2>) (response bool bool))
   ))
-  
+
   (define-trait circular2 (
     (circular (<circular1>) (response bool bool))
   ))`;

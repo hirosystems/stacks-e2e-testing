@@ -100,7 +100,9 @@ describe("concrete trait parameter used in a wrapper", () => {
   });
 
   it("using a concrete trait parameter should not work in Stacks 2.2", async () => {
-    const network = new StacksTestnet({ url: orchestrator.getStacksNodeUrl() });
+    const network = new StacksTestnet({
+      url: orchestrator.getStacksNodeUrl().replace("localhost", "127.0.0.1"),
+    });
 
     await orchestrator.waitForNextStacksBlock();
 
@@ -161,7 +163,9 @@ describe("concrete trait parameter used in a wrapper", () => {
   });
 
   it("using a concrete trait parameter should work in Stacks 2.3", async () => {
-    const network = new StacksTestnet({ url: orchestrator.getStacksNodeUrl() });
+    const network = new StacksTestnet({
+      url: orchestrator.getStacksNodeUrl().replace("localhost", "127.0.0.1"),
+    });
     //
     // Wait for the 2.3 activation, then check again
     //

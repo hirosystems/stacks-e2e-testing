@@ -38,7 +38,9 @@ describe("stx-account", () => {
       epoch_2_2: 300,
     });
     orchestrator.start();
-    network = new StacksTestnet({ url: orchestrator.getStacksNodeUrl() });
+    network = new StacksTestnet({
+      url: orchestrator.getStacksNodeUrl().replace("localhost", "127.0.0.1"),
+    });
   });
 
   afterAll(() => {

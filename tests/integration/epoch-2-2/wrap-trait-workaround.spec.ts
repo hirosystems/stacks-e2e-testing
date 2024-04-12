@@ -32,11 +32,11 @@ describe("trait parameter with wrapped caller in Stacks 2.2", () => {
 
   const codeBodyTestTrait = `(define-trait test-trait
     ((foo (uint) (response uint uint))))
-  
+
   (define-read-only (foo-arg (f <test-trait>))
     (contract-of f)
   )
-  
+
   (define-public (call-foo (f <test-trait>) (a uint))
     (contract-call? f foo a)
   )`;
@@ -46,11 +46,11 @@ describe("trait parameter with wrapped caller in Stacks 2.2", () => {
   )`;
 
   const codeBodyTestTraitWrapper = `(use-trait test-trait .test-trait.test-trait)
-    
+
   (define-read-only (foo-arg (f <test-trait>))
     (contract-call? .test-trait foo-arg f)
   )
-  
+
   (define-public (call-foo (f <test-trait>) (a uint))
     (contract-call? .test-trait call-foo f a)
   )`;
@@ -68,7 +68,9 @@ describe("trait parameter with wrapped caller in Stacks 2.2", () => {
   });
 
   it("work around the bug by wrapping the caller should fail in Stacks 2.2", async () => {
-    const network = new StacksTestnet({ url: orchestrator.getStacksNodeUrl() });
+    const network = new StacksTestnet({
+      url: orchestrator.getStacksNodeUrl().replace("localhost", "127.0.0.1"),
+    });
 
     await orchestrator.waitForNextStacksBlock();
 

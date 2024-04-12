@@ -58,7 +58,9 @@ describe("transaction-fee", () => {
   });
 
   it("fee is charged prior to execution", async (ctx) => {
-    const network = new StacksTestnet({ url: orchestrator.getStacksNodeUrl() });
+    const network = new StacksTestnet({
+      url: orchestrator.getStacksNodeUrl().replace("localhost", "127.0.0.1"),
+    });
 
     // Wait for Stacks 2.1 to start
     await orchestrator.waitForStacksBlockAnchoredOnBitcoinBlockOfHeight(

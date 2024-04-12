@@ -39,7 +39,9 @@ describe("testing reject-pox", () => {
   });
 
   it("pox should remain active if non-zero amount, but less than the limit reject", async () => {
-    const network = new StacksTestnet({ url: orchestrator.getStacksNodeUrl() });
+    const network = new StacksTestnet({
+      url: orchestrator.getStacksNodeUrl().replace("localhost", "127.0.0.1"),
+    });
 
     // Wait for 2.4 to go live
     await orchestrator.waitForStacksBlockAnchoredOnBitcoinBlockOfHeight(
@@ -128,7 +130,9 @@ describe("testing reject-pox", () => {
   });
 
   it("cannot reject-pox if already stacked", async () => {
-    const network = new StacksTestnet({ url: orchestrator.getStacksNodeUrl() });
+    const network = new StacksTestnet({
+      url: orchestrator.getStacksNodeUrl().replace("localhost", "127.0.0.1"),
+    });
 
     // Alice rejects pox, but has already stacked, so it fails
     let response = await broadcastRejectPox({
@@ -148,7 +152,9 @@ describe("testing reject-pox", () => {
   });
 
   it("pox should be disabled if enough STX reject", async () => {
-    const network = new StacksTestnet({ url: orchestrator.getStacksNodeUrl() });
+    const network = new StacksTestnet({
+      url: orchestrator.getStacksNodeUrl().replace("localhost", "127.0.0.1"),
+    });
 
     let response = await broadcastRejectPox({
       poxVersion: 3,
@@ -199,7 +205,9 @@ describe("testing reject-pox", () => {
   });
 
   it("pox should be re-enabled in the next cycle", async () => {
-    const network = new StacksTestnet({ url: orchestrator.getStacksNodeUrl() });
+    const network = new StacksTestnet({
+      url: orchestrator.getStacksNodeUrl().replace("localhost", "127.0.0.1"),
+    });
 
     await waitForNextRewardPhase(network, orchestrator, 1);
 

@@ -36,7 +36,9 @@ describe("use", () => {
       pox_2_activation: 120,
     });
     orchestrator.start();
-    network = new StacksTestnet({ url: orchestrator.getStacksNodeUrl() });
+    network = new StacksTestnet({
+      url: orchestrator.getStacksNodeUrl().replace("localhost", "127.0.0.1"),
+    });
   });
 
   afterAll(() => {
@@ -53,7 +55,7 @@ describe("use", () => {
   (define-public (call-double-1 (double <double>))
     (contract-call? double foo u5)
   )
-  
+
   (define-public (call-double-2 (double <double>))
     (contract-call? double foo true)
   )`;

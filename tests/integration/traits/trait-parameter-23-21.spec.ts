@@ -119,7 +119,9 @@ describe("trait implementer deployed in 2.1, trait user deployed in 2.3", () => 
   });
 
   it("passing a trait parameter should work in Stacks 2.3", async () => {
-    const network = new StacksTestnet({ url: orchestrator.getStacksNodeUrl() });
+    const network = new StacksTestnet({
+      url: orchestrator.getStacksNodeUrl().replace("localhost", "127.0.0.1"),
+    });
 
     // Wait for the 2.1 activation
     await orchestrator.waitForStacksBlockAnchoredOnBitcoinBlockOfHeight(

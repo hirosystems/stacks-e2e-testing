@@ -51,7 +51,9 @@ describe("testing pooled stacking for sbtc mini under epoch 2.4", () => {
   });
 
   it("STX delegation and locking by pool operator should register STX for rewards", async () => {
-    const network = new StacksTestnet({ url: orchestrator.getStacksNodeUrl() });
+    const network = new StacksTestnet({
+      url: orchestrator.getStacksNodeUrl().replace("localhost", "127.0.0.1"),
+    });
 
     // Wait for 2.4 to go live
     await orchestrator.waitForStacksBlockAnchoredOnBitcoinBlockOfHeight(
@@ -167,7 +169,9 @@ describe("testing pooled stacking for sbtc mini under epoch 2.4", () => {
   });
 
   it("pool operator can extend using different pox address (cycle #1)", async () => {
-    const network = new StacksTestnet({ url: orchestrator.getStacksNodeUrl() });
+    const network = new StacksTestnet({
+      url: orchestrator.getStacksNodeUrl().replace("localhost", "127.0.0.1"),
+    });
 
     // Chloe extends Alice 90m by 1 cycle using wallet_2.btcAddress
     let response = await broadcastDelegateStackExtend(
@@ -267,7 +271,9 @@ describe("testing pooled stacking for sbtc mini under epoch 2.4", () => {
   });
 
   it("extended STX are locked for next cycle (cycle #2)", async () => {
-    const network = new StacksTestnet({ url: orchestrator.getStacksNodeUrl() });
+    const network = new StacksTestnet({
+      url: orchestrator.getStacksNodeUrl().replace("localhost", "127.0.0.1"),
+    });
 
     // Wait for block N+6 where N is the height of the next reward phase
     await waitForNextRewardPhase(network, orchestrator, 6);

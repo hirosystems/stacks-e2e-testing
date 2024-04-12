@@ -39,7 +39,9 @@ describe("testing solo stacker below minimum", () => {
   });
 
   it("stacking above minimum increment should succeed", async () => {
-    const network = new StacksTestnet({ url: orchestrator.getStacksNodeUrl() });
+    const network = new StacksTestnet({
+      url: orchestrator.getStacksNodeUrl().replace("localhost", "127.0.0.1"),
+    });
 
     // Wait for 2.4 to go live
     await orchestrator.waitForStacksBlockAnchoredOnBitcoinBlockOfHeight(
@@ -119,7 +121,9 @@ describe("testing solo stacker below minimum", () => {
   });
 
   it("Increased slot price should auto-unlock user (cycle #2)", async () => {
-    const network = new StacksTestnet({ url: orchestrator.getStacksNodeUrl() });
+    const network = new StacksTestnet({
+      url: orchestrator.getStacksNodeUrl().replace("localhost", "127.0.0.1"),
+    });
 
     // Wait for block N+5 where N is the height of the next reward phase
     await waitForNextRewardPhase(network, orchestrator, 5);

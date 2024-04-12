@@ -7,6 +7,7 @@ import { uintCV } from "@stacks/transactions";
 import { Accounts, Constants, DEFAULT_FEE } from "../../constants";
 import {
   DEFAULT_EPOCH_TIMELINE,
+  EPOCH_TIMELINE_LONG_2_1,
   asyncExpectStacksTransactionSuccess,
   buildDevnetNetworkOrchestrator,
   getNetworkIdFromEnv,
@@ -29,11 +30,7 @@ import { getCoreInfo } from "../helpers";
 describe("testing pooled stacking under epoch 2.1", () => {
   let orchestrator: DevnetNetworkOrchestrator;
 
-  const timeline = {
-    epoch_2_2: 128,
-    pox_2_unlock_height: 129,
-    epoch_2_3: 138,
-  };
+  const timeline = EPOCH_TIMELINE_LONG_2_1;
 
   beforeAll(() => {
     orchestrator = buildDevnetNetworkOrchestrator(
@@ -48,7 +45,9 @@ describe("testing pooled stacking under epoch 2.1", () => {
   });
 
   it("STX delegation and locking by pool operator should register STX for rewards", async () => {
-    const network = new StacksTestnet({ url: orchestrator.getStacksNodeUrl() });
+    const network = new StacksTestnet({
+      url: orchestrator.getStacksNodeUrl().replace("localhost", "127.0.0.1"),
+    });
 
     // Wait for the pox-2 activation
     await orchestrator.waitForStacksBlockAnchoredOnBitcoinBlockOfHeight(
@@ -129,7 +128,9 @@ describe("testing pooled stacking under epoch 2.1", () => {
   });
 
   it("user can switch pools and new pool operator can extend (cycle #1)", async () => {
-    const network = new StacksTestnet({ url: orchestrator.getStacksNodeUrl() });
+    const network = new StacksTestnet({
+      url: orchestrator.getStacksNodeUrl().replace("localhost", "127.0.0.1"),
+    });
 
     // Alice revokes, then delegates 95m STX to Bob
     let response = await broadcastRevokeDelegateStx({
@@ -215,7 +216,9 @@ describe("testing pooled stacking under epoch 2.1", () => {
   });
 
   it("extended STX are locked for next cycle (cycle #2)", async () => {
-    const network = new StacksTestnet({ url: orchestrator.getStacksNodeUrl() });
+    const network = new StacksTestnet({
+      url: orchestrator.getStacksNodeUrl().replace("localhost", "127.0.0.1"),
+    });
 
     // Wait for block N+6 where N is the height of the next reward phase
     // block 126

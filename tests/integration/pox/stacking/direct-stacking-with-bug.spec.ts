@@ -41,7 +41,9 @@ describe("testing solo stacker increase with bug", () => {
   });
 
   it("using stacks-increase in the same cycle should result in increased rewards", async () => {
-    const network = new StacksTestnet({ url: orchestrator.getStacksNodeUrl() });
+    const network = new StacksTestnet({
+      url: orchestrator.getStacksNodeUrl().replace("localhost", "127.0.0.1"),
+    });
 
     // Wait for Stacks genesis block
     await orchestrator.waitForNextStacksBlock();

@@ -38,7 +38,9 @@ describe("testing solo stacker increase without bug", () => {
   });
 
   it("using stacks-increase in the same cycle should result in increased rewards", async () => {
-    const network = new StacksTestnet({ url: orchestrator.getStacksNodeUrl() });
+    const network = new StacksTestnet({
+      url: orchestrator.getStacksNodeUrl().replace("localhost", "127.0.0.1"),
+    });
 
     // Wait for Stacks genesis block
     await orchestrator.waitForNextStacksBlock();
@@ -129,7 +131,9 @@ describe("testing solo stacker increase without bug", () => {
     if (Number(version) < 2.2) {
       return;
     }
-    const network = new StacksTestnet({ url: orchestrator.getStacksNodeUrl() });
+    const network = new StacksTestnet({
+      url: orchestrator.getStacksNodeUrl().replace("localhost", "127.0.0.1"),
+    });
 
     // Wait for 2.2 activation and unlock
     await orchestrator.waitForStacksBlockAnchoredOnBitcoinBlockOfHeight(
@@ -176,7 +180,7 @@ describe("testing solo stacker increase without bug", () => {
   it("PoX should stay disabled indefinitely in 2.2 and 2.3", async () => {
     if (version === "2.2" || version === "2.3") {
       const network = new StacksTestnet({
-        url: orchestrator.getStacksNodeUrl(),
+        url: orchestrator.getStacksNodeUrl().replace("localhost", "127.0.0.1"),
       });
       let poxInfo = await getPoxInfo(network);
       await waitForNextRewardPhase(

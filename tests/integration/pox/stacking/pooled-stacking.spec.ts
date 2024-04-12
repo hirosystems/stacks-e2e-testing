@@ -3,6 +3,7 @@ import { StacksTestnet } from "@stacks/network";
 import { Accounts, Constants } from "../../constants";
 import {
   DEFAULT_EPOCH_TIMELINE,
+  EPOCH_TIMELINE_LONG_2_1,
   asyncExpectStacksTransactionSuccess,
   broadcastSTXTransfer,
   buildDevnetNetworkOrchestrator,
@@ -33,11 +34,7 @@ describe("testing pooled stacking under epoch 2.1", () => {
   let orchestrator: DevnetNetworkOrchestrator;
   const version = getStacksNodeVersion();
   const fee = 1000;
-  const timeline = {
-    epoch_2_2: 144,
-    epoch_2_3: 147,
-    epoch_2_4: 149,
-  };
+  const timeline = EPOCH_TIMELINE_LONG_2_1;
   let aliceNonce = 0;
   let bobNonce = 0;
   let chloeNonce = 0;
@@ -55,7 +52,9 @@ describe("testing pooled stacking under epoch 2.1", () => {
   });
 
   it("STX delegation and locking by pool operator should register STX for rewards", async () => {
-    const network = new StacksTestnet({ url: orchestrator.getStacksNodeUrl() });
+    const network = new StacksTestnet({
+      url: orchestrator.getStacksNodeUrl().replace("localhost", "127.0.0.1"),
+    });
 
     // Wait for Stacks genesis block
     await orchestrator.waitForNextStacksBlock();
@@ -154,7 +153,9 @@ describe("testing pooled stacking under epoch 2.1", () => {
   });
 
   it("pool operator can add small amounts (cycle #1)", async () => {
-    const network = new StacksTestnet({ url: orchestrator.getStacksNodeUrl() });
+    const network = new StacksTestnet({
+      url: orchestrator.getStacksNodeUrl().replace("localhost", "127.0.0.1"),
+    });
 
     // Chloe locks 50m for Bob (below minimum for normal stack aggregation commit)
     let response = await broadcastDelegateStackSTX(
@@ -218,7 +219,9 @@ describe("testing pooled stacking under epoch 2.1", () => {
   });
 
   it("Revoking delegation should not unlock STX (cycle #2)", async () => {
-    const network = new StacksTestnet({ url: orchestrator.getStacksNodeUrl() });
+    const network = new StacksTestnet({
+      url: orchestrator.getStacksNodeUrl().replace("localhost", "127.0.0.1"),
+    });
 
     // Wait for block N+1 where N is the height of the next reward phase
     await waitForNextRewardPhase(network, orchestrator, 1);
@@ -252,7 +255,9 @@ describe("testing pooled stacking under epoch 2.1", () => {
   });
 
   it("pool operator can't user delegate-stack-stx for already stacked users (cycle #2)", async () => {
-    const network = new StacksTestnet({ url: orchestrator.getStacksNodeUrl() });
+    const network = new StacksTestnet({
+      url: orchestrator.getStacksNodeUrl().replace("localhost", "127.0.0.1"),
+    });
 
     // Chloe tries to stack 80m for Alice
     let response = await broadcastDelegateStackSTX(
@@ -282,7 +287,9 @@ describe("testing pooled stacking under epoch 2.1", () => {
   });
 
   it("pool operators can lock user's locked stx for longer (cycle #2)", async () => {
-    const network = new StacksTestnet({ url: orchestrator.getStacksNodeUrl() });
+    const network = new StacksTestnet({
+      url: orchestrator.getStacksNodeUrl().replace("localhost", "127.0.0.1"),
+    });
 
     // Chloe locks extends Alice's locking (90m) for 1 cycle
     // until #3
@@ -330,7 +337,9 @@ describe("testing pooled stacking under epoch 2.1", () => {
   });
 
   it("pool operator can increase stacking amount for already stacked users (cycle #2)", async () => {
-    const network = new StacksTestnet({ url: orchestrator.getStacksNodeUrl() });
+    const network = new StacksTestnet({
+      url: orchestrator.getStacksNodeUrl().replace("localhost", "127.0.0.1"),
+    });
 
     // Chloe increases Alice stacking by 10m
     let response = await broadcastDelegateStackIncrease(
@@ -392,7 +401,9 @@ describe("testing pooled stacking under epoch 2.1", () => {
   });
 
   it("without action from pool operator, stack unlocks (cycle #3)", async () => {
-    const network = new StacksTestnet({ url: orchestrator.getStacksNodeUrl() });
+    const network = new StacksTestnet({
+      url: orchestrator.getStacksNodeUrl().replace("localhost", "127.0.0.1"),
+    });
 
     // move on to the nexte cycle
     await waitForNextRewardPhase(network, orchestrator, 1);
@@ -421,7 +432,9 @@ describe("testing pooled stacking under epoch 2.1", () => {
     if (Number(version) < 2.2) {
       return;
     }
-    const network = new StacksTestnet({ url: orchestrator.getStacksNodeUrl() });
+    const network = new StacksTestnet({
+      url: orchestrator.getStacksNodeUrl().replace("localhost", "127.0.0.1"),
+    });
 
     // Wait for 2.2 activation and unlock
     await orchestrator.waitForStacksBlockAnchoredOnBitcoinBlockOfHeight(
@@ -468,7 +481,7 @@ describe("testing pooled stacking under epoch 2.1", () => {
   it("PoX should stay disabled indefinitely in 2.2 and 2.3", async () => {
     if (version === "2.2" || version === "2.3") {
       const network = new StacksTestnet({
-        url: orchestrator.getStacksNodeUrl(),
+        url: orchestrator.getStacksNodeUrl().replace("localhost", "127.0.0.1"),
       });
       let poxInfo = await getPoxInfo(network);
       await waitForNextRewardPhase(

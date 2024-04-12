@@ -39,7 +39,9 @@ describe("use and define trait with same name", () => {
       timeline,
     );
     orchestrator.start();
-    network = new StacksTestnet({ url: orchestrator.getStacksNodeUrl() });
+    network = new StacksTestnet({
+      url: orchestrator.getStacksNodeUrl().replace("localhost", "127.0.0.1"),
+    });
   });
 
   afterAll(() => {
@@ -54,7 +56,7 @@ describe("use and define trait with same name", () => {
   (define-trait a (
     (do-that () (response bool bool))
   ))
-  
+
   (define-public (call-do-it (a-contract <a-alias>))
     (contract-call? a-contract do-it)
   )`;

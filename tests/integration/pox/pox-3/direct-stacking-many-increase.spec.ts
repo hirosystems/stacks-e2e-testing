@@ -36,7 +36,9 @@ describe("testing multiple stack-stx and stack-increase calls in the same block"
 
   // This test would have failed due to the bug in pox-2
   it("multiple stack-stx and stack-increase calls in the same block", async () => {
-    const network = new StacksTestnet({ url: orchestrator.getStacksNodeUrl() });
+    const network = new StacksTestnet({
+      url: orchestrator.getStacksNodeUrl().replace("localhost", "127.0.0.1"),
+    });
 
     // Wait for 2.4 to go live
     await orchestrator.waitForStacksBlockAnchoredOnBitcoinBlockOfHeight(

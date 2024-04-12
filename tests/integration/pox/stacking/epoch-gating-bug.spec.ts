@@ -42,7 +42,9 @@ describe("testing solo stacker increase with bug", () => {
   });
 
   it("epoch gating in clarity should work", async () => {
-    const network = new StacksTestnet({ url: orchestrator.getStacksNodeUrl() });
+    const network = new StacksTestnet({
+      url: orchestrator.getStacksNodeUrl().replace("localhost", "127.0.0.1"),
+    });
 
     await orchestrator.waitForStacksBlockAnchoredOnBitcoinBlockOfHeight(
       Constants.DEVNET_DEFAULT_POX_2_ACTIVATION + 1,

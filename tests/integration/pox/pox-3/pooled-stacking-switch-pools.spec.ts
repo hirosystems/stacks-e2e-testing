@@ -48,7 +48,9 @@ describe("testing pooled stacking under epoch 2.1", () => {
   });
 
   it("STX delegation and locking by pool operator should register STX for rewards", async () => {
-    const network = new StacksTestnet({ url: orchestrator.getStacksNodeUrl() });
+    const network = new StacksTestnet({
+      url: orchestrator.getStacksNodeUrl().replace("localhost", "127.0.0.1"),
+    });
 
     // Wait for 2.4 to go live
     await orchestrator.waitForStacksBlockAnchoredOnBitcoinBlockOfHeight(
@@ -131,7 +133,9 @@ describe("testing pooled stacking under epoch 2.1", () => {
   });
 
   it("user can switch pools, but new pool cannot lock, extend, or increase (cycle #1)", async () => {
-    const network = new StacksTestnet({ url: orchestrator.getStacksNodeUrl() });
+    const network = new StacksTestnet({
+      url: orchestrator.getStacksNodeUrl().replace("localhost", "127.0.0.1"),
+    });
     const chainInfo = await getChainInfo(network);
     const blockHeight = chainInfo.burn_block_height;
 
@@ -264,7 +268,9 @@ describe("testing pooled stacking under epoch 2.1", () => {
   });
 
   it("STX are not locked for next cycle (cycle #2)", async () => {
-    const network = new StacksTestnet({ url: orchestrator.getStacksNodeUrl() });
+    const network = new StacksTestnet({
+      url: orchestrator.getStacksNodeUrl().replace("localhost", "127.0.0.1"),
+    });
 
     // Wait for block N+6 where N is the height of the next reward phase
     await waitForNextRewardPhase(network, orchestrator, 6);
@@ -302,7 +308,9 @@ describe("testing pooled stacking under epoch 2.1", () => {
   });
 
   it("New pool can lock user's STX after previous lock-up is complete (cycle #3)", async () => {
-    const network = new StacksTestnet({ url: orchestrator.getStacksNodeUrl() });
+    const network = new StacksTestnet({
+      url: orchestrator.getStacksNodeUrl().replace("localhost", "127.0.0.1"),
+    });
 
     // Wait for block N+2 where N is the height of the next reward phase
     await waitForNextRewardPhase(network, orchestrator, 2);

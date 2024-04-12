@@ -4,6 +4,7 @@ import { SomeCV, cvToString, uintCV } from "@stacks/transactions";
 import { Accounts, Constants } from "../../constants";
 import {
   DEFAULT_EPOCH_TIMELINE,
+  EPOCH_TIMELINE_LONG_2_1,
   asyncExpectStacksTransactionSuccess,
   broadcastSTXTransfer,
   buildDevnetNetworkOrchestrator,
@@ -28,11 +29,7 @@ describe("testing mixed direct and pooled stacking with extend under epoch 2.1",
   let orchestrator: DevnetNetworkOrchestrator;
   const version = getStacksNodeVersion();
   const fee = 1000;
-  const timeline = {
-    epoch_2_2: 138,
-    epoch_2_3: 142,
-    epoch_2_4: 146,
-  };
+  const timeline = EPOCH_TIMELINE_LONG_2_1;
   let aliceNonce = 0;
   let bobNonce = 0;
   let chloeNonce = 0;
@@ -51,7 +48,9 @@ describe("testing mixed direct and pooled stacking with extend under epoch 2.1",
   });
 
   it("delegate-stack-extend should extend locking to direct stacker (cycle #1)", async () => {
-    const network = new StacksTestnet({ url: orchestrator.getStacksNodeUrl() });
+    const network = new StacksTestnet({
+      url: orchestrator.getStacksNodeUrl().replace("localhost", "127.0.0.1"),
+    });
 
     // Wait for Stacks genesis block
     await orchestrator.waitForNextStacksBlock();
@@ -156,7 +155,9 @@ describe("testing mixed direct and pooled stacking with extend under epoch 2.1",
   });
 
   it("stacking more should increase the slot price (cycle #1)", async () => {
-    const network = new StacksTestnet({ url: orchestrator.getStacksNodeUrl() });
+    const network = new StacksTestnet({
+      url: orchestrator.getStacksNodeUrl().replace("localhost", "127.0.0.1"),
+    });
 
     const blockHeight = Constants.DEVNET_DEFAULT_POX_2_ACTIVATION + 1;
     const cycles = 1;
@@ -186,7 +187,9 @@ describe("testing mixed direct and pooled stacking with extend under epoch 2.1",
   });
 
   it("auto-unlock unlocks directly stacked amount and total_stacked is not updated (BUG) (cycle #2)", async () => {
-    const network = new StacksTestnet({ url: orchestrator.getStacksNodeUrl() });
+    const network = new StacksTestnet({
+      url: orchestrator.getStacksNodeUrl().replace("localhost", "127.0.0.1"),
+    });
 
     // Wait for Stacks genesis block
     await orchestrator.waitForNextStacksBlock();
@@ -241,7 +244,9 @@ describe("testing mixed direct and pooled stacking with extend under epoch 2.1",
   });
 
   it("stacking by other user should activate pox for cycle #3 (cycle #2)", async () => {
-    const network = new StacksTestnet({ url: orchestrator.getStacksNodeUrl() });
+    const network = new StacksTestnet({
+      url: orchestrator.getStacksNodeUrl().replace("localhost", "127.0.0.1"),
+    });
     const blockHeight = Constants.DEVNET_DEFAULT_POX_2_ACTIVATION + 11;
     const cycles = 1;
 
@@ -265,7 +270,9 @@ describe("testing mixed direct and pooled stacking with extend under epoch 2.1",
   });
 
   it("unlocked amount should be still unlocked, but STX are earning (BUG) (cycle #3)", async () => {
-    const network = new StacksTestnet({ url: orchestrator.getStacksNodeUrl() });
+    const network = new StacksTestnet({
+      url: orchestrator.getStacksNodeUrl().replace("localhost", "127.0.0.1"),
+    });
 
     // Wait for Stacks genesis block
     await orchestrator.waitForNextStacksBlock();
@@ -318,7 +325,9 @@ describe("testing mixed direct and pooled stacking with extend under epoch 2.1",
     if (Number(version) < 2.2) {
       return;
     }
-    const network = new StacksTestnet({ url: orchestrator.getStacksNodeUrl() });
+    const network = new StacksTestnet({
+      url: orchestrator.getStacksNodeUrl().replace("localhost", "127.0.0.1"),
+    });
 
     // Wait for 2.2 activation and unlock
     await orchestrator.waitForStacksBlockAnchoredOnBitcoinBlockOfHeight(
@@ -365,7 +374,7 @@ describe("testing mixed direct and pooled stacking with extend under epoch 2.1",
   it("PoX should stay disabled indefinitely in 2.2 and 2.3", async () => {
     if (version === "2.2" || version === "2.3") {
       const network = new StacksTestnet({
-        url: orchestrator.getStacksNodeUrl(),
+        url: orchestrator.getStacksNodeUrl().replace("localhost", "127.0.0.1"),
       });
       let poxInfo = await getPoxInfo(network);
       await waitForNextRewardPhase(

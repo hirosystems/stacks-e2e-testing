@@ -6,6 +6,8 @@ const config = {
   maxWorkers: 1,
   reporters: ["default", "jest-github-actions-reporter"],
   testLocationInResults: true,
+
+  setupFilesAfterEnv: ["<rootDir>/setup.ts"],
 };
 
 export default config;

@@ -55,7 +55,7 @@ describe("traits across contracts", () => {
 
   const codeBodyMetaContract = `(use-trait test-trait .test-trait.test-trait)
 (define-trait meta-trait
-    ((call-foo (<test-trait> uint) (response uint uint))))  
+    ((call-foo (<test-trait> uint) (response uint uint))))
 
 (define-map contracts principal principal)
 
@@ -101,7 +101,9 @@ describe("traits across contracts", () => {
   });
 
   it("wrapped trait should be be accepted as parameter in Stacks 2.1", async () => {
-    const network = new StacksTestnet({ url: orchestrator.getStacksNodeUrl() });
+    const network = new StacksTestnet({
+      url: orchestrator.getStacksNodeUrl().replace("localhost", "127.0.0.1"),
+    });
 
     await orchestrator.waitForNextStacksBlock();
 

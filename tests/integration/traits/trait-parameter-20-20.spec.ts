@@ -120,7 +120,9 @@ describe("trait user and trait implementer both deployed in 2.0", () => {
   });
 
   it("passing a trait parameter should work in Stacks 2.1", async () => {
-    const network = new StacksTestnet({ url: orchestrator.getStacksNodeUrl() });
+    const network = new StacksTestnet({
+      url: orchestrator.getStacksNodeUrl().replace("localhost", "127.0.0.1"),
+    });
 
     await orchestrator.waitForNextStacksBlock();
 
@@ -173,7 +175,7 @@ describe("trait user and trait implementer both deployed in 2.0", () => {
 
   it("passing a trait parameter should not work in Stacks 2.2", async () => {
     const network = new StacksTestnet({
-      url: orchestrator.getStacksNodeUrl(),
+      url: orchestrator.getStacksNodeUrl().replace("localhost", "127.0.0.1"),
     });
 
     // Wait for the 2.2 activation, then check again
@@ -211,7 +213,7 @@ describe("trait user and trait implementer both deployed in 2.0", () => {
 
   it("passing a trait parameter should work in Stacks 2.3", async () => {
     const network = new StacksTestnet({
-      url: orchestrator.getStacksNodeUrl(),
+      url: orchestrator.getStacksNodeUrl().replace("localhost", "127.0.0.1"),
     });
     // Wait for the 2.3 activation, then check again
     await orchestrator.waitForStacksBlockAnchoredOnBitcoinBlockOfHeight(

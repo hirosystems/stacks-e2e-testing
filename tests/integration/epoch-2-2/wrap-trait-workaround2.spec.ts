@@ -28,11 +28,11 @@ describe("trait parameter with wrapped implementation in Stacks 2.2", () => {
 
   const codeBodyTestTrait = `(define-trait test-trait
     ((foo (uint) (response uint uint))))
-  
+
   (define-read-only (foo-arg (f <test-trait>))
     (contract-of f)
   )
-  
+
   (define-public (call-foo (f <test-trait>) (a uint))
     (contract-call? f foo a)
   )`;
@@ -58,7 +58,9 @@ describe("trait parameter with wrapped implementation in Stacks 2.2", () => {
   });
 
   it("work around bug by wrapping the implementor should fail in Stacks 2.2", async () => {
-    const network = new StacksTestnet({ url: orchestrator.getStacksNodeUrl() });
+    const network = new StacksTestnet({
+      url: orchestrator.getStacksNodeUrl().replace("localhost", "127.0.0.1"),
+    });
 
     await orchestrator.waitForNextStacksBlock();
 

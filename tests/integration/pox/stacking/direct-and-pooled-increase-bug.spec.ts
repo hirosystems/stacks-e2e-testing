@@ -4,6 +4,7 @@ import { uintCV } from "@stacks/transactions";
 import { Accounts, Constants } from "../../constants";
 import {
   DEFAULT_EPOCH_TIMELINE,
+  EPOCH_TIMELINE_LONG_2_1,
   asyncExpectStacksTransactionSuccess,
   broadcastSTXTransfer,
   buildDevnetNetworkOrchestrator,
@@ -27,11 +28,7 @@ import {
 describe("testing mixed direct and pooled stacking under epoch 2.1", () => {
   let orchestrator: DevnetNetworkOrchestrator;
   const version = getStacksNodeVersion();
-  const timeline = {
-    epoch_2_2: 126,
-    epoch_2_3: 131,
-    epoch_2_4: 133,
-  };
+  const timeline = EPOCH_TIMELINE_LONG_2_1;
   const fee = 1000;
   let bobNonce = 0;
   let faucetNonce = 0;
@@ -49,7 +46,9 @@ describe("testing mixed direct and pooled stacking under epoch 2.1", () => {
   });
 
   it("delegate-stack-increase should add more locked stx to direct stacker (cycle #1)", async () => {
-    const network = new StacksTestnet({ url: orchestrator.getStacksNodeUrl() });
+    const network = new StacksTestnet({
+      url: orchestrator.getStacksNodeUrl().replace("localhost", "127.0.0.1"),
+    });
 
     // Wait for Stacks genesis block
     await orchestrator.waitForNextStacksBlock();
@@ -154,7 +153,9 @@ describe("testing mixed direct and pooled stacking under epoch 2.1", () => {
   });
 
   it("auto-unlock does not remove locked amount from delegation (BUG) (cycle #2)", async () => {
-    const network = new StacksTestnet({ url: orchestrator.getStacksNodeUrl() });
+    const network = new StacksTestnet({
+      url: orchestrator.getStacksNodeUrl().replace("localhost", "127.0.0.1"),
+    });
 
     // Wait for Stacks genesis block
     await orchestrator.waitForNextStacksBlock();
@@ -201,7 +202,9 @@ describe("testing mixed direct and pooled stacking under epoch 2.1", () => {
     if (Number(version) < 2.2) {
       return;
     }
-    const network = new StacksTestnet({ url: orchestrator.getStacksNodeUrl() });
+    const network = new StacksTestnet({
+      url: orchestrator.getStacksNodeUrl().replace("localhost", "127.0.0.1"),
+    });
 
     // Wait for 2.2 activation and unlock
     await orchestrator.waitForStacksBlockAnchoredOnBitcoinBlockOfHeight(
@@ -248,7 +251,7 @@ describe("testing mixed direct and pooled stacking under epoch 2.1", () => {
   it("PoX should stay disabled indefinitely in 2.2 and 2.3", async () => {
     if (version === "2.2" || version === "2.3") {
       const network = new StacksTestnet({
-        url: orchestrator.getStacksNodeUrl(),
+        url: orchestrator.getStacksNodeUrl().replace("localhost", "127.0.0.1"),
       });
       let poxInfo = await getPoxInfo(network);
       await waitForNextRewardPhase(

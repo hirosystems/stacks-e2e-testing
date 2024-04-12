@@ -46,7 +46,9 @@ describe("testing pooled stacking with auto unlock", () => {
   });
 
   it("STX delegation and locking by pool operator should register STX for rewards", async () => {
-    const network = new StacksTestnet({ url: orchestrator.getStacksNodeUrl() });
+    const network = new StacksTestnet({
+      url: orchestrator.getStacksNodeUrl().replace("localhost", "127.0.0.1"),
+    });
 
     // Wait for 2.4 to go live
     await orchestrator.waitForStacksBlockAnchoredOnBitcoinBlockOfHeight(
@@ -196,7 +198,9 @@ describe("testing pooled stacking with auto unlock", () => {
   });
 
   it("Increased slot price should auto-unlock pool (cycle #2)", async () => {
-    const network = new StacksTestnet({ url: orchestrator.getStacksNodeUrl() });
+    const network = new StacksTestnet({
+      url: orchestrator.getStacksNodeUrl().replace("localhost", "127.0.0.1"),
+    });
 
     // Wait for block N+5 where N is the height of the next reward phase
     await waitForNextRewardPhase(network, orchestrator, 5);
@@ -235,7 +239,9 @@ describe("testing pooled stacking with auto unlock", () => {
   });
 
   it("stackers below minimum should not have received any rewards (cycle #3)", async () => {
-    const network = new StacksTestnet({ url: orchestrator.getStacksNodeUrl() });
+    const network = new StacksTestnet({
+      url: orchestrator.getStacksNodeUrl().replace("localhost", "127.0.0.1"),
+    });
 
     // Wait for block N+5 where N is the height of the next reward phase
     await waitForNextRewardPhase(network, orchestrator, 5);

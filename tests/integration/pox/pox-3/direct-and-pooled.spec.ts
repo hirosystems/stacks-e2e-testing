@@ -51,7 +51,9 @@ describe("testing mixed direct and pooled stacking in pox-3", () => {
   });
 
   it("delegating after direct stacking should fail (cycle #2)", async () => {
-    const network = new StacksTestnet({ url: orchestrator.getStacksNodeUrl() });
+    const network = new StacksTestnet({
+      url: orchestrator.getStacksNodeUrl().replace("localhost", "127.0.0.1"),
+    });
 
     // Wait for 2.4 to go live
     await orchestrator.waitForStacksBlockAnchoredOnBitcoinBlockOfHeight(
@@ -175,7 +177,9 @@ describe("testing mixed direct and pooled stacking in pox-3", () => {
   });
 
   it("stacking more should increase the slot price (cycle #2)", async () => {
-    const network = new StacksTestnet({ url: orchestrator.getStacksNodeUrl() });
+    const network = new StacksTestnet({
+      url: orchestrator.getStacksNodeUrl().replace("localhost", "127.0.0.1"),
+    });
     const cycles = 1;
 
     // Faucet stacks 900m (1/4 of liquid suply)
@@ -207,7 +211,9 @@ describe("testing mixed direct and pooled stacking in pox-3", () => {
   });
 
   it("auto-unlock unlocks directly stacked amount and total_stacked is updated (cycle #3)", async () => {
-    const network = new StacksTestnet({ url: orchestrator.getStacksNodeUrl() });
+    const network = new StacksTestnet({
+      url: orchestrator.getStacksNodeUrl().replace("localhost", "127.0.0.1"),
+    });
 
     // Wait for Stacks genesis block
     await orchestrator.waitForNextStacksBlock();
@@ -273,7 +279,9 @@ describe("testing mixed direct and pooled stacking in pox-3", () => {
   });
 
   it("stacking by other user should activate pox for cycle #4 (in cycle #3)", async () => {
-    const network = new StacksTestnet({ url: orchestrator.getStacksNodeUrl() });
+    const network = new StacksTestnet({
+      url: orchestrator.getStacksNodeUrl().replace("localhost", "127.0.0.1"),
+    });
     let chainInfo = await getChainInfo(network);
     blockHeight = chainInfo.burn_block_height;
     const cycles = 1;
@@ -301,7 +309,9 @@ describe("testing mixed direct and pooled stacking in pox-3", () => {
   });
 
   it("re-check locked amounts (cycle #4)", async () => {
-    const network = new StacksTestnet({ url: orchestrator.getStacksNodeUrl() });
+    const network = new StacksTestnet({
+      url: orchestrator.getStacksNodeUrl().replace("localhost", "127.0.0.1"),
+    });
 
     // Wait for Stacks genesis block
     await orchestrator.waitForNextStacksBlock();

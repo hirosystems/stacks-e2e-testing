@@ -20,7 +20,9 @@ describe("testing devnet settings", () => {
   });
 
   it("testing pox info data after 2.1 activation (cycle #1)", async () => {
-    const network = new StacksTestnet({ url: orchestrator.getStacksNodeUrl() });
+    const network = new StacksTestnet({
+      url: orchestrator.getStacksNodeUrl().replace("localhost", "127.0.0.1"),
+    });
     // Wait for Stacks genesis block
     await orchestrator.waitForNextStacksBlock();
     // Wait for block N+2 where N is the height of the next reward phase

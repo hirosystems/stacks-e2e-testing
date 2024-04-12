@@ -35,7 +35,9 @@ describe("define a trait with duplicate identical methods", () => {
       pox_2_activation: 120,
     });
     orchestrator.start();
-    network = new StacksTestnet({ url: orchestrator.getStacksNodeUrl() });
+    network = new StacksTestnet({
+      url: orchestrator.getStacksNodeUrl().replace("localhost", "127.0.0.1"),
+    });
   });
 
   afterAll(() => {

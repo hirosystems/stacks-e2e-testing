@@ -31,7 +31,9 @@ describe("testing stacking under epoch 2.0", () => {
   });
 
   it("submitting stacks-stx through pox-1 contract during epoch 2.0 should succeed", async () => {
-    const network = new StacksTestnet({ url: orchestrator.getStacksNodeUrl() });
+    const network = new StacksTestnet({
+      url: orchestrator.getStacksNodeUrl().replace("localhost", "127.0.0.1"),
+    });
     // Wait for Stacks genesis block
     await orchestrator.waitForNextStacksBlock();
 
