@@ -5,6 +5,7 @@ import {
   getBitcoinBlockHeight,
   getNetworkIdFromEnv,
   getChainInfo,
+  EPOCH_TIMELINE_LONG_2_05,
 } from "../../helpers";
 import { DevnetNetworkOrchestrator } from "@hirosystems/stacks-devnet-js";
 import { load_versioned } from "./helper";
@@ -12,19 +13,16 @@ import { load_versioned } from "./helper";
 describe("use redefined trait from contract that redefines it", () => {
   let orchestrator: DevnetNetworkOrchestrator;
   let network: StacksNetwork;
-  const STACKS_2_1_EPOCH = 112;
 
   let networkId: number;
 
   beforeAll(() => {
     networkId = getNetworkIdFromEnv();
     console.log(`network #${networkId}`);
-    orchestrator = buildDevnetNetworkOrchestrator(networkId, {
-      epoch_2_0: 100,
-      epoch_2_05: 102,
-      epoch_2_1: STACKS_2_1_EPOCH,
-      pox_2_activation: 120,
-    });
+    orchestrator = buildDevnetNetworkOrchestrator(
+      networkId,
+      EPOCH_TIMELINE_LONG_2_05,
+    );
     orchestrator.start();
     network = new StacksTestnet({
       url: orchestrator.getStacksNodeUrl().replace("localhost", "127.0.0.1"),
@@ -61,14 +59,16 @@ describe("use redefined trait from contract that redefines it", () => {
 
     // Make sure this we stayed in 2.05
     let chainInfo = await getChainInfo(network);
-    expect(chainInfo.burn_block_height).toBeLessThanOrEqual(STACKS_2_1_EPOCH);
+    expect(chainInfo.burn_block_height).toBeLessThanOrEqual(
+      EPOCH_TIMELINE_LONG_2_05.epoch_2_1,
+    );
   });
 
   describe("in 2.1", () => {
     beforeAll(async () => {
       // Wait for 2.1 to go live
       await orchestrator.waitForStacksBlockAnchoredOnBitcoinBlockOfHeight(
-        STACKS_2_1_EPOCH + 1,
+        EPOCH_TIMELINE_LONG_2_05.epoch_2_1 + 1,
       );
     });
 
