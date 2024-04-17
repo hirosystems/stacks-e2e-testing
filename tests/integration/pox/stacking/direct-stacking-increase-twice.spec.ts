@@ -35,7 +35,9 @@ describe("testing solo stacker increase without bug", () => {
   });
 
   it("using stacks-increase in the same cycle should result in increased rewards", async () => {
-    const network = new StacksTestnet({ url: orchestrator.getStacksNodeUrl() });
+    const network = new StacksTestnet({
+      url: orchestrator.getStacksNodeUrl().replace("localhost", "127.0.0.1"),
+    });
 
     // Wait for Stacks genesis block
     await orchestrator.waitForNextStacksBlock();
@@ -54,7 +56,7 @@ describe("testing solo stacker increase without bug", () => {
         fee,
         nonce: bobNonce++,
       },
-      { amount: 30_000_000_000_010, blockHeight, cycles }
+      { amount: 30_000_000_000_010, blockHeight, cycles },
     );
     expect(response.error).toBeUndefined();
 
@@ -67,7 +69,7 @@ describe("testing solo stacker increase without bug", () => {
         fee,
         nonce: bobNonce++,
       },
-      { amount: 20_000_000_000_100 }
+      { amount: 20_000_000_000_100 },
     );
     expect(response.error).toBeUndefined();
 
@@ -80,7 +82,7 @@ describe("testing solo stacker increase without bug", () => {
         fee,
         nonce: bobNonce++,
       },
-      { amount: 5_000_000_001_000 }
+      { amount: 5_000_000_001_000 },
     );
     expect(response.error).toBeUndefined();
 
@@ -95,7 +97,7 @@ describe("testing solo stacker increase without bug", () => {
       network,
       Accounts.WALLET_2.stxAddress,
       100_000_000_000_000 - 55_000_000_001_110 - bobNonce * fee,
-      55_000_000_001_110
+      55_000_000_001_110,
     );
   });
 
@@ -104,11 +106,13 @@ describe("testing solo stacker increase without bug", () => {
     if (Number(version) < 2.2) {
       return;
     }
-    const network = new StacksTestnet({ url: orchestrator.getStacksNodeUrl() });
+    const network = new StacksTestnet({
+      url: orchestrator.getStacksNodeUrl().replace("localhost", "127.0.0.1"),
+    });
 
     // Wait for 2.2 activation and unlock
     await orchestrator.waitForStacksBlockAnchoredOnBitcoinBlockOfHeight(
-      Constants.DEVNET_DEFAULT_EPOCH_2_2 + 2
+      Constants.DEVNET_DEFAULT_EPOCH_2_2 + 2,
     );
 
     // Check Bob's account info
@@ -116,7 +120,7 @@ describe("testing solo stacker increase without bug", () => {
       network,
       Accounts.WALLET_2.stxAddress,
       100_000_000_000_000 - bobNonce * fee,
-      0
+      0,
     );
 
     // Verify that Bob's STX are really unlocked by doing a transfer
@@ -125,7 +129,7 @@ describe("testing solo stacker increase without bug", () => {
       {
         amount: 100_000_000_000_000 - bobNonce * fee,
         recipient: Accounts.WALLET_3.stxAddress,
-      }
+      },
     );
     await asyncExpectStacksTransactionSuccess(orchestrator, response.txid);
   });
@@ -133,13 +137,13 @@ describe("testing solo stacker increase without bug", () => {
   it("PoX should stay disabled indefinitely in 2.2 and 2.3", async () => {
     if (version === "2.2" || version === "2.3") {
       const network = new StacksTestnet({
-        url: orchestrator.getStacksNodeUrl(),
+        url: orchestrator.getStacksNodeUrl().replace("localhost", "127.0.0.1"),
       });
       let poxInfo = await getPoxInfo(network);
       await waitForNextRewardPhase(
         network,
         orchestrator,
-        poxInfo.current_cycle.id + 1
+        poxInfo.current_cycle.id + 1,
       );
 
       poxInfo = await getPoxInfo(network);

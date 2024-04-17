@@ -28,11 +28,11 @@ describe("trait parameter with wrapped implementation in Stacks 2.2", () => {
 
   const codeBodyTestTrait = `(define-trait test-trait
     ((foo (uint) (response uint uint))))
-  
+
   (define-read-only (foo-arg (f <test-trait>))
     (contract-of f)
   )
-  
+
   (define-public (call-foo (f <test-trait>) (a uint))
     (contract-call? f foo a)
   )`;
@@ -48,7 +48,7 @@ describe("trait parameter with wrapped implementation in Stacks 2.2", () => {
   beforeAll(() => {
     orchestrator = buildDevnetNetworkOrchestrator(
       getNetworkIdFromEnv(),
-      timeline
+      timeline,
     );
     orchestrator.start();
   });
@@ -58,7 +58,9 @@ describe("trait parameter with wrapped implementation in Stacks 2.2", () => {
   });
 
   it("work around bug by wrapping the implementor should fail in Stacks 2.2", async () => {
-    const network = new StacksTestnet({ url: orchestrator.getStacksNodeUrl() });
+    const network = new StacksTestnet({
+      url: orchestrator.getStacksNodeUrl().replace("localhost", "127.0.0.1"),
+    });
 
     await orchestrator.waitForNextStacksBlock();
 
@@ -68,7 +70,7 @@ describe("trait parameter with wrapped implementation in Stacks 2.2", () => {
       Accounts.DEPLOYER,
       0,
       "test-trait",
-      codeBodyTestTrait
+      codeBodyTestTrait,
     );
     expect(response.error).toBeUndefined();
 
@@ -77,19 +79,19 @@ describe("trait parameter with wrapped implementation in Stacks 2.2", () => {
       Accounts.DEPLOYER,
       1,
       "impl-trait",
-      codeBodyImplTrait
+      codeBodyImplTrait,
     ));
     expect(response.error).toBeUndefined();
     let [block, tx] = await asyncExpectStacksTransactionSuccess(
       orchestrator,
-      transaction.txid()
+      transaction.txid(),
     );
 
     await orchestrator.waitForNextStacksBlock();
 
     // Wait for the 2.2 activation, then check again
     await orchestrator.waitForStacksBlockAnchoredOnBitcoinBlockOfHeight(
-      timeline.epoch_2_2
+      timeline.epoch_2_2,
     );
 
     // Deploy a wrapper contract
@@ -98,12 +100,12 @@ describe("trait parameter with wrapped implementation in Stacks 2.2", () => {
       Accounts.DEPLOYER,
       2,
       "impl-trait-wrapper",
-      codeBodyImplTraitWrapper
+      codeBodyImplTraitWrapper,
     ));
     expect(response.error).toBeUndefined();
     [block, tx] = await asyncExpectStacksTransactionSuccess(
       orchestrator,
-      transaction.txid()
+      transaction.txid(),
     );
 
     // Call the public function

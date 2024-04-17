@@ -42,7 +42,7 @@ describe("stack-increase", async () => {
         fee,
         nonce: aliceNonce++,
       },
-      { amount: 75_000_000_000_000, blockHeight, cycles: 3 }
+      { amount: 75_000_000_000_000, blockHeight, cycles: 3 },
     );
     console.log("Alice stacks 75m response: ", response);
     expect(response.error).toBeUndefined();
@@ -56,7 +56,7 @@ describe("stack-increase", async () => {
         fee,
         nonce: aliceNonce++,
       },
-      { amount: 50_000_000_000_000, poolAddress: Accounts.FAUCET }
+      { amount: 50_000_000_000_000, poolAddress: Accounts.FAUCET },
     );
     console.log("Alice delegates 50m response: ", response);
     expect(response.error).toBeUndefined();
@@ -76,7 +76,7 @@ describe("stack-increase", async () => {
         poolRewardAccount: Accounts.FAUCET,
         startBurnHeight: blockHeight,
         lockPeriodCycles: 1,
-      }
+      },
     );
     console.log("Faucet tries to stack Alice's 50m STX response: ", response);
     expect(response.error).toBeUndefined();
@@ -92,11 +92,11 @@ describe("stack-increase", async () => {
         fee: fee,
         nonce: faucetNonce++,
       },
-      { poolRewardAccount: Accounts.FAUCET, cycleId: poxInfo.next_cycle.id }
+      { poolRewardAccount: Accounts.FAUCET, cycleId: poxInfo.next_cycle.id },
     );
     console.log(
       "Faucet tries to commit 50m for next cycle response: ",
-      response
+      response,
     );
     expect(response.error).toBeUndefined();
 
@@ -109,7 +109,7 @@ describe("stack-increase", async () => {
         fee,
         nonce: bobNonce++,
       },
-      { amount: 800_000_000_000_000, blockHeight, cycles: 1 }
+      { amount: 800_000_000_000_000, blockHeight, cycles: 1 },
     );
     console.log("Bob stacks 800M response: ", response);
     expect(response.error).toBeUndefined();
@@ -123,7 +123,7 @@ describe("stack-increase", async () => {
         fee,
         nonce: chloeNonce++,
       },
-      { amount: 100_000_000_000_000, blockHeight, cycles: 1 }
+      { amount: 100_000_000_000_000, blockHeight, cycles: 1 },
     );
     console.log("Chloe stacks 100M response: ", response);
     expect(response.error).toBeUndefined();
@@ -137,7 +137,7 @@ describe("stack-increase", async () => {
         fee,
         nonce: chloeNonce++,
       },
-      { amount: 20_000_000_000_000 }
+      { amount: 20_000_000_000_000 },
     );
     console.log("Chloe increases 20M response: ", response);
     expect(response.error).toBeUndefined();
@@ -151,7 +151,7 @@ describe("stack-increase", async () => {
         fee,
         nonce: deployerNonce++,
       },
-      { amount: 200_000_000_000_000, poolAddress: Accounts.FAUCET }
+      { amount: 200_000_000_000_000, poolAddress: Accounts.FAUCET },
     );
     console.log("Deployer delegates 200m to faucet pool: ", response);
     expect(response.error).toBeUndefined();
@@ -171,7 +171,7 @@ describe("stack-increase", async () => {
         poolRewardAccount: Accounts.FAUCET,
         startBurnHeight: blockHeight,
         lockPeriodCycles: 1,
-      }
+      },
     );
     console.log("Faucet stacks deployers's 200m STX: ", response);
     expect(response.error).toBeUndefined();
@@ -185,7 +185,7 @@ describe("stack-increase", async () => {
         fee: fee,
         nonce: faucetNonce++,
       },
-      { poolRewardAccount: Accounts.FAUCET, cycleId: poxInfo.next_cycle.id }
+      { poolRewardAccount: Accounts.FAUCET, cycleId: poxInfo.next_cycle.id },
     );
     console.log("Faucet commits for next cycle: ", response);
     expect(response.error).toBeUndefined();

@@ -28,7 +28,7 @@ describe("testing stack-extend functionality", () => {
   beforeAll(() => {
     orchestrator = buildDevnetNetworkOrchestrator(
       getNetworkIdFromEnv(),
-      timeline
+      timeline,
     );
     orchestrator.start();
   });
@@ -38,11 +38,13 @@ describe("testing stack-extend functionality", () => {
   });
 
   it("stacking and then extending should result in rewards for 3 cycles", async () => {
-    const network = new StacksTestnet({ url: orchestrator.getStacksNodeUrl() });
+    const network = new StacksTestnet({
+      url: orchestrator.getStacksNodeUrl().replace("localhost", "127.0.0.1"),
+    });
 
     // Wait for 2.4 to go live
     await orchestrator.waitForStacksBlockAnchoredOnBitcoinBlockOfHeight(
-      timeline.epoch_2_4
+      timeline.epoch_2_4,
     );
     await orchestrator.waitForNextStacksBlock();
 
@@ -62,13 +64,13 @@ describe("testing stack-extend functionality", () => {
         amount: 80_000_000_000_000,
         blockHeight,
         cycles: 1,
-      }
+      },
     );
     expect(response.error).toBeUndefined();
     // Wait for Alice's stacking transaction to confirm
     let [block, tx] = await waitForStacksTransaction(
       orchestrator,
-      response.txid
+      response.txid,
     );
     expect(tx.success).toBeTruthy();
 
@@ -81,7 +83,7 @@ describe("testing stack-extend functionality", () => {
         fee,
         nonce: aliceNonce++,
       },
-      { cycles: 2 }
+      { cycles: 2 },
     );
     expect(response.error).toBeUndefined();
     // Wait for Alice's stacking extension transaction to confirm
@@ -99,7 +101,7 @@ describe("testing stack-extend functionality", () => {
         network,
         3,
         cycle + 1, // cycle + 1 because we are checking the next cycle, including rewards
-        Accounts.WALLET_1.stxAddress
+        Accounts.WALLET_1.stxAddress,
       )) as Record<string, ClarityValue>;
       expect(poxAddrInfo?.["total-ustx"]).toEqual(uintCV(80_000_000_000_000));
 

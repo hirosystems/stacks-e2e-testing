@@ -1,11 +1,16 @@
 export namespace Constants {
-  export const DEVNET_DEFAULT_EPOCH_2_0 = 100;
-  export const DEVNET_DEFAULT_EPOCH_2_05 = 102;
-  export const DEVNET_DEFAULT_EPOCH_2_1 = 106;
-  export const DEVNET_DEFAULT_POX_2_ACTIVATION = 110;
-  export const DEVNET_DEFAULT_EPOCH_2_2 = 122;
-  export const DEVNET_DEFAULT_EPOCH_2_3 = 128;
-  export const DEVNET_DEFAULT_EPOCH_2_4 = 134;
+  export const DEVNET_DEFAULT_EPOCH_2_0 = 100; // 100
+  export const DEVNET_DEFAULT_EPOCH_2_05 = 102; // 102
+  export const DEVNET_DEFAULT_EPOCH_2_1 = 108; // 106
+  export const DEVNET_DEFAULT_POX_2_ACTIVATION = 110; // 110
+  export const DEVNET_DEFAULT_EPOCH_2_2 = 122; // 122
+  export const DEVNET_DEFAULT_EPOCH_2_3 = 128; // 128
+  export const DEVNET_DEFAULT_EPOCH_2_4 = 134; // 134
+  export const DEVNET_DEFAULT_POX_3_ACTIVATION = 136; // 136
+  export const DEVNET_DEFAULT_EPOCH_2_5 = 140; // 140
+  export const DEVNET_DEFAULT_POX_4_ACTIVATION = 142; // 142
+  export const DEVNET_DEFAULT_EPOCH_3_0 = 154; // 144
+
   export const BITCOIN_BLOCK_TIME = 10_000;
 }
 
@@ -33,11 +38,16 @@ export namespace Contracts {
     address: "ST000000000000000000002AMW42H",
     name: "pox-3",
   };
+  export const POX_4 = {
+    address: "ST000000000000000000002AMW42H",
+    name: "pox-4",
+  };
   export const DEFAULT = POX_3;
   export const POX: PoxVersions = {
     1: POX_1,
     2: POX_2,
     3: POX_3,
+    4: POX_4,
   };
 }
 

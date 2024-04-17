@@ -32,7 +32,7 @@ describe("testing solo stacker increase with bug", () => {
   beforeAll(() => {
     orchestrator = buildDevnetNetworkOrchestrator(
       getNetworkIdFromEnv(),
-      timeline
+      timeline,
     );
     orchestrator.start();
   });
@@ -42,10 +42,12 @@ describe("testing solo stacker increase with bug", () => {
   });
 
   it("epoch gating in clarity should work", async () => {
-    const network = new StacksTestnet({ url: orchestrator.getStacksNodeUrl() });
+    const network = new StacksTestnet({
+      url: orchestrator.getStacksNodeUrl().replace("localhost", "127.0.0.1"),
+    });
 
     await orchestrator.waitForStacksBlockAnchoredOnBitcoinBlockOfHeight(
-      Constants.DEVNET_DEFAULT_POX_2_ACTIVATION + 1
+      Constants.DEVNET_DEFAULT_POX_2_ACTIVATION + 1,
     );
 
     const codeBody = `(define-read-only (check-unlock-height (address principal))
@@ -76,7 +78,7 @@ describe("testing solo stacker increase with bug", () => {
     // Faucet stacks 900m (1/4 of liquid suply)
     response = await broadcastStackSTX(
       { poxVersion: 2, network, account: Accounts.FAUCET, fee, nonce: 0 },
-      { amount: 900_000_000_000_001, blockHeight, cycles }
+      { amount: 900_000_000_000_001, blockHeight, cycles },
     );
     expect(response.error).toBeUndefined();
 
@@ -86,14 +88,14 @@ describe("testing solo stacker increase with bug", () => {
     // Bob stacks 80m
     response = await broadcastStackSTX(
       { poxVersion: 2, network, account: Accounts.WALLET_2, fee, nonce: 0 },
-      { amount: 80_000_000_000_010, blockHeight, cycles }
+      { amount: 80_000_000_000_010, blockHeight, cycles },
     );
     expect(response.error).toBeUndefined();
 
     // Bob increases by 10m
     response = await broadcastStackIncrease(
       { poxVersion: 2, network, account: Accounts.WALLET_2, fee, nonce: 1 },
-      { amount: 10000000000100 }
+      { amount: 10000000000100 },
     );
     expect(response.error).toBeUndefined();
     // let Bobx's stacking confirm to enforce reward index 1
@@ -102,14 +104,14 @@ describe("testing solo stacker increase with bug", () => {
     // Chloe stacks 80m
     response = await broadcastStackSTX(
       { poxVersion: 2, network, account: Accounts.WALLET_3, fee, nonce: 0 },
-      { amount: 80_000_000_001_000, blockHeight, cycles }
+      { amount: 80_000_000_001_000, blockHeight, cycles },
     );
     expect(response.error).toBeUndefined();
 
     // Chloe increases by 10m
     response = await broadcastStackIncrease(
       { poxVersion: 2, network, account: Accounts.WALLET_3, fee, nonce: 1 },
-      { amount: 10_000_000_010_000 }
+      { amount: 10_000_000_010_000 },
     );
     expect(response.error).toBeUndefined();
     await orchestrator.waitForStacksBlockIncludingTransaction(response.txid);
@@ -127,7 +129,7 @@ describe("testing solo stacker increase with bug", () => {
       network,
       2,
       2,
-      Accounts.FAUCET.stxAddress
+      Accounts.FAUCET.stxAddress,
     );
     expect(poxAddrInfo0?.["total-ustx"]).toEqual(uintCV(900_000_000_000_001));
 
@@ -136,7 +138,7 @@ describe("testing solo stacker increase with bug", () => {
       network,
       2,
       2,
-      Accounts.WALLET_2.stxAddress
+      Accounts.WALLET_2.stxAddress,
     );
     // HERE'S THE BUG: THIS SHOULD BE `u90000000000110`
     // expect(poxAddrInfo1["total-ustx"]).toEqual(
@@ -149,7 +151,7 @@ describe("testing solo stacker increase with bug", () => {
       network,
       2,
       2,
-      Accounts.WALLET_3.stxAddress
+      Accounts.WALLET_3.stxAddress,
     );
     // HERE'S THE BUG: THIS SHOULD BE `u90000000011000`
     // expect(poxAddrInfo2["total-ustx"]).toEqual(uintCV(90_000_000_011_000));
@@ -179,7 +181,7 @@ describe("testing solo stacker increase with bug", () => {
 
     // Wait for the 2.2 activation, then check again
     await orchestrator.waitForStacksBlockAnchoredOnBitcoinBlockOfHeight(
-      timeline.epoch_2_2
+      timeline.epoch_2_2,
     );
 
     // Verify that calling the clarity contract gives the same incorrect result

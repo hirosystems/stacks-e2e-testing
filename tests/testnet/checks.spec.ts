@@ -14,8 +14,8 @@ const printPoxAddrInfo = (infoList: Record<string, ClarityValue>[]) => {
     let btcAddr = poxAddressToBtcAddress(info["pox-addr"], "testnet");
     console.log(
       `Pox Address: ${btcAddr}, Stacker: ${cvToString(
-        info["stacker"]
-      )}, Amount: ${cvToString(info["total-ustx"])}`
+        info["stacker"],
+      )}, Amount: ${cvToString(info["total-ustx"])}`,
     );
   });
 };
@@ -30,15 +30,15 @@ describe("stack-increase", async () => {
     let aliceInfo = await callReadOnlystackerInfo(
       network,
       3,
-      Accounts.WALLET_1
+      Accounts.WALLET_1,
     );
     console.log(
       "Alice",
       Accounts.WALLET_1.stxAddress,
-      Accounts.WALLET_1.btcAddress
+      Accounts.WALLET_1.btcAddress,
     );
     console.log(
-      `https://mempool.space/testnet/address/${Accounts.WALLET_1.btcAddress}`
+      `https://mempool.space/testnet/address/${Accounts.WALLET_1.btcAddress}`,
     );
     console.log(alice);
     console.log(cvToString(aliceInfo));
@@ -48,10 +48,10 @@ describe("stack-increase", async () => {
     console.log(
       "Bob",
       Accounts.WALLET_2.stxAddress,
-      Accounts.WALLET_2.btcAddress
+      Accounts.WALLET_2.btcAddress,
     );
     console.log(
-      `https://mempool.space/testnet/address/${Accounts.WALLET_2.btcAddress}`
+      `https://mempool.space/testnet/address/${Accounts.WALLET_2.btcAddress}`,
     );
     console.log(bob);
     console.log(cvToString(bobInfo));
@@ -60,15 +60,15 @@ describe("stack-increase", async () => {
     let chloeInfo = await callReadOnlystackerInfo(
       network,
       3,
-      Accounts.WALLET_3
+      Accounts.WALLET_3,
     );
     console.log(
       "Chloe",
       Accounts.WALLET_3.stxAddress,
-      Accounts.WALLET_3.btcAddress
+      Accounts.WALLET_3.btcAddress,
     );
     console.log(
-      `https://mempool.space/testnet/address/${Accounts.WALLET_3.btcAddress}`
+      `https://mempool.space/testnet/address/${Accounts.WALLET_3.btcAddress}`,
     );
     console.log(chloe);
     console.log(cvToString(chloeInfo));
@@ -77,15 +77,15 @@ describe("stack-increase", async () => {
     let deployerInfo = await callReadOnlystackerInfo(
       network,
       3,
-      Accounts.DEPLOYER
+      Accounts.DEPLOYER,
     );
     console.log(
       "Deployer",
       Accounts.DEPLOYER.stxAddress,
-      Accounts.DEPLOYER.btcAddress
+      Accounts.DEPLOYER.btcAddress,
     );
     console.log(
-      `https://mempool.space/testnet/address/${Accounts.DEPLOYER.btcAddress}`
+      `https://mempool.space/testnet/address/${Accounts.DEPLOYER.btcAddress}`,
     );
     console.log(deployer);
     console.log(cvToString(deployerInfo));
@@ -95,10 +95,10 @@ describe("stack-increase", async () => {
     console.log(
       "Faucet",
       Accounts.FAUCET.stxAddress,
-      Accounts.FAUCET.btcAddress
+      Accounts.FAUCET.btcAddress,
     );
     console.log(
-      `https://mempool.space/testnet/address/${Accounts.FAUCET.btcAddress}`
+      `https://mempool.space/testnet/address/${Accounts.FAUCET.btcAddress}`,
     );
     console.log(faucet);
     console.log(cvToString(faucetInfo));
@@ -110,7 +110,7 @@ describe("stack-increase", async () => {
     let poxAddrs = await readRewardCyclePoxAddressList(
       network,
       3,
-      poxInfo.current_cycle.id
+      poxInfo.current_cycle.id,
     );
     console.log("current cycle poxAddrs:");
     if (poxAddrs) {
@@ -122,7 +122,7 @@ describe("stack-increase", async () => {
     poxAddrs = await readRewardCyclePoxAddressList(
       network,
       3,
-      poxInfo.next_cycle.id
+      poxInfo.next_cycle.id,
     );
     console.log("next cycle poxAddrs:");
     if (poxAddrs) {

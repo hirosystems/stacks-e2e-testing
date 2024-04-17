@@ -1,9 +1,13 @@
 /** @type {import('ts-jest/dist/types').InitialOptionsTsJest} */
-module.exports = {
+const config = {
   preset: "ts-jest",
   testEnvironment: "node",
   testTimeout: 300_000,
   maxWorkers: 1,
   reporters: ["default", "jest-github-actions-reporter"],
   testLocationInResults: true,
+
+  setupFilesAfterEnv: ["<rootDir>/setup.ts"],
 };
+
+export default config;

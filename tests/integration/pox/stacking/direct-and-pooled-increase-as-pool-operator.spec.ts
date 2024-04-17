@@ -4,6 +4,7 @@ import { uintCV } from "@stacks/transactions";
 import { Accounts, Constants } from "../../constants";
 import {
   DEFAULT_EPOCH_TIMELINE,
+  EPOCH_TIMELINE_LONG_2_1,
   asyncExpectStacksTransactionSuccess,
   broadcastSTXTransfer,
   buildDevnetNetworkOrchestrator,
@@ -28,18 +29,14 @@ describe("testing direct stacker as pool operator without auto-unlock under epoc
   let orchestrator: DevnetNetworkOrchestrator;
   const version = getStacksNodeVersion();
   const fee = 1000;
-  const timeline = {
-    epoch_2_2: 127,
-    epoch_2_3: 132,
-    epoch_2_4: 134,
-  };
+  const timeline = EPOCH_TIMELINE_LONG_2_1;
   let aliceNonce = 0;
   let faucetNonce = 0;
 
   beforeAll(() => {
     orchestrator = buildDevnetNetworkOrchestrator(
       getNetworkIdFromEnv(),
-      timeline
+      timeline,
     );
     orchestrator.start();
   });
@@ -49,7 +46,9 @@ describe("testing direct stacker as pool operator without auto-unlock under epoc
   });
 
   it("using direct stacking and delegate-stack-increase should not result in auto-unlock", async () => {
-    const network = new StacksTestnet({ url: orchestrator.getStacksNodeUrl() });
+    const network = new StacksTestnet({
+      url: orchestrator.getStacksNodeUrl().replace("localhost", "127.0.0.1"),
+    });
 
     // Wait for Stacks genesis block
     await orchestrator.waitForNextStacksBlock();
@@ -68,7 +67,7 @@ describe("testing direct stacker as pool operator without auto-unlock under epoc
         fee,
         nonce: aliceNonce++,
       },
-      { amount: 80_000_000_000_000, blockHeight, cycles }
+      { amount: 80_000_000_000_000, blockHeight, cycles },
     );
     expect(response.error).toBeUndefined();
 
@@ -81,12 +80,12 @@ describe("testing direct stacker as pool operator without auto-unlock under epoc
         fee,
         nonce: faucetNonce++,
       },
-      { amount: 999000000000000, poolAddress: Accounts.WALLET_1 }
+      { amount: 999000000000000, poolAddress: Accounts.WALLET_1 },
     );
     expect(response.error).toBeUndefined();
     let [block, tx] = await waitForStacksTransaction(
       orchestrator,
-      response.txid
+      response.txid,
     );
     expect(tx.success, tx.result).toBeTruthy();
 
@@ -105,7 +104,7 @@ describe("testing direct stacker as pool operator without auto-unlock under epoc
         poolRewardAccount: Accounts.WALLET_1,
         startBurnHeight: blockHeight,
         lockPeriodCycles: 1,
-      }
+      },
     );
     expect(response.error).toBeUndefined();
     [block, tx] = await waitForStacksTransaction(orchestrator, response.txid);
@@ -120,7 +119,7 @@ describe("testing direct stacker as pool operator without auto-unlock under epoc
         fee,
         nonce: aliceNonce++,
       },
-      { poolRewardAccount: Accounts.WALLET_1, cycleId: 2 }
+      { poolRewardAccount: Accounts.WALLET_1, cycleId: 2 },
     );
     expect(response.error).toBeUndefined();
 
@@ -138,7 +137,7 @@ describe("testing direct stacker as pool operator without auto-unlock under epoc
       network,
       2,
       2,
-      0
+      0,
     );
     expect(poxAddrInfo0?.["total-ustx"]).toEqual(uintCV(80_000_000_000_000));
 
@@ -147,7 +146,7 @@ describe("testing direct stacker as pool operator without auto-unlock under epoc
       network,
       2,
       2,
-      1
+      1,
     );
     expect(poxAddrInfo1?.["total-ustx"]).toEqual(uintCV(999_000_000_000_000));
 
@@ -155,7 +154,7 @@ describe("testing direct stacker as pool operator without auto-unlock under epoc
       network,
       Accounts.WALLET_1.stxAddress,
       100_000_000_000_000 - 80_000_000_000_000 - aliceNonce * fee,
-      80_000_000_000_000
+      80_000_000_000_000,
     );
 
     // Wait until unlock happens that is block N+5 where N is the height of the next reward phase
@@ -182,7 +181,7 @@ describe("testing direct stacker as pool operator without auto-unlock under epoc
       network,
       Accounts.WALLET_1.stxAddress,
       100_000_000_000_000 - 80_000_000_000_000 - aliceNonce * fee,
-      80_000_000_000_000
+      80_000_000_000_000,
     );
   });
 
@@ -191,11 +190,13 @@ describe("testing direct stacker as pool operator without auto-unlock under epoc
     if (Number(version) < 2.2) {
       return;
     }
-    const network = new StacksTestnet({ url: orchestrator.getStacksNodeUrl() });
+    const network = new StacksTestnet({
+      url: orchestrator.getStacksNodeUrl().replace("localhost", "127.0.0.1"),
+    });
 
     // Wait for 2.2 activation and unlock
     await orchestrator.waitForStacksBlockAnchoredOnBitcoinBlockOfHeight(
-      timeline.epoch_2_2 + 2
+      timeline.epoch_2_2 + 2,
     );
 
     // Check Alice's account info
@@ -203,7 +204,7 @@ describe("testing direct stacker as pool operator without auto-unlock under epoc
       network,
       Accounts.WALLET_1.stxAddress,
       100_000_000_000_000 - aliceNonce * fee,
-      0
+      0,
     );
 
     // Verify that Alice's STX are really unlocked by doing a transfer
@@ -212,7 +213,7 @@ describe("testing direct stacker as pool operator without auto-unlock under epoc
       {
         amount: 100_000_000_000_000 - aliceNonce * fee,
         recipient: Accounts.WALLET_3.stxAddress,
-      }
+      },
     );
     await asyncExpectStacksTransactionSuccess(orchestrator, response.txid);
 
@@ -221,7 +222,7 @@ describe("testing direct stacker as pool operator without auto-unlock under epoc
       network,
       Accounts.FAUCET.stxAddress,
       1_000_000_000_000_000 - faucetNonce * fee,
-      0
+      0,
     );
 
     // Verify that Faucet's STX are really unlocked by doing a transfer
@@ -230,7 +231,7 @@ describe("testing direct stacker as pool operator without auto-unlock under epoc
       {
         amount: 1_000_000_000_000_000 - faucetNonce * fee,
         recipient: Accounts.WALLET_3.stxAddress,
-      }
+      },
     );
     await asyncExpectStacksTransactionSuccess(orchestrator, response.txid);
   });
@@ -238,13 +239,13 @@ describe("testing direct stacker as pool operator without auto-unlock under epoc
   it("PoX should stay disabled indefinitely in 2.2 and 2.3", async () => {
     if (version === "2.2" || version === "2.3") {
       const network = new StacksTestnet({
-        url: orchestrator.getStacksNodeUrl(),
+        url: orchestrator.getStacksNodeUrl().replace("localhost", "127.0.0.1"),
       });
       let poxInfo = await getPoxInfo(network);
       await waitForNextRewardPhase(
         network,
         orchestrator,
-        poxInfo.current_cycle.id + 1
+        poxInfo.current_cycle.id + 1,
       );
 
       poxInfo = await getPoxInfo(network);

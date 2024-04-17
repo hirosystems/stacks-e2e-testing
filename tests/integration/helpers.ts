@@ -24,8 +24,14 @@ interface EpochTimeline {
   pox_2_activation?: number;
   epoch_2_2?: number;
   epoch_2_3?: number;
+  pox_3_activation?: number;
   epoch_2_4?: number;
+  epoch_2_5?: number;
+  pox_4_activation?: number;
+  epoch_3_0?: number;
 }
+
+export const POX_CYCLE_LENGTH = 10;
 
 export const DEFAULT_EPOCH_TIMELINE = {
   epoch_2_0: Constants.DEVNET_DEFAULT_EPOCH_2_0,
@@ -34,7 +40,11 @@ export const DEFAULT_EPOCH_TIMELINE = {
   pox_2_activation: Constants.DEVNET_DEFAULT_POX_2_ACTIVATION,
   epoch_2_2: Constants.DEVNET_DEFAULT_EPOCH_2_2,
   epoch_2_3: Constants.DEVNET_DEFAULT_EPOCH_2_3,
+  pox_3_activation: Constants.DEVNET_DEFAULT_POX_3_ACTIVATION,
   epoch_2_4: Constants.DEVNET_DEFAULT_EPOCH_2_4,
+  epoch_2_5: Constants.DEVNET_DEFAULT_EPOCH_2_5,
+  pox_4_activation: Constants.DEVNET_DEFAULT_POX_4_ACTIVATION,
+  epoch_3_0: Constants.DEVNET_DEFAULT_EPOCH_3_0,
 };
 
 export const FAST_FORWARD_TO_EPOCH_2_4 = {
@@ -47,7 +57,39 @@ export const FAST_FORWARD_TO_EPOCH_2_4 = {
   epoch_2_4: 112,
 };
 
-export const POX_CYCLE_LENGTH = 10;
+export const EPOCH_TIMELINE_LONG_2_05 = {
+  epoch_2_0: Constants.DEVNET_DEFAULT_EPOCH_2_0,
+  epoch_2_05: Constants.DEVNET_DEFAULT_EPOCH_2_05,
+  epoch_2_1: Constants.DEVNET_DEFAULT_EPOCH_2_1 + POX_CYCLE_LENGTH,
+  pox_2_activation:
+    Constants.DEVNET_DEFAULT_POX_2_ACTIVATION + POX_CYCLE_LENGTH,
+  epoch_2_2: Constants.DEVNET_DEFAULT_EPOCH_2_2 + POX_CYCLE_LENGTH,
+  epoch_2_3: Constants.DEVNET_DEFAULT_EPOCH_2_3 + POX_CYCLE_LENGTH,
+  pox_3_activation:
+    Constants.DEVNET_DEFAULT_POX_3_ACTIVATION + POX_CYCLE_LENGTH,
+  epoch_2_4: Constants.DEVNET_DEFAULT_EPOCH_2_4 + POX_CYCLE_LENGTH,
+  epoch_2_5: Constants.DEVNET_DEFAULT_EPOCH_2_5 + POX_CYCLE_LENGTH,
+  pox_4_activation:
+    Constants.DEVNET_DEFAULT_POX_4_ACTIVATION + POX_CYCLE_LENGTH,
+  epoch_3_0: Constants.DEVNET_DEFAULT_EPOCH_3_0 + POX_CYCLE_LENGTH,
+};
+
+export const EPOCH_TIMELINE_LONG_2_1 = {
+  epoch_2_0: Constants.DEVNET_DEFAULT_EPOCH_2_0,
+  epoch_2_05: Constants.DEVNET_DEFAULT_EPOCH_2_05,
+  epoch_2_1: Constants.DEVNET_DEFAULT_EPOCH_2_1,
+  pox_2_activation:
+    Constants.DEVNET_DEFAULT_POX_2_ACTIVATION + 2 * POX_CYCLE_LENGTH,
+  epoch_2_2: Constants.DEVNET_DEFAULT_EPOCH_2_2 + 2 * POX_CYCLE_LENGTH,
+  epoch_2_3: Constants.DEVNET_DEFAULT_EPOCH_2_3 + 2 * POX_CYCLE_LENGTH,
+  pox_3_activation:
+    Constants.DEVNET_DEFAULT_POX_3_ACTIVATION + 2 * POX_CYCLE_LENGTH,
+  epoch_2_4: Constants.DEVNET_DEFAULT_EPOCH_2_4 + 2 * POX_CYCLE_LENGTH,
+  epoch_2_5: Constants.DEVNET_DEFAULT_EPOCH_2_5 + 2 * POX_CYCLE_LENGTH,
+  pox_4_activation:
+    Constants.DEVNET_DEFAULT_POX_4_ACTIVATION + 2 * POX_CYCLE_LENGTH,
+  epoch_3_0: Constants.DEVNET_DEFAULT_EPOCH_3_0 + 2 * POX_CYCLE_LENGTH,
+};
 
 /// This function will fill in any missing epoch values in the timeline
 /// with reasonable block heights.
@@ -82,10 +124,28 @@ function fillTimeline(timeline: EpochTimeline) {
       timeline.epoch_2_3 += POX_CYCLE_LENGTH;
     }
   }
+  if (timeline.pox_3_activation === undefined) {
+    timeline.pox_3_activation = timeline.epoch_2_3 + 1;
+  }
   if (timeline.epoch_2_4 === undefined) {
     timeline.epoch_2_4 = DEFAULT_EPOCH_TIMELINE.epoch_2_4;
     while (timeline.epoch_2_4 <= timeline.epoch_2_3) {
       timeline.epoch_2_4 += POX_CYCLE_LENGTH;
+    }
+  }
+  if (timeline.epoch_2_5 === undefined) {
+    timeline.epoch_2_5 = DEFAULT_EPOCH_TIMELINE.epoch_2_5;
+    while (timeline.epoch_2_5 <= timeline.epoch_2_4) {
+      timeline.epoch_2_5 += POX_CYCLE_LENGTH;
+    }
+  }
+  if (timeline.pox_4_activation === undefined) {
+    timeline.pox_4_activation = timeline.epoch_2_5 + 1;
+  }
+  if (timeline.epoch_3_0 === undefined) {
+    timeline.epoch_3_0 = DEFAULT_EPOCH_TIMELINE.epoch_2_5;
+    while (timeline.epoch_3_0 <= timeline.epoch_2_5) {
+      timeline.epoch_3_0 += POX_CYCLE_LENGTH;
     }
   }
   return timeline;
@@ -95,7 +155,7 @@ export function buildDevnetNetworkOrchestrator(
   networkId: number,
   timeline: EpochTimeline = DEFAULT_EPOCH_TIMELINE,
   logs = false,
-  stacks_node_image_url?: string
+  stacks_node_image_url?: string,
 ) {
   let uuid = Date.now();
   let working_dir = `/tmp/stacks-test-${uuid}-${networkId}`;
@@ -118,6 +178,8 @@ export function buildDevnetNetworkOrchestrator(
       epoch_2_2: full_timeline.epoch_2_2,
       epoch_2_3: full_timeline.epoch_2_3,
       epoch_2_4: full_timeline.epoch_2_4,
+      epoch_2_5: full_timeline.epoch_2_5,
+      epoch_3_0: full_timeline.epoch_3_0,
       bitcoin_controller_automining_disabled: false,
       working_dir,
       use_docker_gateway_routing: process.env.GITHUB_ACTIONS ? true : false,
@@ -128,14 +190,14 @@ export function buildDevnetNetworkOrchestrator(
   };
   let consolidatedConfig = getIsolatedNetworkConfigUsingNetworkId(
     networkId,
-    config
+    config,
   );
   let orchestrator = new DevnetNetworkOrchestrator(consolidatedConfig, 2500);
   return orchestrator;
 }
 
 export const getBitcoinBlockHeight = (
-  chainUpdate: StacksChainUpdate
+  chainUpdate: StacksChainUpdate,
 ): number => {
   let metadata = chainUpdate.new_blocks[0].block
     .metadata! as StacksBlockMetadata;
@@ -144,7 +206,7 @@ export const getBitcoinBlockHeight = (
 
 export const waitForStacksTransaction = async (
   orchestrator: DevnetNetworkOrchestrator,
-  txid: string
+  txid: string,
 ): Promise<[StacksBlockMetadata, StacksTransactionMetadata]> => {
   let { chainUpdate, transaction } =
     await orchestrator.waitForStacksBlockIncludingTransaction(txid);
@@ -158,8 +220,8 @@ export const getNetworkIdFromEnv = (): number => {
   let networkId = process.env.JEST_WORKER_ID
     ? parseInt(process.env.JEST_WORKER_ID!)
     : process.env.VITEST_WORKER_ID
-    ? parseInt(process.env.VITEST_WORKER_ID!)
-    : 1;
+      ? parseInt(process.env.VITEST_WORKER_ID!)
+      : 1;
   return networkId;
 };
 
@@ -179,7 +241,7 @@ const delay = () => new Promise((resolve) => setTimeout(resolve, 2000));
 
 export const getChainInfo = async (
   network: StacksNetwork,
-  retry?: number
+  retry?: number,
 ): Promise<any> => {
   let retryCountdown = retry ? retry : 20;
   if (retryCountdown == 0) return Promise.reject();
@@ -202,7 +264,7 @@ export interface AccountInfo {
 
 export async function asyncExpectStacksTransactionSuccess(
   orchestrator: DevnetNetworkOrchestrator,
-  txid: string
+  txid: string,
 ) {
   let [block, tx] = await waitForStacksTransaction(orchestrator, txid);
   expect(tx.success, tx.result).toBeTruthy();
@@ -224,7 +286,7 @@ export interface BroadcastOptions {
 
 export const broadcastSTXTransfer = async (
   { network, account, fee, nonce }: BroadcastOptions,
-  { recipient, amount }: { recipient: string; amount: number }
+  { recipient, amount }: { recipient: string; amount: number },
 ): Promise<TxBroadcastResult> => {
   const txOptions = {
     recipient,
@@ -247,7 +309,7 @@ export async function deployContract(
   sender: Account,
   nonce: number,
   contractName: string,
-  codeBody: string
+  codeBody: string,
 ) {
   // Build the transaction to deploy the contract
   let deployTxOptions = {

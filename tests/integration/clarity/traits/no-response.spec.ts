@@ -15,27 +15,27 @@ import {
   waitForStacksTransaction,
   getNetworkIdFromEnv,
   getChainInfo,
+  EPOCH_TIMELINE_LONG_2_05,
 } from "../../helpers";
 import { DevnetNetworkOrchestrator } from "@hirosystems/stacks-devnet-js";
 
 describe("use", () => {
   let orchestrator: DevnetNetworkOrchestrator;
   let network: StacksNetwork;
-  const STACKS_2_1_EPOCH = 112;
 
   let networkId: number;
 
   beforeAll(() => {
     networkId = getNetworkIdFromEnv();
     console.log(`network #${networkId}`);
-    orchestrator = buildDevnetNetworkOrchestrator(networkId, {
-      epoch_2_0: 100,
-      epoch_2_05: 102,
-      epoch_2_1: STACKS_2_1_EPOCH,
-      pox_2_activation: 120,
-    });
+    orchestrator = buildDevnetNetworkOrchestrator(
+      networkId,
+      EPOCH_TIMELINE_LONG_2_05,
+    );
     orchestrator.start();
-    network = new StacksTestnet({ url: orchestrator.getStacksNodeUrl() });
+    network = new StacksTestnet({
+      url: orchestrator.getStacksNodeUrl().replace("localhost", "127.0.0.1"),
+    });
   });
 
   afterAll(() => {
@@ -52,7 +52,9 @@ describe("use", () => {
     afterAll(async () => {
       // Make sure this we stayed in 2.05
       let chainInfo = await getChainInfo(network);
-      expect(chainInfo.burn_block_height).toBeLessThanOrEqual(STACKS_2_1_EPOCH);
+      expect(chainInfo.burn_block_height).toBeLessThanOrEqual(
+        EPOCH_TIMELINE_LONG_2_05.epoch_2_1,
+      );
     });
 
     it("publish a trait with an invalid method", async () => {
@@ -81,10 +83,10 @@ describe("use", () => {
       // Wait for the transaction to be processed
       let [block, tx] = await waitForStacksTransaction(
         orchestrator,
-        transaction.txid()
+        transaction.txid(),
       );
       expect(tx.description).toBe(
-        `deployed: ${Accounts.DEPLOYER.stxAddress}.no-response-trait`
+        `deployed: ${Accounts.DEPLOYER.stxAddress}.no-response-trait`,
       );
       expect(tx.success).toBeFalsy();
     });
@@ -94,7 +96,7 @@ describe("use", () => {
     beforeAll(async () => {
       // Wait for 2.1 to go live
       await orchestrator.waitForStacksBlockAnchoredOnBitcoinBlockOfHeight(
-        STACKS_2_1_EPOCH + 1
+        EPOCH_TIMELINE_LONG_2_05.epoch_2_1 + 1,
       );
     });
 
@@ -123,10 +125,10 @@ describe("use", () => {
       // Wait for the transaction to be processed
       let [block, tx] = await waitForStacksTransaction(
         orchestrator,
-        transaction.txid()
+        transaction.txid(),
       );
       expect(tx.description).toBe(
-        `deployed: ${Accounts.DEPLOYER.stxAddress}.no-response-trait-2`
+        `deployed: ${Accounts.DEPLOYER.stxAddress}.no-response-trait-2`,
       );
       expect(tx.success).toBeFalsy();
     });

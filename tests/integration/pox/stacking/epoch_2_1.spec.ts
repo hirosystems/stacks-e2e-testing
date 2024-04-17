@@ -18,7 +18,7 @@ describe("testing stacking under epoch 2.1", () => {
     };
     orchestrator = buildDevnetNetworkOrchestrator(
       getNetworkIdFromEnv(),
-      timeline
+      timeline,
     );
     orchestrator.start();
   });
@@ -28,7 +28,9 @@ describe("testing stacking under epoch 2.1", () => {
   });
 
   it("submitting stacks-stx through pox-2 contract during epoch 2.0 should succeed", async () => {
-    const network = new StacksTestnet({ url: orchestrator.getStacksNodeUrl() });
+    const network = new StacksTestnet({
+      url: orchestrator.getStacksNodeUrl().replace("localhost", "127.0.0.1"),
+    });
 
     // Wait for Stacks genesis block
     await orchestrator.waitForNextStacksBlock();
@@ -37,7 +39,7 @@ describe("testing stacking under epoch 2.1", () => {
     let blockHeight = Constants.DEVNET_DEFAULT_POX_2_ACTIVATION + 1;
     let chainUpdate =
       await orchestrator.waitForStacksBlockAnchoredOnBitcoinBlockOfHeight(
-        blockHeight
+        blockHeight,
       );
 
     // Broadcast some STX stacking orders
@@ -45,19 +47,19 @@ describe("testing stacking under epoch 2.1", () => {
     let cycles = 1;
     let response = await broadcastStackSTX(
       { poxVersion: 2, network, account: Accounts.WALLET_1, fee, nonce: 0 },
-      { amount: 25_000_000_000_000, blockHeight, cycles }
+      { amount: 25_000_000_000_000, blockHeight, cycles },
     );
     expect(response.error).toBeUndefined();
 
     response = await broadcastStackSTX(
       { poxVersion: 2, network, account: Accounts.WALLET_2, fee, nonce: 0 },
-      { amount: 50_000_000_000_000, blockHeight, cycles }
+      { amount: 50_000_000_000_000, blockHeight, cycles },
     );
     expect(response.error).toBeUndefined();
 
     response = await broadcastStackSTX(
       { poxVersion: 2, network, account: Accounts.WALLET_3, fee, nonce: 0 },
-      { amount: 75_000_000_000_000, blockHeight, cycles }
+      { amount: 75_000_000_000_000, blockHeight, cycles },
     );
     expect(response.error).toBeUndefined();
 
@@ -68,6 +70,5 @@ describe("testing stacking under epoch 2.1", () => {
     // Assert
     expect(poxInfo.contract_id).toBe("ST000000000000000000002AMW42H.pox-2");
     expect(poxInfo.current_cycle.is_pox_active).toBe(true);
-    expect(poxInfo.total);
   });
 });

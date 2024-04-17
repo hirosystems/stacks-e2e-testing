@@ -65,7 +65,7 @@ describe("trait implementer deployed in 2.0, trait user deployed in 2.1", () => 
 
   const callReadOnlyTestTraitCallFoo = (
     network: StacksNetwork,
-    { a }: { a: number }
+    { a }: { a: number },
   ) => {
     return callReadOnlyFunction({
       contractName: "test-trait",
@@ -84,7 +84,7 @@ describe("trait implementer deployed in 2.0, trait user deployed in 2.1", () => 
     network: StacksNetwork,
     sender: Account,
     nonce: number,
-    { a }: { a: number }
+    { a }: { a: number },
   ) => {
     let callTxOptions: SignedContractCallOptions = {
       senderKey: sender.secretKey,
@@ -109,7 +109,7 @@ describe("trait implementer deployed in 2.0, trait user deployed in 2.1", () => 
   beforeAll(() => {
     orchestrator = buildDevnetNetworkOrchestrator(
       getNetworkIdFromEnv(),
-      timeline
+      timeline,
     );
     orchestrator.start();
   });
@@ -119,7 +119,9 @@ describe("trait implementer deployed in 2.0, trait user deployed in 2.1", () => 
   });
 
   it("passing a trait parameter should work in Stacks 2.1", async () => {
-    const network = new StacksTestnet({ url: orchestrator.getStacksNodeUrl() });
+    const network = new StacksTestnet({
+      url: orchestrator.getStacksNodeUrl().replace("localhost", "127.0.0.1"),
+    });
 
     await orchestrator.waitForNextStacksBlock();
 
@@ -128,14 +130,14 @@ describe("trait implementer deployed in 2.0, trait user deployed in 2.1", () => 
       Accounts.DEPLOYER,
       0,
       "impl-trait",
-      codeBodyImplTrait
+      codeBodyImplTrait,
     );
     expect(response.error).toBeUndefined();
     await asyncExpectStacksTransactionSuccess(orchestrator, transaction.txid());
 
     // Wait for the 2.1 activation
     await orchestrator.waitForStacksBlockAnchoredOnBitcoinBlockOfHeight(
-      timeline.epoch_2_1
+      timeline.epoch_2_1,
     );
 
     ({ response, transaction } = await deployContract(
@@ -143,7 +145,7 @@ describe("trait implementer deployed in 2.0, trait user deployed in 2.1", () => 
       Accounts.DEPLOYER,
       1,
       "test-trait",
-      codeBodyTestTrait
+      codeBodyTestTrait,
     ));
     expect(response.error).toBeUndefined();
     await asyncExpectStacksTransactionSuccess(orchestrator, transaction.txid());
@@ -153,7 +155,7 @@ describe("trait implementer deployed in 2.0, trait user deployed in 2.1", () => 
     // Call the readonly function
     let output = await callReadOnlyTestTraitFooArg(network);
     expect(output, cvToString(output)).toEqual(
-      contractPrincipalCV(contractAddress, "impl-trait")
+      contractPrincipalCV(contractAddress, "impl-trait"),
     );
 
     // call public function as readonly
@@ -165,30 +167,30 @@ describe("trait implementer deployed in 2.0, trait user deployed in 2.1", () => 
       network,
       Accounts.WALLET_1,
       0,
-      { a: 1 }
+      { a: 1 },
     ));
     expect(response.error).toBeUndefined();
     let [_, tx] = await asyncExpectStacksTransactionSuccess(
       orchestrator,
-      transaction.txid()
+      transaction.txid(),
     );
     expect((tx as StacksTransactionMetadata).result).toEqual("(ok u1)");
   });
 
   it("passing a trait parameter should work in Stacks 2.2", async () => {
     const network = new StacksTestnet({
-      url: orchestrator.getStacksNodeUrl(),
+      url: orchestrator.getStacksNodeUrl().replace("localhost", "127.0.0.1"),
     });
 
     // Wait for the 2.2 activation, then check again
     await orchestrator.waitForStacksBlockAnchoredOnBitcoinBlockOfHeight(
-      timeline.epoch_2_2 + 2
+      timeline.epoch_2_2 + 2,
     );
 
     // Call the readonly function
     let output = await callReadOnlyTestTraitFooArg(network);
     expect(output, cvToString(output)).toEqual(
-      contractPrincipalCV(contractAddress, "impl-trait")
+      contractPrincipalCV(contractAddress, "impl-trait"),
     );
 
     // call public function as readonly
@@ -200,23 +202,23 @@ describe("trait implementer deployed in 2.0, trait user deployed in 2.1", () => 
       network,
       Accounts.WALLET_1,
       1,
-      { a: 2 }
+      { a: 2 },
     );
     expect(response.error).toBeUndefined();
     let [_, tx] = await asyncExpectStacksTransactionSuccess(
       orchestrator,
-      transaction.txid()
+      transaction.txid(),
     );
     expect((tx as StacksTransactionMetadata).result).toEqual("(ok u2)");
   });
 
   it("passing a trait parameter should work in Stacks 2.3", async () => {
     const network = new StacksTestnet({
-      url: orchestrator.getStacksNodeUrl(),
+      url: orchestrator.getStacksNodeUrl().replace("localhost", "127.0.0.1"),
     });
     // Wait for the 2.3 activation, then check again
     await orchestrator.waitForStacksBlockAnchoredOnBitcoinBlockOfHeight(
-      timeline.epoch_2_3 + 2
+      timeline.epoch_2_3 + 2,
     );
 
     // Call the readonly function
@@ -232,12 +234,12 @@ describe("trait implementer deployed in 2.0, trait user deployed in 2.1", () => 
       network,
       Accounts.WALLET_1,
       2,
-      { a: 3 }
+      { a: 3 },
     );
     expect(response.error).toBeUndefined();
     let [_, tx] = await waitForStacksTransaction(
       orchestrator,
-      transaction.txid()
+      transaction.txid(),
     );
     expect(tx.result).toEqual("(ok u3)");
   });

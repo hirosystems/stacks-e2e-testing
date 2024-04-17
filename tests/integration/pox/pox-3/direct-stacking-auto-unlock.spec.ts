@@ -29,7 +29,7 @@ describe("testing solo stacker below minimum", () => {
   beforeAll(() => {
     orchestrator = buildDevnetNetworkOrchestrator(
       getNetworkIdFromEnv(),
-      timeline
+      timeline,
     );
     orchestrator.start();
   });
@@ -39,11 +39,13 @@ describe("testing solo stacker below minimum", () => {
   });
 
   it("stacking above minimum increment should succeed", async () => {
-    const network = new StacksTestnet({ url: orchestrator.getStacksNodeUrl() });
+    const network = new StacksTestnet({
+      url: orchestrator.getStacksNodeUrl().replace("localhost", "127.0.0.1"),
+    });
 
     // Wait for 2.4 to go live
     await orchestrator.waitForStacksBlockAnchoredOnBitcoinBlockOfHeight(
-      timeline.epoch_2_4
+      timeline.epoch_2_4,
     );
     await orchestrator.waitForNextStacksBlock();
 
@@ -60,12 +62,12 @@ describe("testing solo stacker below minimum", () => {
         fee,
         nonce: aliceNonce++,
       },
-      { amount: 80_000_000_000_000, blockHeight, cycles }
+      { amount: 80_000_000_000_000, blockHeight, cycles },
     );
     expect(response.error).toBeUndefined();
     let [block, tx] = await waitForStacksTransaction(
       orchestrator,
-      response.txid
+      response.txid,
     );
     expect(tx.success).toBeTruthy();
 
@@ -78,7 +80,7 @@ describe("testing solo stacker below minimum", () => {
         fee,
         nonce: faucetNonce++,
       },
-      { amount: 999_000_000_000_000, blockHeight, cycles }
+      { amount: 999_000_000_000_000, blockHeight, cycles },
     );
     expect(response.error).toBeUndefined();
 
@@ -96,7 +98,7 @@ describe("testing solo stacker below minimum", () => {
       network,
       Accounts.WALLET_1.stxAddress,
       100_000_000_000_000 - 80_000_000_000_000 - fee,
-      80_000_000_000_000
+      80_000_000_000_000,
     );
 
     // Check Alice's table entry
@@ -104,7 +106,7 @@ describe("testing solo stacker below minimum", () => {
       network,
       3,
       2,
-      Accounts.WALLET_1.stxAddress
+      Accounts.WALLET_1.stxAddress,
     );
     expect(poxAddrInfo0?.["total-ustx"]).toEqual(uintCV(80_000_000_000_000));
 
@@ -113,13 +115,15 @@ describe("testing solo stacker below minimum", () => {
       network,
       3,
       2,
-      Accounts.FAUCET.stxAddress
+      Accounts.FAUCET.stxAddress,
     );
     expect(poxAddrInfo1?.["total-ustx"]).toEqual(uintCV(999_000_000_000_000));
   });
 
   it("Increased slot price should auto-unlock user (cycle #2)", async () => {
-    const network = new StacksTestnet({ url: orchestrator.getStacksNodeUrl() });
+    const network = new StacksTestnet({
+      url: orchestrator.getStacksNodeUrl().replace("localhost", "127.0.0.1"),
+    });
 
     // Wait for block N+5 where N is the height of the next reward phase
     await waitForNextRewardPhase(network, orchestrator, 5);
@@ -132,7 +136,7 @@ describe("testing solo stacker below minimum", () => {
       network,
       Accounts.WALLET_1.stxAddress,
       100_000_000_000_000 - fee,
-      0
+      0,
     );
 
     // Table entries for cycle #2 is cleared for auto-unlocked stackers.
@@ -141,7 +145,7 @@ describe("testing solo stacker below minimum", () => {
       network,
       3,
       2,
-      Accounts.WALLET_1.stxAddress
+      Accounts.WALLET_1.stxAddress,
     );
     expect(poxAddrInfo0).toBeNull();
 
@@ -150,7 +154,7 @@ describe("testing solo stacker below minimum", () => {
       network,
       3,
       2,
-      Accounts.FAUCET.stxAddress
+      Accounts.FAUCET.stxAddress,
     );
     expect(poxAddrInfo1?.["total-ustx"]).toEqual(uintCV(999_000_000_000_000));
   });

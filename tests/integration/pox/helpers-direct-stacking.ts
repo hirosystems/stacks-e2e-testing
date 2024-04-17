@@ -10,10 +10,8 @@ import {
 } from "@stacks/transactions";
 import { Contracts } from "../constants";
 
-import { toBytes } from "@stacks/common";
 import { decodeBtcAddress } from "@stacks/stacking";
 import { BroadcastOptionsPox } from "./helpers";
-const fetch = require("node-fetch");
 
 export const broadcastStackSTX = async (
   { poxVersion, network, account, fee, nonce }: BroadcastOptionsPox,
@@ -21,15 +19,16 @@ export const broadcastStackSTX = async (
     amount,
     blockHeight,
     cycles,
-  }: { amount: number; blockHeight: number; cycles: number }
+  }: { amount: number; blockHeight: number; cycles: number },
 ): Promise<TxBroadcastResult> => {
   const { version, data } = decodeBtcAddress(account.btcAddress);
   const address = {
-    version: bufferCV(toBytes(new Uint8Array([version.valueOf()]))),
+    version: bufferCV(new Uint8Array([version.valueOf()])),
     hashbytes: bufferCV(data),
   };
 
   let poxContract = Contracts.POX[poxVersion] || Contracts.DEFAULT;
+  // todo: generate signature and other args
   const txOptions = {
     contractAddress: poxContract.address,
     contractName: poxContract.name,
@@ -55,7 +54,7 @@ export const broadcastStackSTX = async (
 
 export const broadcastStackIncrease = async (
   { poxVersion, network, account, fee, nonce }: BroadcastOptionsPox,
-  { amount }: { amount: number }
+  { amount }: { amount: number },
 ): Promise<TxBroadcastResult> => {
   let poxContract = Contracts.POX[poxVersion] || Contracts.DEFAULT;
   const txOptions = {
@@ -78,11 +77,11 @@ export const broadcastStackIncrease = async (
 
 export const broadcastStackExtend = async (
   { poxVersion, network, account, fee, nonce }: BroadcastOptionsPox,
-  { cycles }: { cycles: number }
+  { cycles }: { cycles: number },
 ): Promise<TxBroadcastResult> => {
   const { version, data } = decodeBtcAddress(account.btcAddress);
   const address = {
-    version: bufferCV(toBytes(new Uint8Array([version.valueOf()]))),
+    version: bufferCV(new Uint8Array([version.valueOf()])),
     hashbytes: bufferCV(data),
   };
 

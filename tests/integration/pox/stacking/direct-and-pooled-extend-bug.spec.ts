@@ -4,6 +4,7 @@ import { SomeCV, cvToString, uintCV } from "@stacks/transactions";
 import { Accounts, Constants } from "../../constants";
 import {
   DEFAULT_EPOCH_TIMELINE,
+  EPOCH_TIMELINE_LONG_2_1,
   asyncExpectStacksTransactionSuccess,
   broadcastSTXTransfer,
   buildDevnetNetworkOrchestrator,
@@ -28,11 +29,7 @@ describe("testing mixed direct and pooled stacking with extend under epoch 2.1",
   let orchestrator: DevnetNetworkOrchestrator;
   const version = getStacksNodeVersion();
   const fee = 1000;
-  const timeline = {
-    epoch_2_2: 138,
-    epoch_2_3: 142,
-    epoch_2_4: 146,
-  };
+  const timeline = EPOCH_TIMELINE_LONG_2_1;
   let aliceNonce = 0;
   let bobNonce = 0;
   let chloeNonce = 0;
@@ -41,7 +38,7 @@ describe("testing mixed direct and pooled stacking with extend under epoch 2.1",
   beforeAll(() => {
     orchestrator = buildDevnetNetworkOrchestrator(
       getNetworkIdFromEnv(),
-      timeline
+      timeline,
     );
     orchestrator.start();
   });
@@ -51,7 +48,9 @@ describe("testing mixed direct and pooled stacking with extend under epoch 2.1",
   });
 
   it("delegate-stack-extend should extend locking to direct stacker (cycle #1)", async () => {
-    const network = new StacksTestnet({ url: orchestrator.getStacksNodeUrl() });
+    const network = new StacksTestnet({
+      url: orchestrator.getStacksNodeUrl().replace("localhost", "127.0.0.1"),
+    });
 
     // Wait for Stacks genesis block
     await orchestrator.waitForNextStacksBlock();
@@ -70,7 +69,7 @@ describe("testing mixed direct and pooled stacking with extend under epoch 2.1",
         fee,
         nonce: aliceNonce++,
       },
-      { amount: 75_000_000_000_000, blockHeight, cycles }
+      { amount: 75_000_000_000_000, blockHeight, cycles },
     );
     expect(response.error).toBeUndefined();
 
@@ -83,12 +82,12 @@ describe("testing mixed direct and pooled stacking with extend under epoch 2.1",
         fee,
         nonce: aliceNonce++,
       },
-      { amount: 100_000_000_000_000, poolAddress: Accounts.WALLET_2 }
+      { amount: 100_000_000_000_000, poolAddress: Accounts.WALLET_2 },
     );
     expect(response.error).toBeUndefined();
     let [block, tx] = await waitForStacksTransaction(
       orchestrator,
-      response.txid
+      response.txid,
     );
     expect(tx.success, tx.result).toBeTruthy();
 
@@ -105,7 +104,7 @@ describe("testing mixed direct and pooled stacking with extend under epoch 2.1",
         stacker: Accounts.WALLET_1,
         poolRewardAccount: Accounts.WALLET_2,
         extendByCount: 1,
-      }
+      },
     );
     expect(response.error).toBeUndefined();
 
@@ -122,7 +121,7 @@ describe("testing mixed direct and pooled stacking with extend under epoch 2.1",
         fee,
         nonce: bobNonce++,
       },
-      { poolRewardAccount: Accounts.WALLET_2, cycleId: 3 }
+      { poolRewardAccount: Accounts.WALLET_2, cycleId: 3 },
     );
     expect(response.error).toBeUndefined();
 
@@ -141,7 +140,7 @@ describe("testing mixed direct and pooled stacking with extend under epoch 2.1",
       network,
       2,
       2,
-      0
+      0,
     );
     expect(poxAddrInfo0?.["total-ustx"]).toEqual(uintCV(75_000_000_000_000));
 
@@ -150,13 +149,15 @@ describe("testing mixed direct and pooled stacking with extend under epoch 2.1",
       network,
       2,
       2,
-      1
+      1,
     );
     expect(poxAddrInfo1?.["total-ustx"]).toBeUndefined();
   });
 
   it("stacking more should increase the slot price (cycle #1)", async () => {
-    const network = new StacksTestnet({ url: orchestrator.getStacksNodeUrl() });
+    const network = new StacksTestnet({
+      url: orchestrator.getStacksNodeUrl().replace("localhost", "127.0.0.1"),
+    });
 
     const blockHeight = Constants.DEVNET_DEFAULT_POX_2_ACTIVATION + 1;
     const cycles = 1;
@@ -170,7 +171,7 @@ describe("testing mixed direct and pooled stacking with extend under epoch 2.1",
         fee,
         nonce: faucetNonce++,
       },
-      { amount: 900_000_000_000_000, blockHeight, cycles }
+      { amount: 900_000_000_000_000, blockHeight, cycles },
     );
     expect(response.error).toBeUndefined();
 
@@ -186,7 +187,9 @@ describe("testing mixed direct and pooled stacking with extend under epoch 2.1",
   });
 
   it("auto-unlock unlocks directly stacked amount and total_stacked is not updated (BUG) (cycle #2)", async () => {
-    const network = new StacksTestnet({ url: orchestrator.getStacksNodeUrl() });
+    const network = new StacksTestnet({
+      url: orchestrator.getStacksNodeUrl().replace("localhost", "127.0.0.1"),
+    });
 
     // Wait for Stacks genesis block
     await orchestrator.waitForNextStacksBlock();
@@ -209,7 +212,7 @@ describe("testing mixed direct and pooled stacking with extend under epoch 2.1",
       network,
       2,
       2,
-      0
+      0,
     );
     expect(poxAddrInfo0?.["total-ustx"]).toEqual(uintCV(75_000_000_000_000));
 
@@ -218,11 +221,11 @@ describe("testing mixed direct and pooled stacking with extend under epoch 2.1",
       network,
       2,
       2,
-      1
+      1,
     );
     expect(poxAddrInfo1?.["total-ustx"]).toEqual(uintCV(900_000_000_000_000));
     expect(cvToString((poxAddrInfo1?.stacker as SomeCV).value)).toEqual(
-      Accounts.FAUCET.stxAddress
+      Accounts.FAUCET.stxAddress,
     );
     // Check Alice's table entry for cycle 3
     poxAddrInfo0 = await readRewardCyclePoxAddressListAtIndex(network, 2, 3, 0);
@@ -236,12 +239,14 @@ describe("testing mixed direct and pooled stacking with extend under epoch 2.1",
       network,
       Accounts.WALLET_1.stxAddress,
       100_000_000_000_000 - fee * 2,
-      0
+      0,
     );
   });
 
   it("stacking by other user should activate pox for cycle #3 (cycle #2)", async () => {
-    const network = new StacksTestnet({ url: orchestrator.getStacksNodeUrl() });
+    const network = new StacksTestnet({
+      url: orchestrator.getStacksNodeUrl().replace("localhost", "127.0.0.1"),
+    });
     const blockHeight = Constants.DEVNET_DEFAULT_POX_2_ACTIVATION + 11;
     const cycles = 1;
 
@@ -254,7 +259,7 @@ describe("testing mixed direct and pooled stacking with extend under epoch 2.1",
         fee,
         nonce: chloeNonce++,
       },
-      { amount: 80_000_000_000_000, blockHeight, cycles }
+      { amount: 80_000_000_000_000, blockHeight, cycles },
     );
     expect(response.error).toBeUndefined();
     await asyncExpectStacksTransactionSuccess(orchestrator, response.txid);
@@ -265,7 +270,9 @@ describe("testing mixed direct and pooled stacking with extend under epoch 2.1",
   });
 
   it("unlocked amount should be still unlocked, but STX are earning (BUG) (cycle #3)", async () => {
-    const network = new StacksTestnet({ url: orchestrator.getStacksNodeUrl() });
+    const network = new StacksTestnet({
+      url: orchestrator.getStacksNodeUrl().replace("localhost", "127.0.0.1"),
+    });
 
     // Wait for Stacks genesis block
     await orchestrator.waitForNextStacksBlock();
@@ -287,7 +294,7 @@ describe("testing mixed direct and pooled stacking with extend under epoch 2.1",
       network,
       2,
       3,
-      0
+      0,
     );
     expect(poxAddrInfo0?.["total-ustx"]).toEqual(uintCV(75_000_000_000_000));
 
@@ -296,11 +303,11 @@ describe("testing mixed direct and pooled stacking with extend under epoch 2.1",
       network,
       2,
       3,
-      1
+      1,
     );
     expect(poxAddrInfo1?.["total-ustx"]).toEqual(uintCV(80_000_000_000_000));
     expect(cvToString((poxAddrInfo1?.stacker as SomeCV).value)).toEqual(
-      Accounts.WALLET_3.stxAddress
+      Accounts.WALLET_3.stxAddress,
     );
 
     // THIS IS A BUG
@@ -309,7 +316,7 @@ describe("testing mixed direct and pooled stacking with extend under epoch 2.1",
       network,
       Accounts.WALLET_1.stxAddress,
       100_000_000_000_000 - fee * 2,
-      0
+      0,
     );
   });
 
@@ -318,11 +325,13 @@ describe("testing mixed direct and pooled stacking with extend under epoch 2.1",
     if (Number(version) < 2.2) {
       return;
     }
-    const network = new StacksTestnet({ url: orchestrator.getStacksNodeUrl() });
+    const network = new StacksTestnet({
+      url: orchestrator.getStacksNodeUrl().replace("localhost", "127.0.0.1"),
+    });
 
     // Wait for 2.2 activation and unlock
     await orchestrator.waitForStacksBlockAnchoredOnBitcoinBlockOfHeight(
-      timeline.epoch_2_2 + 2
+      timeline.epoch_2_2 + 2,
     );
 
     // Check Alice's account info
@@ -330,7 +339,7 @@ describe("testing mixed direct and pooled stacking with extend under epoch 2.1",
       network,
       Accounts.WALLET_1.stxAddress,
       100_000_000_000_000 - aliceNonce * fee,
-      0
+      0,
     );
 
     // Verify that Alice's STX are really unlocked by doing a transfer
@@ -339,7 +348,7 @@ describe("testing mixed direct and pooled stacking with extend under epoch 2.1",
       {
         amount: 100_000_000_000_000 - aliceNonce * fee,
         recipient: Accounts.WALLET_3.stxAddress,
-      }
+      },
     );
     await asyncExpectStacksTransactionSuccess(orchestrator, response.txid);
 
@@ -348,7 +357,7 @@ describe("testing mixed direct and pooled stacking with extend under epoch 2.1",
       network,
       Accounts.WALLET_2.stxAddress,
       100_000_000_000_000 - bobNonce * fee,
-      0
+      0,
     );
 
     // Verify that Bob's STX are really unlocked by doing a transfer
@@ -357,7 +366,7 @@ describe("testing mixed direct and pooled stacking with extend under epoch 2.1",
       {
         amount: 100_000_000_000_000 - bobNonce * fee,
         recipient: Accounts.WALLET_3.stxAddress,
-      }
+      },
     );
     await asyncExpectStacksTransactionSuccess(orchestrator, response.txid);
   });
@@ -365,13 +374,13 @@ describe("testing mixed direct and pooled stacking with extend under epoch 2.1",
   it("PoX should stay disabled indefinitely in 2.2 and 2.3", async () => {
     if (version === "2.2" || version === "2.3") {
       const network = new StacksTestnet({
-        url: orchestrator.getStacksNodeUrl(),
+        url: orchestrator.getStacksNodeUrl().replace("localhost", "127.0.0.1"),
       });
       let poxInfo = await getPoxInfo(network);
       await waitForNextRewardPhase(
         network,
         orchestrator,
-        poxInfo.current_cycle.id + 1
+        poxInfo.current_cycle.id + 1,
       );
 
       poxInfo = await getPoxInfo(network);

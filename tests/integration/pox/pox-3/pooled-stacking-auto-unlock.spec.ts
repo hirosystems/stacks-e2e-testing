@@ -36,7 +36,7 @@ describe("testing pooled stacking with auto unlock", () => {
   beforeAll(() => {
     orchestrator = buildDevnetNetworkOrchestrator(
       getNetworkIdFromEnv(),
-      timeline
+      timeline,
     );
     orchestrator.start();
   });
@@ -46,11 +46,13 @@ describe("testing pooled stacking with auto unlock", () => {
   });
 
   it("STX delegation and locking by pool operator should register STX for rewards", async () => {
-    const network = new StacksTestnet({ url: orchestrator.getStacksNodeUrl() });
+    const network = new StacksTestnet({
+      url: orchestrator.getStacksNodeUrl().replace("localhost", "127.0.0.1"),
+    });
 
     // Wait for 2.4 to go live
     await orchestrator.waitForStacksBlockAnchoredOnBitcoinBlockOfHeight(
-      timeline.epoch_2_4
+      timeline.epoch_2_4,
     );
     await orchestrator.waitForNextStacksBlock();
 
@@ -67,7 +69,7 @@ describe("testing pooled stacking with auto unlock", () => {
         fee,
         nonce: aliceNonce++,
       },
-      { amount: 90_000_000_000_000, poolAddress: Accounts.WALLET_3 }
+      { amount: 90_000_000_000_000, poolAddress: Accounts.WALLET_3 },
     );
     expect(response.error).toBeUndefined();
 
@@ -80,7 +82,7 @@ describe("testing pooled stacking with auto unlock", () => {
         fee,
         nonce: bobNonce++,
       },
-      { amount: 95_000_000_000_000, poolAddress: Accounts.WALLET_3 }
+      { amount: 95_000_000_000_000, poolAddress: Accounts.WALLET_3 },
     );
     expect(response.error).toBeUndefined();
 
@@ -99,13 +101,13 @@ describe("testing pooled stacking with auto unlock", () => {
         poolRewardAccount: Accounts.WALLET_3,
         startBurnHeight: Constants.DEVNET_DEFAULT_POX_2_ACTIVATION + 6,
         lockPeriodCycles: 1,
-      }
+      },
     );
     expect(response.error).toBeUndefined();
 
     let [block, tx] = await waitForStacksTransaction(
       orchestrator,
-      response.txid
+      response.txid,
     );
     expect(tx.success).toBeTruthy();
 
@@ -118,7 +120,7 @@ describe("testing pooled stacking with auto unlock", () => {
         fee,
         nonce: chloeNonce++,
       },
-      { poolRewardAccount: Accounts.WALLET_3, cycleId: 2 }
+      { poolRewardAccount: Accounts.WALLET_3, cycleId: 2 },
     );
     expect(response.error).toBeUndefined();
 
@@ -136,7 +138,7 @@ describe("testing pooled stacking with auto unlock", () => {
       network,
       3,
       2,
-      0
+      0,
     );
     expect(poxAddrInfo0?.["total-ustx"]).toEqual(uintCV(80_000_000_000_000));
 
@@ -149,7 +151,7 @@ describe("testing pooled stacking with auto unlock", () => {
         fee,
         nonce: faucetNonce++,
       },
-      { amount: 999_000_000_000_000, blockHeight, cycles }
+      { amount: 999_000_000_000_000, blockHeight, cycles },
     );
     expect(response.error).toBeUndefined();
 
@@ -168,7 +170,7 @@ describe("testing pooled stacking with auto unlock", () => {
       network,
       Accounts.WALLET_1.stxAddress,
       100_000_000_000_000 - 80_000_000_000_000 - fee,
-      80_000_000_000_000
+      80_000_000_000_000,
     );
 
     // Check Pool's table entry
@@ -178,11 +180,11 @@ describe("testing pooled stacking with auto unlock", () => {
       cvToString(
         tupleCV({
           hashbytes: bufferCV(
-            hexToBytes("a5180cc1ff6050df53f0ab766d76b630e14feb0c")
+            hexToBytes("a5180cc1ff6050df53f0ab766d76b630e14feb0c"),
           ),
           version: bufferCV(new Uint8Array([0])),
-        })
-      )
+        }),
+      ),
     );
 
     // Check Faucets's table entry
@@ -190,13 +192,15 @@ describe("testing pooled stacking with auto unlock", () => {
       network,
       3,
       2,
-      Accounts.FAUCET.stxAddress
+      Accounts.FAUCET.stxAddress,
     );
     expect(poxAddrInfo1?.["total-ustx"]).toEqual(uintCV(999_000_000_000_000));
   });
 
   it("Increased slot price should auto-unlock pool (cycle #2)", async () => {
-    const network = new StacksTestnet({ url: orchestrator.getStacksNodeUrl() });
+    const network = new StacksTestnet({
+      url: orchestrator.getStacksNodeUrl().replace("localhost", "127.0.0.1"),
+    });
 
     // Wait for block N+5 where N is the height of the next reward phase
     await waitForNextRewardPhase(network, orchestrator, 5);
@@ -211,7 +215,7 @@ describe("testing pooled stacking with auto unlock", () => {
       network,
       Accounts.WALLET_1.stxAddress,
       100_000_000_000_000 - 80_000_000_000_000 - fee,
-      80_000_000_000_000
+      80_000_000_000_000,
     );
 
     // Table entries for cycle #2 is cleared due to auto unlocked.
@@ -220,7 +224,7 @@ describe("testing pooled stacking with auto unlock", () => {
       network,
       3,
       2,
-      0
+      0,
     );
     expect(poxAddrInfo0?.["total-ustx"]).toEqual(uintCV(80_000_000_000_000));
 
@@ -229,13 +233,15 @@ describe("testing pooled stacking with auto unlock", () => {
       network,
       3,
       2,
-      Accounts.FAUCET.stxAddress
+      Accounts.FAUCET.stxAddress,
     );
     expect(poxAddrInfo1?.["total-ustx"]).toEqual(uintCV(999_000_000_000_000));
   });
 
   it("stackers below minimum should not have received any rewards (cycle #3)", async () => {
-    const network = new StacksTestnet({ url: orchestrator.getStacksNodeUrl() });
+    const network = new StacksTestnet({
+      url: orchestrator.getStacksNodeUrl().replace("localhost", "127.0.0.1"),
+    });
 
     // Wait for block N+5 where N is the height of the next reward phase
     await waitForNextRewardPhase(network, orchestrator, 5);

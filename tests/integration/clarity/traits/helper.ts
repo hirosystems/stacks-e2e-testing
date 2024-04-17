@@ -32,11 +32,11 @@ export const load_versioned = async (
   network: StacksNetwork,
   orchestrator: DevnetNetworkOrchestrator,
   version?: number,
-  suffix?: string
+  suffix?: string,
 ): Promise<Result<StacksTransactionMetadata>> => {
   let codeBody = fs.readFileSync(
     `tests/integration/clarity/traits/contracts/${contractName}.clar`,
-    "utf8"
+    "utf8",
   );
 
   // Build the transaction to deploy the contract
@@ -66,7 +66,7 @@ export const load_versioned = async (
   // Wait for the transaction to be processed
   let [_, tx] = await waitForStacksTransaction(
     orchestrator,
-    transaction.txid()
+    transaction.txid(),
   );
   if (!tx.success) {
     return { ok: false, error: Error(tx.description) };
@@ -83,7 +83,7 @@ export const contract_call = async (
   functionArgs: ClarityValue[],
   nonce: number,
   network: StacksNetwork,
-  orchestrator: DevnetNetworkOrchestrator
+  orchestrator: DevnetNetworkOrchestrator,
 ): Promise<Result<StacksTransactionMetadata>> => {
   // Build a transaction to call the contract
   let callTxOptions: SignedContractCallOptions = {
@@ -112,7 +112,7 @@ export const contract_call = async (
   // Wait for the transaction to be processed
   let [_, tx] = await waitForStacksTransaction(
     orchestrator,
-    transaction.txid()
+    transaction.txid(),
   );
   if (!tx.success) {
     return { ok: false, error: Error(tx.description) };
