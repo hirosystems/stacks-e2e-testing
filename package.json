@@ -11,7 +11,7 @@
     "fmt": "./node_modules/.bin/prettier --write ."
   },
   "dependencies": {
-    "@hirosystems/stacks-devnet-js": "^2.5.0",
+    "@hirosystems/stacks-devnet-js": "^2.5.1",
     "@noble/hashes": "^1.4.0",
     "@noble/secp256k1": "^2.1.0",
     "@scure/base": "^1.1.6",

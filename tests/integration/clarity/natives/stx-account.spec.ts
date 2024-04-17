@@ -20,7 +20,7 @@ import {
   getBitcoinBlockHeight,
   waitForStacksTransaction,
   getNetworkIdFromEnv,
-  getChainInfo,
+  EPOCH_TIMELINE_LONG_2_1,
 } from "../../helpers";
 import { principalCV } from "@stacks/transactions/dist/clarity/types/principalCV";
 import { broadcastStackSTX } from "../../pox/helpers-direct-stacking";
@@ -34,9 +34,10 @@ describe("stx-account", () => {
   beforeAll(() => {
     networkId = getNetworkIdFromEnv();
     console.log(`network #${networkId}`);
-    orchestrator = buildDevnetNetworkOrchestrator(networkId, {
-      epoch_2_2: 300,
-    });
+    orchestrator = buildDevnetNetworkOrchestrator(
+      networkId,
+      EPOCH_TIMELINE_LONG_2_1,
+    );
     orchestrator.start();
     network = new StacksTestnet({
       url: orchestrator.getStacksNodeUrl().replace("localhost", "127.0.0.1"),
@@ -332,11 +333,11 @@ describe("stx-account", () => {
     });
 
     it("returns expected results when stacking", async () => {
-      // Wait for block N-2 where N is the height of the next prepare phase
+      // Wait for block N-3 where N is the height of the next prepare phase
       let chainUpdate = await waitForNextPreparePhase(
         network,
         orchestrator,
-        -2,
+        -3,
       );
       let blockHeight = getBitcoinBlockHeight(chainUpdate);
 

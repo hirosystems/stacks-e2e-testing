@@ -439,10 +439,10 @@
   resolved "https://registry.yarnpkg.com/@hirosystems/chainhook-types/-/chainhook-types-1.1.2.tgz#9e6788c6c74f3dc2bee64b7f97f1b5cd4c2db1cb"
   integrity sha512-klQDKRyiPqF9fgDetMLTPMcB4A/+Vo7px74RbzzvmnCSDMPQua0DD5zhfuo12Ga3pexFFoIftIqnSjWvjncKNQ==
 
-"@hirosystems/stacks-devnet-js@^2.5.0":
-  version "2.5.0"
-  resolved "https://registry.yarnpkg.com/@hirosystems/stacks-devnet-js/-/stacks-devnet-js-2.5.0.tgz#7b64720ec5dadb1183c3df4471771b78c9eb2888"
-  integrity sha512-yMJELdpMhxBgIKpPQjbMCmDCXM+8Ytq5od0Mtx5gHKLbQ0R4TsFBJ6456MVQX4M8Hw9nA0rFtPVGVt4ddpMGDw==
+"@hirosystems/stacks-devnet-js@^2.5.1":
+  version "2.5.1"
+  resolved "https://registry.yarnpkg.com/@hirosystems/stacks-devnet-js/-/stacks-devnet-js-2.5.1.tgz#be2b6d075da1bc0fdefa30d29e01b254e119f71b"
+  integrity sha512-DTICeqHr8mMLHaMEF9/LxkgNZShABH4miGYQ36HfxuhCKbAodyy4vmAvOMkmG4ruuPQeLa9DvfV/3WHWcqu3PQ==
   dependencies:
     "@hirosystems/chainhook-types" "^1.1.2"
     "@mapbox/node-pre-gyp" "^1.0.8"

@@ -21,7 +21,7 @@ describe("chain-id", () => {
   let orchestrator: DevnetNetworkOrchestrator;
   let network: StacksNetwork;
 
-  let networkId: number;
+  let networkId: number; // todo: remove these
 
   beforeAll(() => {
     networkId = getNetworkIdFromEnv();
