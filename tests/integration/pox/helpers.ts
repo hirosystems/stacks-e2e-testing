@@ -287,7 +287,7 @@ export const readStackingStateForAddress = async (
     "stacking-state"
   );
   const keyValue = tupleCV({
-    "stacker": principalCV(address),
+    stacker: principalCV(address),
   });
   const response = await network.fetchFn(url, {
     method: "POST",

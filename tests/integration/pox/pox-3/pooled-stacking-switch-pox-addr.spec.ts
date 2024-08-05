@@ -21,13 +21,13 @@ import {
   getPoxInfo,
   readRewardCyclePoxAddressForAddress,
   readRewardCyclePoxAddressListAtIndex,
-  waitForNextRewardPhase
+  waitForNextRewardPhase,
 } from "../helpers";
 import {
   broadcastDelegateSTX,
   broadcastDelegateStackExtend,
   broadcastDelegateStackSTX,
-  broadcastStackAggregationCommitIndexed
+  broadcastStackAggregationCommitIndexed,
 } from "../helpers-pooled-stacking";
 
 describe("testing pooled stacking for sbtc mini under epoch 2.4", () => {
