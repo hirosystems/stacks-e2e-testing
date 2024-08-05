@@ -1,9 +1,20 @@
 name: Stacks 2.1 CI
 
-on: [push]
+on:
+  push:
+    branches:
+      - 'devnet-test'
+  workflow_dispatch:
+    inputs:
+      clarinet_version:
+        description: 'Clarinet version to use'
+        required: true
+        default: 'v2.8.0'
+
 
 env:
   CI: 1
+  CLARINET_VERSION: ${{ github.event.inputs.clarinet_version || 'v2.8.0' }}
 
 jobs:
   pre_run:
@@ -14,7 +25,42 @@ jobs:
         uses: styfle/cancel-workflow-action@ad6cb1b847ffb509a69b745b6ee2f1d14dfe14b8
         with:
           access_token: ${{ github.token }}
-          persist-credentials: false
+  start-devnet:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Install Clarinet
+      run: |
+        wget -nv https://github.com/hirosystems/clarinet/releases/download/${{ env.CLARINET_VERSION }}/clarinet-linux-x64-glibc.tar.gz -O clarinet-linux-x64.tar.gz
+        tar -xf clarinet-linux-x64.tar.gz
+        chmod +x ./clarinet
+        sudo mv ./clarinet /usr/local/bin
+        clarinet --version
+
+    - name: Start Clarinet Devnet in Background
+      run: |
+        clarinet devnet start --no-dashboard --manifest-path ${{ github.workspace }}/Clarinet.toml > devnet.log 2>&1 &
+        echo $! > devnet.pid
+        sleep 10  # Give the devnet some time to start up
+
+    - name: Check if Devnet is Running
+      run: |
+        if [ -f devnet.pid ]; then
+          if kill -0 $(cat devnet.pid) 2>/dev/null; then
+            echo "Devnet process is running"
+            tail -n 20 devnet.log
+          else
+            echo "Devnet process is not running"
+            cat devnet.log
+            exit 1
+          fi
+        else
+          echo "devnet.pid file not found"
+          exit 1
+        fi
+
   run:
     name: Run integration tests
     runs-on: ubuntu-latest
